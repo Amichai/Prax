@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" ?>
+<Dictionary>
+	<Words>
+		<!--<Unrecognized>
+			<Word>cb</Word>
+		</Unrecognized>-->
+		<Recognized>
+			<Word>Prax</Word>
+			<Word>Mvc</Word>
+		</Recognized>
+		<!--<Deprecated>
+			<Term PreferredAlternate="EnterpriseServices">ComPlus</Term>
+		</Deprecated>-->
+	</Words>
+	<Acronyms>
+		<CasingExceptions>
+			<Acronym>Ce</Acronym>
+		</CasingExceptions>
+	</Acronyms>
+</Dictionary>

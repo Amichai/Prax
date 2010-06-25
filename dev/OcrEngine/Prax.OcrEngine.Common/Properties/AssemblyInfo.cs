@@ -6,7 +6,7 @@ using System;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Prax.OcrEngine.ScanWorker")]
+[assembly: AssemblyTitle("Prax.OcrEngine.Common")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Praxiteles Algorithm Design")]
@@ -21,7 +21,7 @@ using System;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("6262d27e-5ab7-4d75-b752-d999a095b256")]
+[assembly: Guid("079f17ac-76da-4174-bfac-139f64a67c0a")]
 
 // Version information for an assembly consists of the following four values:
 //

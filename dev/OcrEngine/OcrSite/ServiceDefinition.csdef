@@ -8,9 +8,11 @@
       <Setting name="DiagnosticsConnectionString" />
     </ConfigurationSettings>
   </WebRole>
-  <WorkerRole name="Prax.OcrEngine.ScanWorker">
+  <WorkerRole name="Prax.OcrEngine.ScanWorker" enableNativeCodeExecution="false">
     <ConfigurationSettings>
       <Setting name="DiagnosticsConnectionString" />
     </ConfigurationSettings>
+    <LocalResources>
+    </LocalResources>
   </WorkerRole>
 </ServiceDefinition>

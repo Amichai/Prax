@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="Prax Websites" Description="Contains rules that our website projects ought to pass.&#xD;&#xA;&#xD;&#xA;Some rules are not applicable to website projects and are excluded by this ruleset." ToolsVersion="10.0">
+  <Include Path="prax.ruleset" Action="Default" />
+  <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1020" Action="None" />
+    <Rule Id="CA1054" Action="None" />
+  </Rules>
+</RuleSet>
