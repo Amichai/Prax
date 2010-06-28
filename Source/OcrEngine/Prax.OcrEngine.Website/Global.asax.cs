@@ -13,6 +13,12 @@ namespace Prax.OcrEngine.Website {
 		public static void RegisterRoutes(RouteCollection routes) {
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+			routes.MapRoute("Content pages",
+							"{action}",
+							new { controller = "Content", action = "Home" },
+							new { action = new ValueListConstraint(Controllers.ContentController.Pages) }
+			);
+
 			routes.MapRoute(
 				"Default", // Route name
 				"{controller}/{action}/{id}", // URL with parameters
@@ -27,4 +33,13 @@ namespace Prax.OcrEngine.Website {
 			RegisterRoutes(RouteTable.Routes);
 		}
 	}
+	class ValueListConstraint : IRouteConstraint {
+		readonly IEnumerable<string> allowedValues;
+		public ValueListConstraint(IEnumerable<string> allowedValues) { this.allowedValues = allowedValues; }
+
+		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
+			return allowedValues.Contains((string)values[parameterName], StringComparer.OrdinalIgnoreCase);
+		}
+	}
+
 }

@@ -1,0 +1,58 @@
+﻿body {
+	font-family: "Calibri" , Verdana, Arial, sans-serif;
+}
+.TopBar {
+	width: 100%;
+	border-bottom: solid 1px black;
+	margin-bottom: 5px;
+	overflow: hidden; /*Force bar to account for floats when sizing */
+}
+.TopBar ul.Menu li {
+	float: left;
+	border-right: solid 1px black;
+}
+.TopBar ul.Menu li a {
+	padding: 2px 6px;
+	display: block;
+	color: Blue;
+}
+.TopBar ul.Menu li a:hover {
+	display: block;
+	background: DodgerBlue;
+	color: Black;
+}
+.TopBar ul.Menu li.Current {
+	background-color: Blue;
+}
+.TopBar ul.Menu li.Current a {
+	font-weight: bold;
+	text-decoration: none;
+	color: White;
+}
+div.Content {
+	margin: 0 auto;
+	text-align: left;
+	width: 700px;
+}
+div.Content .Logo {
+	width: 180px;
+	height: 180px;
+	line-height: 180px;
+	font-size: 65px;
+	text-align: center;
+	background-color: LightGray;
+	border: outset blue 3px;
+	margin: 14px auto 50px auto;
+}
+h1, h2, h3, h4, h5, h6 {
+	margint-top: 1.5em;
+}
+h1 {
+	font-size: 2em;
+	border-bottom: solid 1px black;
+	margin-bottom: 10px;
+}
+h2 {
+	font-size: 1.75em;
+	font-weight: bold;
+}
