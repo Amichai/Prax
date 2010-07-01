@@ -1,38 +1,13 @@
-﻿body {
+﻿html, body {
 	font-family: "Calibri" , Verdana, Arial, sans-serif;
-}
-.TopBar {
-	width: 100%;
-	border-bottom: solid 1px black;
-	margin-bottom: 5px;
-	overflow: hidden; /*Force bar to account for floats when sizing */
-}
-.TopBar ul.Menu li {
-	float: left;
-	border-right: solid 1px black;
-}
-.TopBar ul.Menu li a {
-	padding: 2px 6px;
-	display: block;
-	color: Blue;
-}
-.TopBar ul.Menu li a:hover {
-	display: block;
-	background: DodgerBlue;
-	color: Black;
-}
-.TopBar ul.Menu li.Current {
-	background-color: Blue;
-}
-.TopBar ul.Menu li.Current a {
-	font-weight: bold;
-	text-decoration: none;
-	color: White;
+	height: 100%;
+	overflow: hidden;
 }
 div.Content {
 	margin: 0 auto;
 	text-align: left;
 	width: 700px;
+	margin-bottom: 30px;
 }
 div.Content .Logo {
 	width: 180px;
@@ -45,7 +20,7 @@ div.Content .Logo {
 	margin: 14px auto 50px auto;
 }
 h1, h2, h3, h4, h5, h6 {
-	margint-top: 1.5em;
+	margin-top: 1.5em;
 }
 h1 {
 	font-size: 2em;
@@ -55,4 +30,21 @@ h1 {
 h2 {
 	font-size: 1.75em;
 	font-weight: bold;
+}
+div.Footer {
+	position: absolute;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background: LightGray;
+	border-top: solid 2px black;
+	padding: 7px 0 9px;
+	text-align: center;
+}
+div.Footer .Links a {
+	padding: 4px 8px;
+	color: Blue;
+}
+div.Footer .Links {
+	margin-bottom: 5px;
 }

@@ -97,6 +97,7 @@
     <Content Include="Views\Content\Contact.aspx" />
     <Content Include="Views\Content\FAQ.aspx" />
     <Content Include="Views\Content\Home.aspx" />
+    <Content Include="Views\Content\Privacy.aspx" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -130,7 +131,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Prax.snk" />
-    <Content Include="Web.sitemap" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

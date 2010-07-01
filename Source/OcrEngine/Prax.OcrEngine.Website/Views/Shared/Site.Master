@@ -8,24 +8,24 @@
 				Prax OCR</asp:ContentPlaceHolder>
 		</title>
 		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.1.1/build/cssreset/reset-min.css" />
-		<%--<link href="<%=ResolveUrl(@"~/Content/CSS/YUI-Reset.css") %>" rel="stylesheet" type="text/css" />--%>
-		<link href="<%=ResolveUrl(@"~/Content/CSS/Site.css") %>" rel="stylesheet" type="text/css" />
+		<%--<link href="<%=Url.Content(@"~/Content/CSS/YUI-Reset.css") %>" rel="stylesheet" type="text/css" />--%>
+		<link href="<%=Url.Content(@"~/Content/CSS/Site.css") %>" rel="stylesheet" type="text/css" />
 		<asp:ContentPlaceHolder runat="server" ID="HeadContent" />
 	</head>
 
 	<body>
-		<div class="TopBar">
-			<ul class="Menu">
-				<%foreach (SiteMapNode menuItem in SiteMap.RootNode.ChildNodes) {%>
-				<li class="<%=menuItem == SiteMap.CurrentNode ? "MenuItem Current" : "MenuItem" %>">
-					<a href="<%=Html.AttributeEncode(menuItem.Url) %>" title="<%=Html.AttributeEncode(menuItem.Description) %>">
-						<%=Html.Encode(menuItem.Title) %></a> </li>
-				<%} %>
-			</ul>
-		</div>
 		<div class="Content">
 			<div class="Logo">Logo</div>
 			<asp:ContentPlaceHolder runat="server" ID="MainContent" />
+		</div>
+		<div class="Footer">
+			<div class="Links">
+				<%=Html.ActionLink("FAQ", "FAQ", "Content")%>
+				<%=Html.ActionLink("About Prax", "About", "Content")%>
+				<%=Html.ActionLink("Privacy Policy", "Privacy", "Content") %>
+				<%=Html.ActionLink("Contact Us", "Contact", "Content") %></div>
+			<div>Copyright ©
+				<%=DateTime.Now.Year %> Praxiteles Algorithm Design</div>
 		</div>
 	</body>
 
