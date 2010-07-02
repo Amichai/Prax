@@ -10,14 +10,9 @@ div.Content {
 	margin-bottom: 30px;
 }
 div.Content .Logo {
-	width: 180px;
-	height: 180px;
-	line-height: 180px;
-	font-size: 65px;
+	display: block;
+	margin: 30px auto 15px;
 	text-align: center;
-	background-color: LightGray;
-	border: outset blue 3px;
-	margin: 14px auto 50px auto;
 }
 h1, h2, h3, h4, h5, h6 {
 	margin-top: 1.5em;

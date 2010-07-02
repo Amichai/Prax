@@ -14,8 +14,8 @@
 	</head>
 
 	<body>
-		<div class="Content">
-			<div class="Logo">Logo</div>
+		<div class="Content"><a href="/" class="Logo">
+			<img src="<%=Url.Content(@"~/Content/Images/Logo.png") %>" alt="Prax" /></a>
 			<asp:ContentPlaceHolder runat="server" ID="MainContent" />
 		</div>
 		<div class="Footer">
@@ -25,7 +25,8 @@
 				<%=Html.ActionLink("Privacy Policy", "Privacy", "Content") %>
 				<%=Html.ActionLink("Contact Us", "Contact", "Content") %></div>
 			<div>Copyright ©
-				<%=DateTime.Now.Year %> Praxiteles Algorithm Design</div>
+				<%=DateTime.Now.Year %>
+				Praxiteles Algorithm Design LLC</div>
 		</div>
 	</body>
 
