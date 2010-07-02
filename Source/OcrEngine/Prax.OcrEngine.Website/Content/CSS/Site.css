@@ -11,8 +11,10 @@ div.Content {
 }
 div.Content .Logo {
 	display: block;
-	margin: 30px auto 15px;
 	text-align: center;
+	width: 240px;
+	padding: 2px 25px;
+	margin: 20px auto;
 }
 h1, h2, h3, h4, h5, h6 {
 	margin-top: 1.5em;
