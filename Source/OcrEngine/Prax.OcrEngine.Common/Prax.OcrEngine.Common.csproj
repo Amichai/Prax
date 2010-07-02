@@ -8,7 +8,7 @@
     <ProjectGuid>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Prax.OcrEngine.Common</RootNamespace>
+    <RootNamespace>Prax.OcrEngine</RootNamespace>
     <AssemblyName>Prax.OcrEngine.Common</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

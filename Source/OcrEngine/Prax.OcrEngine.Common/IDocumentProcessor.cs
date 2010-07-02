@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading;
 
-namespace Prax.OcrEngine.Common {
+namespace Prax.OcrEngine{
 	///<summary>Performs OCR processing.</summary>
 	public interface IDocumentProcessor {
 		//Amichai: Your main class should implement this interface.
@@ -35,14 +35,17 @@ namespace Prax.OcrEngine.Common {
 		//them as properties in this interface.
 	}
 	public class DummyProcesor : IDocumentProcessor {
-		static readonly Random Rand = new Random();
+		[ThreadStatic]
+		static Random rand;
 		///<summary>Does nothing for a while.</summary>
 		public void ProcessDocument(Stream document) {
 			IsProcessing = true;
+			if (rand == null)
+				rand = new Random(Thread.CurrentThread.ManagedThreadId ^ Environment.TickCount);
 
-			MaximumProgress = Rand.Next(15, 45);
+			MaximumProgress = rand.Next(5, 15);
 			for (int i = 0; i < MaximumProgress; i++) {
-				Thread.Sleep(TimeSpan.FromSeconds(Rand.Next(30, 90)));
+				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(30, 90)));
 				CurrentProgress = i + 1;
 				OnProgressChanged();
 			}
