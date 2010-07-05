@@ -34,7 +34,7 @@ namespace Prax.OcrEngine{
 		//that store the OCR's results, then expose
 		//them as properties in this interface.
 	}
-	public class DummyProcesor : IDocumentProcessor {
+	public class DummyProcessor : IDocumentProcessor {
 		[ThreadStatic]
 		static Random rand;
 		///<summary>Does nothing for a while.</summary>
