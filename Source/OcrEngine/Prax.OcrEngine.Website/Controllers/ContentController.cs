@@ -9,7 +9,8 @@ namespace Prax.OcrEngine.Website.Controllers {
 	public class ContentController : Controller {
 		public static readonly ReadOnlyCollection<string> Pages = new ReadOnlyCollection<string>(
 			typeof(ContentController).GetMethods()
-									 .Where(m => typeof(ActionResult).IsAssignableFrom(m.ReturnType))
+									 .Where(m => typeof(ActionResult).IsAssignableFrom(m.ReturnType)
+											 && m.GetCustomAttribute<ChildActionOnlyAttribute>() == null)
 									 .Select(m => m.Name)
 									 .ToArray()
 		);
@@ -19,5 +20,8 @@ namespace Prax.OcrEngine.Website.Controllers {
 		public ActionResult About() { return View(); }
 		public ActionResult Contact() { return View(); }
 		public ActionResult Privacy() { return View(); }
+
+		[ChildActionOnly]
+		public ActionResult SiteIntro() { return PartialView(); }
 	}
 }

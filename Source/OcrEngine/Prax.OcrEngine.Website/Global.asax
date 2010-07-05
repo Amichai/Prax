@@ -1,1 +1,1 @@
-﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Prax.OcrEngine.Website.MvcApplication" Language="C#" %>
+﻿<%@ Application Codebehind="Global.asax.cs" Inherits="Prax.OcrEngine.Website.PraxMvcApplication" Language="C#" %>
