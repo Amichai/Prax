@@ -5,8 +5,47 @@
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="HeadContent" runat="server">
 	<style type="text/css">
-		td.Size {
+		table#documents {
+			margin-top: 2em;
+			width: 100%;
+			border: 1px solid black;
+		}
+		table#documents thead th {
+			background: LightGray;
+			border-bottom: 2px solid black;
+			font-weight: bold;
+			padding: 2px 5px;
+		}
+		table#documents tbody td {
+			padding: 2px 5px;
+			border-top: gray solid 1px;
+		}
+		.Right {
 			text-align: right;
+		}
+		.ProgressContainer {
+			width: 100%;
+			position: relative;
+			background-color: #eee;
+			border: 1px solid black;
+			padding: 1px;
+			margin-right: -1px;
+		}
+		.ProgressContainer .ProgressBar {
+			background-color: Blue;
+			position: relative;
+			overflow: hidden;
+			height: 1em;
+			padding-bottom: 2px;
+		}
+		.ProgressContainer span {
+			color: Black;
+			text-align: center;
+			width: 100%;
+			position: absolute;
+		}
+		.ProgressContainer .ProgressBar span {
+			color: White;
 		}
 	</style>
 </asp:Content>
@@ -18,12 +57,12 @@
 	<input type="file" name="file" />
 	<input type="submit" name="UploadFile" value="Upload" />
 	<%  } %>
-	<table>
+	<table id="documents">
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th>Size</th>
-				<th>Date</th>
+				<th class="Right">Size</th>
+				<th class="Right">Date</th>
 				<th>State</th>
 				<th>Progress</th>
 			</tr>
@@ -33,14 +72,19 @@
 			<tr>
 				<td>
 					<%:doc.Name %></td>
-				<td class="Size">
+				<td class="Right">
 					<%:doc.Length.ToSizeString() %></td>
-				<td>
+				<td class="Right">
 					<%:doc.DateUploaded.ToShortDateString() %></td>
 				<td>
 					<%:doc.State %></td>
 				<td>
-					<%:doc.ScanProgress %></td>
+					<div class="ProgressContainer"><span class="OuterText">
+						<%:doc.ScanProgress %>%</span>
+						<div class="ProgressBar" style="width: <%:doc.ScanProgress %>%"><span style="width: <%:doc.ScanProgress == 0 ? 0 : (100 * 100 / doc.ScanProgress) %>%">
+							<%:doc.ScanProgress %>%</span></div>
+					</div>
+				</td>
 			</tr>
 			<%} %></tbody></table>
 </asp:Content>
