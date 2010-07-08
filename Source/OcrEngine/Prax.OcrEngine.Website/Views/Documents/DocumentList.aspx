@@ -6,7 +6,7 @@
 <asp:Content ID="Content3" ContentPlaceHolderID="HeadContent" runat="server">
 	<style type="text/css">
 		table#documents {
-			margin-top: 2em;
+			margin-top: 1em;
 			width: 100%;
 			border: 1px solid black;
 		}
@@ -51,15 +51,40 @@
 		.ProgressContainer .ProgressBar span {
 			color: White;
 		}
+		.SiteIntro {
+			width: 50%;
+			margin: 1.5em auto;
+			padding: 5px;
+			border: 2px solid darkgray;
+			background: #DD9;
+		}
+		form.Upload fieldset {
+			width: 50%;
+			padding: 5px 10px 12px;
+			text-align: center;
+			border: 2px groove darkgray;
+			margin: 0 auto;
+		}
+		form.Upload fieldset {
+			text-align: center;
+		}
+		form.Upload .Submit {
+			font-size: 2.5em;
+			padding: 4px;
+			margin-top: .2em;
+		}
 	</style>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 	<%if (Model.ShowSiteIntro)
 	   Html.RenderAction("SiteIntro", "Content"); %>
 	<%
-		using (Html.BeginForm("Upload", "Documents", FormMethod.Post, new { enctype = "multipart/form-data" })) {%>
-	<input type="file" name="file" />
-	<input type="submit" name="UploadFile" value="Upload" />
+		using (Html.BeginForm("Upload", "Documents", FormMethod.Post, new { enctype = "multipart/form-data", @class = "Upload" })) {%>
+	<fieldset>
+		<legend>Upload Document</legend>
+		<input type="file" name="file" /><br />
+		<input type="submit" name="UploadFile" value="Upload" class="Submit" />
+	</fieldset>
 	<%  } %>
 	<table id="documents">
 		<thead>
