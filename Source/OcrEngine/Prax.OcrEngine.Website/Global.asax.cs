@@ -13,6 +13,20 @@ namespace Prax.OcrEngine.Website {
 	// visit http://go.microsoft.com/?LinkId=9394801
 
 	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
+		///<summary>Registers components with Autofac.</summary>
+		static void RegisterComponents(ContainerBuilder builder) {
+			builder.RegisterType<DummyProcessor>().As<IDocumentProcessor>()
+						.InstancePerDependency();
+
+			builder.RegisterType<InMemoryDocumentManager>().As<IDocumentManager>();
+
+			builder.RegisterType<InMemoryUserAccount>().As<IUserAccount>();
+
+			builder.RegisterType<UserlessAuthenticator>().As<IAuthenticator>()
+						.SingleInstance()
+						.CacheInSession();
+		}
+
 		public static void RegisterRoutes(RouteCollection routes) {
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
@@ -31,10 +45,6 @@ namespace Prax.OcrEngine.Website {
 			);
 		}
 
-		static void RegisterComponents(ContainerBuilder builder) {
-			//Register components here
-		}
-
 		protected void Application_Start() {
 			AreaRegistration.RegisterAllAreas();
 
@@ -49,7 +59,6 @@ namespace Prax.OcrEngine.Website {
 
 			RegisterRoutes(RouteTable.Routes);
 		}
-
 
 		static IContainerProvider containerProvider;
 		public IContainerProvider ContainerProvider { get { return containerProvider; } }
