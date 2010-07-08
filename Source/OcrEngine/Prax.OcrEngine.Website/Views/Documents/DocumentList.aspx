@@ -23,6 +23,9 @@
 		.Right {
 			text-align: right;
 		}
+		.Center {
+			text-align: center;
+		}
 		.ProgressContainer {
 			width: 100%;
 			position: relative;
@@ -30,6 +33,7 @@
 			border: 1px solid black;
 			padding: 1px;
 			margin-right: -1px;
+			text-align: left;
 		}
 		.ProgressContainer .ProgressBar {
 			background-color: Blue;
@@ -63,7 +67,7 @@
 				<th>Name</th>
 				<th class="Right">Size</th>
 				<th class="Right">Date</th>
-				<th>Progress</th>
+				<th class="Center">Progress</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -75,7 +79,7 @@
 					<%:doc.Length.ToSizeString() %></td>
 				<td class="Right">
 					<%:doc.DateUploaded.ToShortDateString() %></td>
-				<td>
+				<td class="Center">
 					<%:Html.Action("ProgressBar", doc) %>
 				</td>
 			</tr>
