@@ -17,4 +17,8 @@ namespace Prax.OcrEngine.Website.Models {
 		///<summary>Gets all of the user's documents.</summary>
 		public ReadOnlyCollection<Document> Documents { get; private set; }
 	}
+	public class ProgressBarModel {
+		public int Progress { get; set; }
+		public string Caption { get; set; }
+	}
 }

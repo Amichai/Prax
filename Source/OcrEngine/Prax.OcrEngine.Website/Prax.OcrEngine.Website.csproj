@@ -112,6 +112,7 @@
     <Content Include="Views\Content\Privacy.aspx" />
     <Content Include="Views\Content\SiteIntro.ascx" />
     <Content Include="Views\Documents\DocumentList.aspx" />
+    <Content Include="Views\Documents\ProgressBar.ascx" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

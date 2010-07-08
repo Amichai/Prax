@@ -63,7 +63,6 @@
 				<th>Name</th>
 				<th class="Right">Size</th>
 				<th class="Right">Date</th>
-				<th>State</th>
 				<th>Progress</th>
 			</tr>
 		</thead>
@@ -77,13 +76,7 @@
 				<td class="Right">
 					<%:doc.DateUploaded.ToShortDateString() %></td>
 				<td>
-					<%:doc.State %></td>
-				<td>
-					<div class="ProgressContainer"><span class="OuterText">
-						<%:doc.ScanProgress %>%</span>
-						<div class="ProgressBar" style="width: <%:doc.ScanProgress %>%"><span style="width: <%:doc.ScanProgress == 0 ? 0 : (100 * 100 / doc.ScanProgress) %>%">
-							<%:doc.ScanProgress %>%</span></div>
-					</div>
+					<%:Html.Action("ProgressBar", doc) %>
 				</td>
 			</tr>
 			<%} %></tbody></table>
