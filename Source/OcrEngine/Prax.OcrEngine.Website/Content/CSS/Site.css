@@ -1,13 +1,12 @@
 ﻿html, body {
 	font-family: "Calibri" , Verdana, Arial, sans-serif;
-	height: 100%;
-	overflow: hidden;
+	overflow: auto;
 }
 div.Content {
 	margin: 0 auto;
 	text-align: left;
 	width: 700px;
-	margin-bottom: 30px;
+	padding-bottom: 60px;	/* This padding goes underneath the footer if the document scrolls */
 }
 div.Content .Logo {
 	display: block;
@@ -35,7 +34,7 @@ div.Footer {
 	width: 100%;
 	background: LightGray;
 	border-top: solid 2px black;
-	padding: 7px 0 9px;
+	padding: 4px 0 6px;
 	text-align: center;
 }
 div.Footer .Links a {
