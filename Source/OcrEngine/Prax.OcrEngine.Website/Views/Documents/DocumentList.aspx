@@ -10,6 +10,9 @@
 			width: 100%;
 			border: 1px solid black;
 		}
+		table#documents a {
+			color: Blue;
+		}
 		table#documents thead th {
 			background: LightGray;
 			border-bottom: 2px solid black;
@@ -99,7 +102,7 @@
 			<%foreach (var doc in Model.Documents) { %>
 			<tr>
 				<td>
-					<%:doc.Name %></td>
+					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name }) %></td>
 				<td class="Right">
 					<%:doc.Length.ToSizeString() %></td>
 				<td class="Right">

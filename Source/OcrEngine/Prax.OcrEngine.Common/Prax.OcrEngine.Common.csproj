@@ -55,6 +55,7 @@
     <Compile Include="IDocumentProcessor.cs" />
     <Compile Include="InMemoryDocumentManager.cs" />
     <Compile Include="IUserAccount.cs" />
+    <Compile Include="MimeTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UserlessAuthenticator.cs" />
   </ItemGroup>

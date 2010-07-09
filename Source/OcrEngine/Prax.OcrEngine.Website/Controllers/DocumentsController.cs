@@ -26,6 +26,11 @@ namespace Prax.OcrEngine.Website.Controllers {
 			return Index();
 		}
 
+		public ActionResult View(Guid id, string name = null) {
+			var doc = DocumentManager.GetDocument(id);
+			return File(doc.Read(), MimeTypes.ForExtension(Path.GetExtension(doc.Name)));
+		}
+
 		///<summary>Renders a partial view that shows the progress of a single document.</summary>
 		///<remarks>The parameters are bound from a Document instance.  
 		///Since Document is abstract, I cannot simply pass the Document itself.</remarks>
