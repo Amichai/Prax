@@ -23,6 +23,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 
 		[HttpPost]
 		public ActionResult Upload(HttpPostedFileBase file) {
+			if (file == null) return Index();	//TODO: Show error message
 			DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
 			return Index();
 		}
