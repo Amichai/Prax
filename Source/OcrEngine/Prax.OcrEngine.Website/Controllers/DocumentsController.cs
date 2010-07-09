@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.IO;
 using System.Globalization;
 using System.Dynamic;
+using Prax.OcrEngine.Services;
 
 namespace Prax.OcrEngine.Website.Controllers {
 	public class DocumentsController : Controller {

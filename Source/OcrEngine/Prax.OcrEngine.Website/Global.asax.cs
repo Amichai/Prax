@@ -7,6 +7,8 @@ using System.Web.Routing;
 using Autofac.Integration.Web;
 using Autofac.Integration.Web.Mvc;
 using Autofac;
+using Prax.OcrEngine.Services;
+using Stubs = Prax.OcrEngine.Services.Stubs;
 
 namespace Prax.OcrEngine.Website {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
@@ -15,16 +17,15 @@ namespace Prax.OcrEngine.Website {
 	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
 		///<summary>Registers components with Autofac.</summary>
 		static void RegisterComponents(ContainerBuilder builder) {
-			builder.RegisterType<DummyProcessor>().As<IDocumentProcessor>()
+			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
 						.InstancePerDependency();
 
-			builder.RegisterType<InMemoryDocumentManager>().As<IDocumentManager>();
+			builder.RegisterType<Stubs.InMemoryDocumentManager>().As<IDocumentManager>();
 
-			builder.RegisterType<InMemoryUserAccount>().As<IUserAccount>();
+			builder.RegisterType<Stubs.InMemoryUserAccount>().As<IUserAccount>();
 
-			builder.RegisterType<UserlessAuthenticator>().As<IAuthenticator>()
-						.SingleInstance()
-						.CacheInSession();
+			builder.RegisterType<Stubs.UserlessAuthenticator>().As<IAuthenticator>()
+						.SingleInstance();
 		}
 
 		public static void RegisterRoutes(RouteCollection routes) {

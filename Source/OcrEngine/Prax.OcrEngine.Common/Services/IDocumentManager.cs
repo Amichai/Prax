@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Prax.OcrEngine {
+namespace Prax.OcrEngine.Services {
 	///<summary>Used by the website to interact with a user's documents in storage and with the scan workers.</summary>
 	public interface IDocumentManager {
 		///<summary>Uploads a document to storage.</summary>

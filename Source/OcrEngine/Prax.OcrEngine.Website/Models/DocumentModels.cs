@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Collections.ObjectModel;
+using Prax.OcrEngine.Services;
 
 namespace Prax.OcrEngine.Website.Models {
 	public class DocumentListModel {

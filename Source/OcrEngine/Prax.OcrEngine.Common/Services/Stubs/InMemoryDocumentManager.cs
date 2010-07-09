@@ -5,20 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-namespace Prax.OcrEngine {
+namespace Prax.OcrEngine.Services.Stubs {
 	///<summary>A fake DocumentManager that stores all documents in memory.</summary>
 	public class InMemoryDocumentManager : IDocumentManager {
 		readonly List<InMemoryDocument> documents = new List<InMemoryDocument>();
 
 		readonly Func<IDocumentProcessor> ProcessorCreator;
-		public InMemoryDocumentManager(string userName, Func<IDocumentProcessor> processorCreator) {
+		public InMemoryDocumentManager(Guid userId, Func<IDocumentProcessor> processorCreator) {
 			if (processorCreator == null) throw new ArgumentNullException("processorCreator");
 			ProcessorCreator = processorCreator;
 
-			UserName = userName;
+			UserId = userId;
 		}
 
-		public string UserName { get; private set; }
+		public Guid UserId { get; private set; }
 		public void UploadDocument(string name, Stream document, long length) {
 			byte[] bytes = new byte[length];
 			document.Read(bytes, 0, bytes.Length);	//TODO: ReadFill extension
