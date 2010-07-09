@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ServiceDefinition name="OcrSite" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition">
-  <WebRole name="Prax.OcrEngine.Website" enableNativeCodeExecution="false">
+  <WebRole name="Prax.OcrEngine.Website" enableNativeCodeExecution="true">
     <InputEndpoints>
       <InputEndpoint name="HttpIn" protocol="http" port="80" />
     </InputEndpoints>
@@ -8,7 +8,7 @@
       <Setting name="DiagnosticsConnectionString" />
     </ConfigurationSettings>
   </WebRole>
-  <WorkerRole name="Prax.OcrEngine.ScanWorker" enableNativeCodeExecution="false">
+  <WorkerRole name="Prax.OcrEngine.ScanWorker" enableNativeCodeExecution="true">
     <ConfigurationSettings>
       <Setting name="DiagnosticsConnectionString" />
     </ConfigurationSettings>
