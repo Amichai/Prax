@@ -2,6 +2,7 @@
 <RuleSet Name="Prax Rules" Description="This rulset contains the rules that our code ought to pass" ToolsVersion="10.0">
   <IncludeAll Action="Warning" />
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
+    <Rule Id="CA1026" Action="None" />
     <Rule Id="CA1062" Action="None" />
     <Rule Id="CA1300" Action="None" />
     <Rule Id="CA1302" Action="None" />
