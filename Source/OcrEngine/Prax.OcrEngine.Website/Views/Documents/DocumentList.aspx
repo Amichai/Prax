@@ -89,6 +89,11 @@
 		<input type="submit" name="UploadFile" value="Upload" class="Submit" />
 	</fieldset>
 	<%  } %>
+	<%if (Model.Documents.Count == 0) { %>
+	<p>
+		You have no documents.<br />
+		Would you like to upload one?</p>
+	<%} else { %>
 	<table id="documents">
 		<thead>
 			<tr>
@@ -102,14 +107,15 @@
 			<%foreach (var doc in Model.Documents) { %>
 			<tr>
 				<td>
-					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name }) %></td>
+					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name })%></td>
 				<td class="Right">
-					<%:doc.Length.ToSizeString() %></td>
+					<%:doc.Length.ToSizeString()%></td>
 				<td class="Right">
-					<%:doc.DateUploaded.ToShortDateString() %></td>
+					<%:doc.DateUploaded.ToShortDateString()%></td>
 				<td class="Center">
-					<%:Html.Action("ProgressBar", doc) %>
+					<%:Html.Action("ProgressBar", doc)%>
 				</td>
 			</tr>
 			<%} %></tbody></table>
+	<%} %>
 </asp:Content>
