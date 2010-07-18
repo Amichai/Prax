@@ -7,9 +7,14 @@
 			<asp:ContentPlaceHolder ID="TitleContent" runat="server">
 				Prax OCR</asp:ContentPlaceHolder>
 		</title>
-		<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.1.1/build/cssreset/reset-min.css" />
-		<%--<link href="<%=Url.Content(@"~/Content/CSS/YUI-Reset.css") %>" rel="stylesheet" type="text/css" />--%>
-		<link href="<%=Url.Content(@"~/Content/CSS/Site.css") %>" rel="stylesheet" type="text/css" />
+		<%if (false) {%>
+		<%-- Add <script> and <link> tags here to convince Visual Studio that the 
+			 files are referenced for IntelliSense. 
+			 The files will actually be included by the ResourceSet architecture. --%>
+		<link rel="stylesheet" type="text/css" href="/Content/CSS/YUI-Reset.css" />
+		<link rel="stylesheet" type="text/css" href="/Content/CSS/Site.css" />
+		<%} %>
+		<%=Html.Scripts(ResourceSet.GlobalCss) %>
 		<asp:ContentPlaceHolder runat="server" ID="HeadContent" />
 	</head>
 

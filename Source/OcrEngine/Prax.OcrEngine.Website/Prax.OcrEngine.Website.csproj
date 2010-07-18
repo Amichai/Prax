@@ -41,6 +41,9 @@
     <AssemblyOriginatorKeyFile>Prax.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AjaxMin">
+      <HintPath>..\..\..\Assemblies\AjaxMin.dll</HintPath>
+    </Reference>
     <Reference Include="Autofac">
       <HintPath>..\..\..\Assemblies\Autofac.dll</HintPath>
     </Reference>
@@ -93,14 +96,22 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Models\AccountModels.cs" />
     <Compile Include="Models\DocumentModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResourceSets.cs" />
+    <Compile Include="Resources\MSAjaxMinifier.cs" />
+    <Compile Include="Resources\ResourceDebuggingResolver.cs" />
+    <Compile Include="Resources\IMinifier.cs" />
+    <Compile Include="Resources\IResourceLocator.cs" />
+    <Compile Include="Views\ViewsExtensions.cs" />
     <Compile Include="WebRole.cs" />
   </ItemGroup>
   <ItemGroup>
     <CodeAnalysisDictionary Include="..\..\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
+      <SubType>Designer</SubType>
     </CodeAnalysisDictionary>
     <Content Include="Content\CSS\YUI-Reset.css" />
     <Content Include="Content\Images\Logo.png" />
@@ -121,18 +132,18 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Content\CSS\Site.css" />
-    <Content Include="Scripts\jquery-1.4.1.js" />
-    <Content Include="Scripts\jquery-1.4.1.min.js" />
-    <Content Include="Scripts\jquery-1.4.1-vsdoc.js" />
-    <Content Include="Scripts\jquery.validate.js" />
-    <Content Include="Scripts\jquery.validate.min.js" />
-    <Content Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\MicrosoftAjax.js" />
-    <Content Include="Scripts\MicrosoftAjax.debug.js" />
-    <Content Include="Scripts\MicrosoftMvcAjax.js" />
-    <Content Include="Scripts\MicrosoftMvcAjax.debug.js" />
-    <Content Include="Scripts\MicrosoftMvcValidation.js" />
-    <Content Include="Scripts\MicrosoftMvcValidation.debug.js" />
+    <Content Include="Content\Javascript\jquery-1.4.1.js" />
+    <Content Include="Content\Javascript\jquery-1.4.1.min.js" />
+    <Content Include="Content\Javascript\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Content\Javascript\jquery.validate.js" />
+    <Content Include="Content\Javascript\jquery.validate.min.js" />
+    <Content Include="Content\Javascript\jquery.validate-vsdoc.js" />
+    <Content Include="Content\Javascript\MicrosoftAjax.js" />
+    <Content Include="Content\Javascript\MicrosoftAjax.debug.js" />
+    <Content Include="Content\Javascript\MicrosoftMvcAjax.js" />
+    <Content Include="Content\Javascript\MicrosoftMvcAjax.debug.js" />
+    <Content Include="Content\Javascript\MicrosoftMvcValidation.js" />
+    <Content Include="Content\Javascript\MicrosoftMvcValidation.debug.js" />
     <Content Include="Views\Account\ChangePassword.aspx" />
     <Content Include="Views\Account\ChangePasswordSuccess.aspx" />
     <Content Include="Views\Account\LogOn.aspx" />

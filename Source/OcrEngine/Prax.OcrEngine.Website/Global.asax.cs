@@ -17,6 +17,16 @@ namespace Prax.OcrEngine.Website {
 	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
 		///<summary>Registers components with Autofac.</summary>
 		static void RegisterComponents(ContainerBuilder builder) {
+			//Register Resources components
+			builder.RegisterInstance(new Resources.MSAjaxScriptMinifier()).As<Resources.IMinifier>();
+			builder.RegisterInstance(new Resources.MSAjaxStylesheetMinifier()).As<Resources.IMinifier>();
+
+			builder.RegisterInstance(new Resources.ScriptDebuggingResolver()).As<Resources.IResourceResolver>()
+				.PropertiesAutowired();
+			builder.RegisterInstance(new Resources.StylesheetDebuggingResolver()).As<Resources.IResourceResolver>()
+				.PropertiesAutowired();
+
+			//Register engine services
 			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
 						.InstancePerDependency();
 
@@ -49,14 +59,13 @@ namespace Prax.OcrEngine.Website {
 		protected void Application_Start() {
 			AreaRegistration.RegisterAllAreas();
 
-
 			var builder = new ContainerBuilder();
 			RegisterComponents(builder);
 
 			//Set up Autofac for MVC
 			builder.RegisterControllers(typeof(PraxMvcApplication).Assembly);
 			containerProvider = new ContainerProvider(builder.Build());
-			ControllerBuilder.Current.SetControllerFactory(new AutofacControllerFactory(ContainerProvider));
+			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory(ContainerProvider));
 
 			RegisterRoutes(RouteTable.Routes);
 		}
@@ -65,12 +74,27 @@ namespace Prax.OcrEngine.Website {
 		public IContainerProvider ContainerProvider { get { return containerProvider; } }
 	}
 
+	///<summary>An IRouteConstraint implementation that constrains a parameter to a fixed set of values.</summary>
 	class ValueListConstraint : IRouteConstraint {
 		readonly IEnumerable<string> allowedValues;
 		public ValueListConstraint(IEnumerable<string> allowedValues) { this.allowedValues = allowedValues; }
 
 		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
 			return allowedValues.Contains((string)values[parameterName], StringComparer.OrdinalIgnoreCase);
+		}
+	}
+
+	///<summary>A ControllerFactory that adds the current RequestContext to the AutoFac registry.</summary>
+	class InjectingControllerFactory : AutofacControllerFactory {
+		readonly IContainerProvider containerProvider;
+		public InjectingControllerFactory(IContainerProvider containerProvider) : base(containerProvider) { this.containerProvider = containerProvider; }
+
+		protected override IController GetControllerInstance(RequestContext context, Type controllerType) {
+			var newBuilder = new ContainerBuilder();
+			newBuilder.RegisterInstance(context).As<RequestContext>();
+			newBuilder.Update(containerProvider.RequestLifetime.ComponentRegistry);
+
+			return base.GetControllerInstance(context, controllerType);
 		}
 	}
 }
