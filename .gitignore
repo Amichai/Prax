@@ -1,4 +1,6 @@
 
+#VS Extensions
+*.vs10x
 #Office temp files
 ~$*
 #ignore thumbnails created by windows
