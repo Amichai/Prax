@@ -22,4 +22,18 @@ namespace Prax.OcrEngine.Website.Models {
 		public int Progress { get; set; }
 		public string Caption { get; set; }
 	}
+
+	public static class DocumentExtensions {
+		public static TimeSpan? GetRefreshTime(this Document doc) {
+			switch (doc.State) {
+				case DocumentState.ScanQueued: return TimeSpan.FromMinutes(5);	//TODO: Intelligent guess?
+				case DocumentState.Scanning: return TimeSpan.FromSeconds(5);
+				case DocumentState.Scanned: return null;
+
+				case DocumentState.Error:
+				default:
+					return TimeSpan.FromMinutes(1);
+			}
+		}
+	}
 }

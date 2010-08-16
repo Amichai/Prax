@@ -115,6 +115,9 @@
     </CodeAnalysisDictionary>
     <Content Include="Content\CSS\YUI-Reset.css" />
     <Content Include="Content\Images\Logo.png" />
+    <Content Include="Content\Javascript\DocTableUpdater.js" />
+    <Content Include="Content\Javascript\Prax.DocumentRow.js" />
+    <Content Include="Content\Javascript\ProgressBar.js" />
     <Content Include="Global.asax" />
     <Content Include="Views\Content\About.aspx" />
     <Content Include="Views\Content\Contact.aspx" />

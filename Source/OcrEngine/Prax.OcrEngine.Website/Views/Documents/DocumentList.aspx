@@ -1,4 +1,4 @@
-﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<Prax.OcrEngine.Website.Models.DocumentListModel>" %>
+﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Views/Shared/Site.Master" Inherits="System.Web.Mvc.ViewPage<DocumentListModel>" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="TitleContent" runat="server">
 	Prax
@@ -77,6 +77,19 @@
 			margin-top: .2em;
 		}
 	</style>
+	<%if (false) {%>
+	<%-- Add <script> and <link> tags here to convince Visual Studio that the 
+			 files are referenced for IntelliSense. 
+			 The files will actually be included by the ResourceSet architecture. --%>
+
+	<script src="../../Content/Javascript/jquery-1.4.1.js" type="text/javascript"></script>
+
+	<script src="../../Content/Javascript/ProgressBar.js" type="text/javascript"></script>
+
+	<script src="../../Content/Javascript/DocTableUpdater.js" type="text/javascript"></script>
+
+	<%} %>
+	<%=Html.Scripts(ResourceSet.DocListJavascript) %>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 	<%if (Model.ShowSiteIntro)
@@ -105,17 +118,22 @@
 		</thead>
 		<tbody>
 			<%foreach (var doc in Model.Documents) { %>
-			<tr>
+			<tr id="document-<%:doc.Id %>">
 				<td>
 					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name })%></td>
 				<td class="Right">
 					<%:doc.Length.ToSizeString()%></td>
 				<td class="Right">
 					<%:doc.DateUploaded.ToShortDateString()%></td>
-				<td class="Center">
+				<td class="Center StatusCell">
 					<%:Html.Action("ProgressBar", doc)%>
 				</td>
 			</tr>
 			<%} %></tbody></table>
+
+	<script type="text/javascript">
+	Prax.DocumentList.start(<%:(Model.Documents.Max(d => d.GetRefreshTime()) ?? TimeSpan.Zero).TotalMilliseconds %>);
+	</script>
+
 	<%} %>
 </asp:Content>
