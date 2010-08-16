@@ -14,7 +14,7 @@
 		<link rel="stylesheet" type="text/css" href="/Content/CSS/YUI-Reset.css" />
 		<link rel="stylesheet" type="text/css" href="/Content/CSS/Site.css" />
 		<%} %>
-		<%=Html.Scripts(ResourceSet.GlobalCss) %>
+		<%=Html.Stylesheets(ResourceSet.GlobalCss) %>
 		<asp:ContentPlaceHolder runat="server" ID="HeadContent" />
 	</head>
 
