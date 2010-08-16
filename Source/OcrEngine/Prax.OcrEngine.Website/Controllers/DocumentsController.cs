@@ -35,15 +35,8 @@ namespace Prax.OcrEngine.Website.Controllers {
 		}
 
 		///<summary>Gets the document list in JSON format for table updates.</summary>
-		///<remarks>This method is called as a child action from the DocumentList view,
-		///and as a normal action via AJAX.  When called as a child action, it gets the
-		///document list from the parent ViewContext to save a network call.</remarks>
 		public ActionResult Data() {
-			IEnumerable<Document> documents;
-			if (ControllerContext.ParentActionViewContext != null)
-				documents = (IEnumerable<Document>)ControllerContext.ParentActionViewContext.ViewData["Documents"];
-			else
-				documents = DocumentManager.GetDocuments();
+			var documents = DocumentManager.GetDocuments().ToArray();
 
 			TimeSpan? refreshTimeout = documents.Max(d => d.GetRefreshTime());
 
