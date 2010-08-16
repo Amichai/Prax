@@ -18,7 +18,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 
 			MaximumProgress = rand.Next(5, 15);
 			for (int i = 0; i < MaximumProgress; i++) {
-				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(30, 90)));
+				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(5, 35)));
 				CurrentProgress = i + 1;
 				OnProgressChanged();
 			}
