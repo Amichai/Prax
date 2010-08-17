@@ -86,7 +86,7 @@
 
 	<script src="../../Content/Javascript/ProgressBar.js" type="text/javascript"></script>
 
-	<script src="../../Content/Javascript/DocTableUpdater.js" type="text/javascript"></script>
+	<script src="../../Content/Javascript/DocumentTable.js" type="text/javascript"></script>
 
 	<%} %>
 	<%=Html.Scripts(ResourceSet.DocListJavascript) %>
@@ -132,7 +132,10 @@
 			<%} %></tbody></table>
 
 	<script type="text/javascript">
-	Prax.DocumentList.start(<%:(Model.Documents.Max(d => d.GetRefreshTime()) ?? TimeSpan.Zero).TotalMilliseconds %>);
+		var documents = new Prax.DocumentTable($('#documents'));
+		var refreshDelay = parseInt('<%:(Model.Documents.Max(d => d.GetRefreshTime()) ?? TimeSpan.Zero).TotalMilliseconds %>', 10); //Using a string fixes VS's syntax parser
+		if (refreshDelay > 0)
+			setTimeout(function () { documents.updateData(); }, refreshDelay);
 	</script>
 
 	<%} %>

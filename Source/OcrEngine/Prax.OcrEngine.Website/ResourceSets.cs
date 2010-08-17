@@ -16,7 +16,7 @@ namespace Prax.OcrEngine.Website {
 		public static readonly ResourceSet GlobalCss = new ResourceSet(ResourceType.Css, "GlobalCss",
 			"YUI-Reset", "Site");
 		public static readonly ResourceSet DocListJavascript = new ResourceSet(ResourceType.Javascript, "DocListJavascript",
-			"jquery-1.4.1", "ProgressBar", "DocTableUpdater");
+			"jquery-1.4.1", "ProgressBar", "DocumentTable");
 
 		///<summary>Creates a ResourceSet instance.</summary>
 		public ResourceSet(ResourceType type, string setName, params string[] names) : this(type, setName, (IEnumerable<string>)names) { }
