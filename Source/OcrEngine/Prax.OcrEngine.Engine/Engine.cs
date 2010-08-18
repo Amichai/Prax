@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Drawing;
 using System.Diagnostics;
-using Prax.OcrEngine.Common;
+using Prax.OcrEngine;
 
 namespace Prax.OcrEngine.Engine
 {
