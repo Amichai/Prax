@@ -61,15 +61,15 @@
 			border: 2px solid darkgray;
 			background: #DD9;
 		}
+		form.Upload {
+			text-align: center;
+		}
 		form.Upload fieldset {
 			width: 50%;
 			padding: 5px 10px 12px;
 			text-align: center;
 			border: 2px groove darkgray;
 			margin: 0 auto;
-		}
-		form.Upload fieldset {
-			text-align: center;
 		}
 		form.Upload .Submit {
 			font-size: 2.5em;
