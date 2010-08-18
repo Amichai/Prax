@@ -19,7 +19,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 		///<summary>Shows a list of documents in the user's account.</summary>
 		///<remarks>This is the website's default home page.</remarks>
 		public ActionResult Index() {
-			return View("DocumentList", new Models.DocumentListModel(true, DocumentManager.GetDocuments()));
+			return View("DocumentList", new Models.DocumentListModel(true, DocumentManager.GetDocuments().OrderByDescending(d => d.DateUploaded)));
 		}
 
 		[HttpPost]
@@ -51,7 +51,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 
 		///<summary>Gets the document list in JSON format for table updates.</summary>
 		public ActionResult Data() {
-			var documents = DocumentManager.GetDocuments().ToArray();
+			var documents = DocumentManager.GetDocuments().OrderByDescending(d => d.DateUploaded).ToArray();
 
 			TimeSpan? refreshTimeout = documents.Max(d => d.GetRefreshTime());
 

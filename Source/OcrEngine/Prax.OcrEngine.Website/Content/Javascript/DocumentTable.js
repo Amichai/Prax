@@ -62,7 +62,7 @@ Prax.DocumentTable.prototype = {
 					.append($('<td />', { 'class': "DateCell Right", text: new Date().toShortDateString() }))
 					.append($('<td class="StatusCell Center">Wait...</td>'));
 
-		tr.appendTo(this.table);
+		tr.prependTo(this.table.children('tbody'));
 		return new Prax.DocumentRow(tr);
 	},
 	updateData: function updateData(noTimer) {
