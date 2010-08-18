@@ -128,8 +128,8 @@
 			<%foreach (var doc in Model.Documents) { %>
 			<tr id="document-<%:doc.Id %>">
 				<td class="NameCell">
-					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name })%></td>
-				<td class="SizeCell Right">
+					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name }, new { target = "DocumentPreview" })%></td>
+				<td class="SizeCell Right" title="<%:doc.Length.ToString()%> bytes">
 					<%:doc.Length.ToSizeString()%></td>
 				<td class="DateCell Right">
 					<%:doc.DateUploaded.ToShortDateString()%></td>

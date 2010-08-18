@@ -43,7 +43,7 @@ Prax.DocumentUploader = function DocumentUploader(table, selector) {
 };
 Prax.DocumentUploader.prototype = {
 	uploadButton: $(),
-	table: new Prax.DocumentTable(),
+	table: new Prax.DocumentTable($()),
 
 	onUploadStart: function (e, queueId, file) {
 		$('#noDocumentsMessage').hide();
@@ -61,10 +61,8 @@ Prax.DocumentUploader.prototype = {
 	},
 	onComplete: function (e, queueId, file, response, data) {
 		var row = this.table.getRow(queueId);
-		row.tr.attr('id', 'document-' + response);
-		row.tr.children('.NameCell').empty().append(
-				$('<a />', { text: file.name, href: '/Documents/View/' + response + '/' + file.name })
-			);
+		row.setId(response);
+		row.setNameLink(true);
 		row.setProgress('Queued', 0);
 
 		this.table.updateData();
