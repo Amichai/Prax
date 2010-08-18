@@ -49,13 +49,14 @@ namespace Prax.OcrEngine {
 		static readonly string[] sizes = { "bytes", "KB", "MB", "GB", "TB" };
 		///<summary>Converts a number of bytes to a string in the appropriate unit.</summary>
 		public static string ToSizeString(this long size) {
+			double shrunkenSize = size;		//Switch to double to preserve the decimal.
 			int order = 0;
-			while (size >= 1024 && order + 1 < sizes.Length) {
+			while (shrunkenSize >= 1024 && order + 1 < sizes.Length) {
 				order++;
-				size /= 1024;
+				shrunkenSize /= 1024;
 			}
 
-			return String.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", size, sizes[order]);
+			return String.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", shrunkenSize, sizes[order]);
 		}
 	}
 }
