@@ -79,8 +79,8 @@
 	</style>
 	<%if (false) {%>
 	<%-- Add <script> and <link> tags here to convince Visual Studio that the 
-			 files are referenced for IntelliSense. 
-			 The files will actually be included by the ResourceSet architecture. --%>
+		 files are referenced for IntelliSense. 
+		 The files should actually be included by the ResourceSet architecture. --%>
 
 	<script src="../../Content/Javascript/jQuery/jquery-1.4.1.js" type="text/javascript"></script>
 
