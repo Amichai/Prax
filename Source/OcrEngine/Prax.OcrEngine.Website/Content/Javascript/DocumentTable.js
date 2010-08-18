@@ -1,4 +1,4 @@
-﻿/// <reference path="jquery-1.4.1-vsdoc.js" />
+﻿/// <reference path="jQuery/jquery-1.4.1-vsdoc.js" />
 /// <reference path="ProgressBar.js" />
 
 if (!Prax)

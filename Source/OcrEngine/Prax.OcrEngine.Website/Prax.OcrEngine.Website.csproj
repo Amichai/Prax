@@ -115,7 +115,6 @@
     </CodeAnalysisDictionary>
     <Content Include="Content\CSS\YUI-Reset.css" />
     <Content Include="Content\Images\Logo.png" />
-    <Content Include="Content\Javascript\DocTableUpdater.js" />
     <Content Include="Content\Javascript\ProgressBar.js" />
     <Content Include="Global.asax" />
     <Content Include="Views\Content\About.aspx" />
@@ -134,18 +133,18 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Content\CSS\Site.css" />
-    <Content Include="Content\Javascript\jquery-1.4.1.js" />
-    <Content Include="Content\Javascript\jquery-1.4.1.min.js" />
-    <Content Include="Content\Javascript\jquery-1.4.1-vsdoc.js" />
-    <Content Include="Content\Javascript\jquery.validate.js" />
-    <Content Include="Content\Javascript\jquery.validate.min.js" />
-    <Content Include="Content\Javascript\jquery.validate-vsdoc.js" />
-    <Content Include="Content\Javascript\MicrosoftAjax.js" />
-    <Content Include="Content\Javascript\MicrosoftAjax.debug.js" />
-    <Content Include="Content\Javascript\MicrosoftMvcAjax.js" />
-    <Content Include="Content\Javascript\MicrosoftMvcAjax.debug.js" />
-    <Content Include="Content\Javascript\MicrosoftMvcValidation.js" />
-    <Content Include="Content\Javascript\MicrosoftMvcValidation.debug.js" />
+    <Content Include="Content\Javascript\jQuery\jquery-1.4.1.js" />
+    <Content Include="Content\Javascript\jQuery\jquery-1.4.1.min.js" />
+    <Content Include="Content\Javascript\jQuery\jquery-1.4.1-vsdoc.js" />
+    <Content Include="Content\Javascript\jQuery\jquery.validate.js" />
+    <Content Include="Content\Javascript\jQuery\jquery.validate.min.js" />
+    <Content Include="Content\Javascript\jQuery\jquery.validate-vsdoc.js" />
+    <Content Include="Content\Javascript\Microsoft\MicrosoftAjax.js" />
+    <Content Include="Content\Javascript\Microsoft\MicrosoftAjax.debug.js" />
+    <Content Include="Content\Javascript\Microsoft\MicrosoftMvcAjax.js" />
+    <Content Include="Content\Javascript\Microsoft\MicrosoftMvcAjax.debug.js" />
+    <Content Include="Content\Javascript\Microsoft\MicrosoftMvcValidation.js" />
+    <Content Include="Content\Javascript\Microsoft\MicrosoftMvcValidation.debug.js" />
     <Content Include="Views\Account\ChangePassword.aspx" />
     <Content Include="Views\Account\ChangePasswordSuccess.aspx" />
     <Content Include="Views\Account\LogOn.aspx" />

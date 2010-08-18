@@ -1,4 +1,4 @@
-﻿/// <reference path="jquery-1.4.1-vsdoc.js" />
+﻿/// <reference path="jQuery/jquery-1.4.1-vsdoc.js" />
 
 function ProgressBar(container, outerCaption, bar, innerCaption) {
 	this.container = container;

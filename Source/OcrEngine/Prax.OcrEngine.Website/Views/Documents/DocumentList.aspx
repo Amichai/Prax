@@ -82,7 +82,7 @@
 			 files are referenced for IntelliSense. 
 			 The files will actually be included by the ResourceSet architecture. --%>
 
-	<script src="../../Content/Javascript/jquery-1.4.1.js" type="text/javascript"></script>
+	<script src="../../Content/Javascript/jQuery/jquery-1.4.1.js" type="text/javascript"></script>
 
 	<script src="../../Content/Javascript/ProgressBar.js" type="text/javascript"></script>
 
