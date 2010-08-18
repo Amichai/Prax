@@ -21,15 +21,15 @@ namespace Prax.OcrEngine.Website.Resources {
 
 		///<summary>Resolves a resource set to a set of URLs</summary>
 		///<param name="url">The UrlHelper used to resolve client URLs.</param>
-		///<param name="set">The resource set to resolve.</param>
+		///<param name="resourceSet">The resource set to resolve.</param>
 		///<returns>A set of URLs to send to the client.</returns>
-		public IEnumerable<string> Resolve(ResourceSet set) {
-			if (set == null) throw new ArgumentNullException("set");
+		public IEnumerable<string> Resolve(ResourceSet resourceSet) {
+			if (resourceSet == null) throw new ArgumentNullException("resourceSet");
 
-			if (set.Type != Type) throw new ArgumentException(GetType() + " cannot resolve " + set.Type + " resources.", "set");
+			if (resourceSet.Type != Type) throw new ArgumentException(GetType() + " cannot resolve " + resourceSet.Type + " resources.", "resourceSet");
 
 			var url = new UrlHelper(RequestContext);
-			foreach (var name in set.Names) {
+			foreach (var name in resourceSet.Names) {
 				var virtualPath = Path.Combine(SearchPath, name + Type.Extension());
 				var filePath = url.RequestContext.HttpContext.Server.MapPath(virtualPath);
 

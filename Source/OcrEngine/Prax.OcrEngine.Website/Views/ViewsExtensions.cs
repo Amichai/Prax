@@ -17,7 +17,7 @@ namespace Prax.OcrEngine.Website.Views {
 		///<summary>Gets the Autofac container used to resolve dependencies.</summary>
 		///<remarks>I added this property since Autofac cannot build up a static class.
 		///In general, manual use of the Autofac container should be avoided.</remarks>
-		static Autofac.IContainer Container {
+		public static Autofac.IContainer Container {
 			get {
 				return container ??	//I might want to explicitly set this in Global.asax.cs
 					   (container = ((IContainerProviderAccessor)HttpContext.Current.ApplicationInstance).ContainerProvider.ApplicationContainer);

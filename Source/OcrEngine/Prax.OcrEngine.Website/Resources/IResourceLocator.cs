@@ -11,8 +11,8 @@ namespace Prax.OcrEngine.Website.Resources {
 		ResourceType Type { get; }
 
 		///<summary>Resolves a resource set to a set of URLs.</summary>
-		///<param name="set">The resource set to resolve.</param>
+		///<param name="resourceSet">The resource set to resolve.</param>
 		///<returns>A set of URLs to send to the client.</returns>
-		IEnumerable<string> Resolve(ResourceSet set);
+		IEnumerable<string> Resolve(ResourceSet resourceSet);
 	}
 }
