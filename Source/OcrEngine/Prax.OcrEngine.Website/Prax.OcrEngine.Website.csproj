@@ -115,6 +115,14 @@
     </CodeAnalysisDictionary>
     <Content Include="Content\CSS\YUI-Reset.css" />
     <Content Include="Content\Images\Logo.png" />
+    <Content Include="Content\Javascript\DocumentUpload.js" />
+    <Content Include="Content\Javascript\Utilities.js" />
+    <Content Include="Content\Uploadify\expressInstall.swf" />
+    <Content Include="Content\Javascript\jQuery\jquery.uploadify.v2.1.0.js" />
+    <Content Include="Content\Javascript\jQuery\jquery.uploadify.v2.1.0.min.js" />
+    <Content Include="Content\Javascript\jQuery\swfobject.js" />
+    <Content Include="Content\Uploadify\uploadify.allglyphs.swf" />
+    <Content Include="Content\Uploadify\uploadify.swf" />
     <Content Include="Content\Javascript\ProgressBar.js" />
     <Content Include="Global.asax" />
     <Content Include="Views\Content\About.aspx" />

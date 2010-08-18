@@ -84,9 +84,17 @@
 
 	<script src="../../Content/Javascript/jQuery/jquery-1.4.1.js" type="text/javascript"></script>
 
+	<script src="../../Content/Javascript/jQuery/swfobject.js" type="text/javascript"></script>
+
+	<script src="../../Content/Javascript/jQuery/jquery.uploadify.v2.1.0.js" type="text/javascript"></script>
+
 	<script src="../../Content/Javascript/ProgressBar.js" type="text/javascript"></script>
 
+	<script src="../../Content/Javascript/Utilities.js" type="text/javascript"></script>
+
 	<script src="../../Content/Javascript/DocumentTable.js" type="text/javascript"></script>
+
+	<script src="../../Content/Javascript/DocumentUpload.js" type="text/javascript"></script>
 
 	<%} %>
 	<%=Html.Scripts(ResourceSet.DocListJavascript) %>
@@ -96,47 +104,49 @@
 	   Html.RenderAction("SiteIntro", "Content"); %>
 	<%
 		using (Html.BeginForm("Upload", "Documents", FormMethod.Post, new { enctype = "multipart/form-data", @class = "Upload" })) {%>
-	<fieldset>
+	<fieldset id="uploadForm">
 		<legend>Upload Document</legend>
 		<input type="file" name="file" /><br />
 		<input type="submit" name="UploadFile" value="Upload" class="Submit" />
 	</fieldset>
 	<%  } %>
 	<%if (Model.Documents.Count == 0) { %>
-	<p>
+	<p id="noDocumentsMessage">
 		You have no documents.<br />
 		Would you like to upload one?</p>
-	<%} else { %>
-	<table id="documents">
+	<%} %>
+	<table id="documents" style="<%: Model.Documents.Count == 0?"display: none;" : "" %>">
 		<thead>
 			<tr>
 				<th>Name</th>
 				<th class="Right">Size</th>
 				<th class="Right">Date</th>
-				<th class="Center">Progress</th>
+				<th class="Center" style="width: 135px">Progress</th>
 			</tr>
 		</thead>
 		<tbody>
 			<%foreach (var doc in Model.Documents) { %>
 			<tr id="document-<%:doc.Id %>">
-				<td>
+				<td class="NameCell">
 					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name })%></td>
-				<td class="Right">
+				<td class="SizeCell Right">
 					<%:doc.Length.ToSizeString()%></td>
-				<td class="Right">
+				<td class="DateCell Right">
 					<%:doc.DateUploaded.ToShortDateString()%></td>
-				<td class="Center StatusCell">
+				<td class="StatusCell Center">
 					<%:Html.Action("ProgressBar", doc)%>
 				</td>
 			</tr>
-			<%} %></tbody></table>
+			<%} %>
+		</tbody>
+	</table>
 
 	<script type="text/javascript">
 		var documents = new Prax.DocumentTable($('#documents'));
+		var uploader = new Prax.DocumentUploader(documents, '#uploadForm');
 		var refreshDelay = parseInt('<%:(Model.Documents.Max(d => d.GetRefreshTime()) ?? TimeSpan.Zero).TotalMilliseconds %>', 10); //Using a string fixes VS's syntax parser
 		if (refreshDelay > 0)
 			setTimeout(function () { documents.updateData(); }, refreshDelay);
 	</script>
 
-	<%} %>
 </asp:Content>

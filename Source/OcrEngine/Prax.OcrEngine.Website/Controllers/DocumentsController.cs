@@ -24,9 +24,24 @@ namespace Prax.OcrEngine.Website.Controllers {
 
 		[HttpPost]
 		public ActionResult Upload(HttpPostedFileBase file) {
-			if (file == null) return Index();	//TODO: Show error message
-			DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
-			return Index();
+			if (file == null)
+				return Index();	//TODO: Show error message
+
+			var id = DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
+
+			if (Request.IsAjaxRequest())
+				return Content(id.ToString());
+			else
+				return Index();
+		}
+		[HttpPost]
+		public ActionResult UploadAjax(HttpPostedFileBase file) {
+			if (file == null)
+				return Content("Error!");
+
+			var id = DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
+
+			return Content(id.ToString());
 		}
 
 		public ActionResult View(Guid id, string name = null) {
