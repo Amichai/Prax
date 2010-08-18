@@ -19,7 +19,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 		}
 
 		public Guid UserId { get; private set; }
-		public void UploadDocument(string name, Stream document, long length) {
+		public Guid UploadDocument(string name, Stream document, long length) {
 			byte[] bytes = new byte[length];
 			document.Read(bytes, 0, bytes.Length);	//TODO: ReadFill extension
 			var doc = new InMemoryDocument(bytes) {
@@ -28,6 +28,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			documents.Add(doc);
 
 			ThreadPool.QueueUserWorkItem(delegate { DoProcess(doc); });
+			return doc.Id;
 		}
 
 		private void DoProcess(InMemoryDocument doc) {

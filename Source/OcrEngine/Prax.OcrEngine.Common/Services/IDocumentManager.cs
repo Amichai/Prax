@@ -9,7 +9,8 @@ namespace Prax.OcrEngine.Services {
 	///<summary>Used by the website to interact with a user's documents in storage and with the scan workers.</summary>
 	public interface IDocumentManager {
 		///<summary>Uploads a document to storage.</summary>
-		void UploadDocument(string name, Stream document, long length);
+		///<returns>The ID of the new document.</returns>
+		Guid UploadDocument(string name, Stream document, long length);
 
 		///<summary>Gets all of the user's documents.</summary>
 		///<remarks>Calling this method might result in a network request.</remarks>
