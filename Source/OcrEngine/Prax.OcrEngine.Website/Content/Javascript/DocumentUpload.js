@@ -59,13 +59,26 @@ Prax.DocumentUploader.prototype = {
 	onCancel: function (e, queueId, file, data) {
 		this.table.getRow(queueId).tr.remove();
 	},
-	onComplete: function (e, queueId, file, response, data) {
-		var row = this.table.getRow(queueId);
-		row.setId(response);
-		row.setNameLink(true);
-		row.setProgress('Queued', 0);
+	onComplete: function (e, queueId, file, guid, data) {
+		//If an updateData call is made as the upload 
+		//finishes (before this callback executes), it
+		//will receive the new document and add it to 
+		//the table.  (Since it doesn't exist yet with
+		//the correct ID).
+		//If this happens, we will see an existing row
+		// with the new GUID.  In that case, we should 
+		//remove our existing row.
 
-		this.table.updateData();
+		var row = this.table.getRow(queueId);
+		if (this.table.getRow(guid))
+			this.table.removeRow(row);
+		else {
+			row.setId(guid);
+			row.setNameLink(true);
+			row.setProgress('Queued', 0);
+
+			this.table.updateData();
+		} 
 	},
 	onError: function (e, queueId, file, error) {
 		if (console)

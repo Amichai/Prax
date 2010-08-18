@@ -64,14 +64,22 @@ namespace Prax.OcrEngine.Website.Controllers {
 			if (doc.State == DocumentState.Scanned)
 				return new {
 					id = doc.Id,
-					state = "Scanned"
+					state = "Scanned",
+
+					name = doc.Name,
+					size = doc.Length,
+					date = doc.DateUploaded
 				};
 			else
 				return new {
 					id = doc.Id,
 					state = doc.State.ToString(),
 					progress = doc.ScanProgress,
-					progressCaption = GetBarCaption(doc.State, doc.ScanProgress)
+					progressCaption = GetBarCaption(doc.State, doc.ScanProgress),
+
+					name = doc.Name,
+					size = doc.Length,
+					date = doc.DateUploaded
 				};
 		}
 
