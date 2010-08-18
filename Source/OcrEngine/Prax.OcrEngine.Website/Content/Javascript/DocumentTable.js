@@ -68,7 +68,7 @@ Prax.DocumentTable.prototype = {
 	updateData: function updateData(noTimer) {
 		var self = this;
 
-		$.getJSON("/Documents/Data", function (data) {
+		$.getJSON("/Documents/Data?Timestamp=" + new Date(), function (data) {
 			for (var i = 0; i < data.documents.length; i++) {
 				self.getRow(data.documents[i].id).updateFrom(data.documents[i]);
 			}
