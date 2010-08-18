@@ -41,15 +41,17 @@ jQuery.fn.progressBar = function () {
 	var container = this;
 	if (!container.length) return null;
 
+	var outerCaption, innerCaption, bar;
+
 	if (container.children().length) {
-		var outerCaption = container.children(".OuterText");
-		var bar = container.children(".ProgressBar");
-		var innerCaption = bar.children();
+		outerCaption = container.children(".OuterText");
+		bar = container.children(".ProgressBar");
+		innerCaption = bar.children();
 	} else {
 		container.addClass('ProgressContainer');
-		var outerCaption = $('<span class="OuterText" />').appendTo(container);
-		var bar = $('<div class="ProgressBar" />').appendTo(container);
-		var innerCaption = $('<span />').appendTo(bar);
+		outerCaption = $('<span class="OuterText" />').appendTo(container);
+		bar = $('<div class="ProgressBar" />').appendTo(container);
+		innerCaption = $('<span />').appendTo(bar);
 	}
 
 	return new ProgressBar(container, outerCaption, bar, innerCaption);
