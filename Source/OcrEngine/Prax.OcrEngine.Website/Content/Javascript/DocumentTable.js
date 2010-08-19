@@ -139,8 +139,8 @@ Prax.DocumentTable.prototype = {
 			//Remove any documents that are no 
 			//longer on the server.  (eg, they
 			//were deleted in another browser)
-			for (var i = 0; i < self.documents.length; i++) {
-				var doc = self.documents[i];
+			for (i = 0; i < self.documents.length; i++) {
+				doc = self.documents[i];
 				if (!doc.id in existingIds)
 					self.removeRow(doc);
 			}
