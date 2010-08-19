@@ -23,9 +23,18 @@ namespace Prax.OcrEngine.Website.Controllers {
 		}
 
 		[HttpPost]
+		public ActionResult Delete(Guid id) {
+			DocumentManager.DeleteDocument(id);
+			if (Request.IsAjaxRequest())
+				return Content("OK");
+			else
+				return RedirectToAction("Index");
+		}
+
+		[HttpPost]
 		public ActionResult Upload(HttpPostedFileBase file) {
 			if (file == null)
-				return Index();	//TODO: Show error message
+				return RedirectToAction("Index");	//TODO: Show error message
 
 			var id = DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
 

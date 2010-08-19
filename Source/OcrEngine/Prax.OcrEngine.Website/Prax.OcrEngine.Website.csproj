@@ -114,6 +114,7 @@
       <SubType>Designer</SubType>
     </CodeAnalysisDictionary>
     <Content Include="Content\CSS\YUI-Reset.css" />
+    <Content Include="Content\Images\Delete16.png" />
     <Content Include="Content\Images\Logo.png" />
     <Content Include="Content\Javascript\DocumentUpload.js" />
     <Content Include="Content\Javascript\Utilities.js" />

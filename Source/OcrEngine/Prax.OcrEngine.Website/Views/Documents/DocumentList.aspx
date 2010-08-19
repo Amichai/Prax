@@ -23,6 +23,10 @@
 			padding: 2px 5px;
 			border-top: gray solid 1px;
 		}
+		table#documents tbody td.DeleteCell {
+			padding: 0 3px 0 10px	;
+			width: 16px;
+		}
 		.Right {
 			text-align: right;
 		}
@@ -122,6 +126,8 @@
 				<th class="Right">Size</th>
 				<th class="Right">Date</th>
 				<th class="Center" style="width: 135px">Progress</th>
+				<th>
+					<%-- Delete buttons --%></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -135,6 +141,11 @@
 					<%:doc.DateUploaded.ToShortDateString()%></td>
 				<td class="StatusCell Center">
 					<%:Html.Action("ProgressBar", doc)%>
+				</td>
+				<td class="DeleteCell">
+					<%using (Html.BeginForm("Delete", "documents", new { id = doc.Id })) { %>
+					<input type="image" name="Delete" value="Delete" title="Delete <%:doc.Name%>" src="/Content/Images/Delete16.png" />
+					<%} %>
 				</td>
 			</tr>
 			<%} %>
