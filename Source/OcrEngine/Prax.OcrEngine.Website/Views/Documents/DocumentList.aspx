@@ -24,9 +24,20 @@
 			border-top: gray solid 1px;
 		}
 		table#documents tbody td.DeleteCell {
-			padding: 0 3px 0 10px	;
+			padding: 0 3px 0 10px;
 			width: 16px;
 		}
+		table#documents tbody td.DeleteCell input {
+			width: 16px;
+			height: 16px;
+			border: none;
+			cursor: pointer;
+			background: url('/Content/Images/DeleteSprite.gif') no-repeat 0 center;
+		}
+		table#documents tbody td.DeleteCell input:hover {
+			background-position: -16px center;
+		}
+		
 		.Right {
 			text-align: right;
 		}
@@ -144,7 +155,7 @@
 				</td>
 				<td class="DeleteCell">
 					<%using (Html.BeginForm("Delete", "documents", new { id = doc.Id })) { %>
-					<input type="image" name="Delete" value="Delete" title="Delete <%:doc.Name%>" src="/Content/Images/Delete16.png" />
+					<input type="submit" name="Delete" title="Delete <%:doc.Name%>" value=" " />
 					<%} %>
 				</td>
 			</tr>
