@@ -15,8 +15,8 @@ Prax.DocumentRow = function DocumentRow(owner, tr) {
 	this.owner = owner;
 
 	this.id = tr.attr('id').substr(Prax.DocumentRow.idPrefix.length);
-	this.name = this.tr.children('.NameCell').text();
-	this.date = this.tr.children('.DateCell').text();
+	this.name = $.trim(this.tr.children('.NameCell').text());
+	this.date = new Date(this.tr.children('.DateCell').text());
 	this.size = parseInt(this.tr.children('.SizeCell').attr('title'), 10);
 
 	this.statusCell = this.tr.children('.StatusCell');
@@ -67,7 +67,7 @@ Prax.DocumentTable = function DocumentTable(table) {
 	this.table = table;
 
 	var self = this;
-	this.documents = table.find('tr').map(function () { return new Prax.DocumentRow(self, $(this)); });
+	this.documents = $.map(table.find('tbody tr'), function (tr) { return new Prax.DocumentRow(self, $(tr)); });
 
 	for (var i = 0; i < this.documents.length; i++)
 		this.documents[this.documents[i].id] = this.documents[i];
@@ -139,9 +139,9 @@ Prax.DocumentTable.prototype = {
 			//Remove any documents that are no 
 			//longer on the server.  (eg, they
 			//were deleted in another browser)
-			for (i = 0; i < self.documents.length; i++) {
+			for (i = self.documents.length - 1; i >= 0; i--) {
 				doc = self.documents[i];
-				if (!doc.id in existingIds)
+				if (!existingIds[doc.id])
 					self.removeRow(doc);
 			}
 
