@@ -22,6 +22,7 @@ Prax.DocumentUploader = function DocumentUploader(table, selector) {
 		script: '/Documents/UploadAjax',
 		fileDataName: 'file',
 
+		simUploadLimit: 3,
 		auto: true, 	//Upload files immediately after selection
 		multi: true, 	//Allow multi-selection
 
@@ -78,7 +79,7 @@ Prax.DocumentUploader.prototype = {
 			row.setProgress('Queued', 0);
 
 			this.table.updateData();
-		} 
+		}
 	},
 	onError: function (e, queueId, file, error) {
 		if (console)
