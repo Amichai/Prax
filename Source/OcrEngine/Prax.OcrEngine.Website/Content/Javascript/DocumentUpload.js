@@ -51,6 +51,7 @@ Prax.DocumentUploader.prototype = {
 		this.table.table.show();
 
 		var row = this.table.createRow(queueId, file.name, file.size);
+		row.state = Prax.DocumentState.uploading;
 		row.setProgress('Waiting to upload', 0);
 	},
 	onProgressChange: function (e, queueId, file, data) {
@@ -71,12 +72,13 @@ Prax.DocumentUploader.prototype = {
 		//remove our existing row.
 
 		var row = this.table.getRow(queueId);
-		if (this.table.getRow(guid))
-			this.table.removeRow(row);
+		if (this.table.getRow(guid))	//If there is a completed row from the server,
+			this.table.removeRow(row); 	//Remove our uploading row
 		else {
 			row.setId(guid);
 			row.setNameLink(true);
 			row.setProgress('Queued', 0);
+			row.state = Prax.DocumentState.scanning;
 
 			this.table.updateData();
 		}

@@ -5,6 +5,13 @@
 if (!Prax)
 	var Prax = {};
 
+Prax.DocumentState = function DocumentState(name) { this.name = name; }
+Prax.DocumentState.prototype = { toString: function () { return this.name; } };
+
+Prax.DocumentState.uploading = new Prax.DocumentState("Uploading");
+Prax.DocumentState.scanning = new Prax.DocumentState("Scanning");
+Prax.DocumentState.complete = new Prax.DocumentState("Complete");
+
 Prax.DocumentRow = function DocumentRow(owner, tr) {
 	/// <summary>Manages a row in the Documents table.</summary>
 	/// <param name="tr" type="jQuery">The table row.</param>
@@ -30,6 +37,7 @@ Prax.DocumentRow.prototype = {
 	name: '',
 	date: new Date(),
 	size: -1,
+	state: null,
 
 	getViewPath: function () { return '/Documents/View/' + this.id + '/' + this.name; },
 	setNameLink: function (on) {
@@ -68,7 +76,14 @@ Prax.DocumentTable = function DocumentTable(table) {
 	this.table = table;
 
 	var self = this;
-	this.documents = $.map(table.find('tbody tr'), function (tr) { return new Prax.DocumentRow(self, $(tr)); });
+	this.documents = $.map(table.find('tbody tr'), function (tr) {
+		var retVal = new Prax.DocumentRow(self, $(tr));
+		if (retVal.statusCell.children('.ProgressContainer').length)
+			retVal.state = Prax.DocumentState.scanning;
+		else
+			retVal.state = Prax.DocumentState.complete;
+		return retVal;
+	});
 
 	for (var i = 0; i < this.documents.length; i++)
 		this.documents[this.documents[i].id] = this.documents[i];
@@ -139,10 +154,13 @@ Prax.DocumentTable.prototype = {
 					docRow.setNameLink(true);
 				}
 
-				if (doc.state === 'Scanned')
+				if (doc.state === 'Scanned') {
 					docRow.statusCell.text('Scanned');
-				else
+					docRow.state = Prax.DocumentState.complete;
+				} else {
 					docRow.setProgress(doc.progressCaption, doc.progress);
+					docRow.state = Prax.DocumentState.scanning;
+				}
 			}
 
 			//Remove any documents that are no 
@@ -150,7 +168,7 @@ Prax.DocumentTable.prototype = {
 			//were deleted in another browser)
 			for (i = self.documents.length - 1; i >= 0; i--) {
 				doc = self.documents[i];
-				if (!existingIds[doc.id])
+				if (!existingIds[doc.id] && doc.state != Prax.DocumentState.uploading)
 					self.removeRow(doc);
 			}
 
