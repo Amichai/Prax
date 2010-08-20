@@ -24,6 +24,9 @@ namespace Prax.OcrEngine.Website.Controllers {
 
 		[HttpPost]
 		public ActionResult Delete(string id) {
+			if (String.IsNullOrWhiteSpace(id))
+				return RedirectToAction("Index");
+
 			//The ID parameter is passed from an <input> value.
 			//For accessibility reasons, it starts with delete.
 			if (id.StartsWith("Delete ", StringComparison.OrdinalIgnoreCase))
@@ -41,12 +44,9 @@ namespace Prax.OcrEngine.Website.Controllers {
 			if (file == null)
 				return RedirectToAction("Index");	//TODO: Show error message
 
-			var id = DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
+			DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
 
-			if (Request.IsAjaxRequest())
-				return Content(id.ToString());
-			else
-				return Index();
+			return RedirectToAction("Index");
 		}
 		[HttpPost]
 		public ActionResult UploadAjax(HttpPostedFileBase file) {
