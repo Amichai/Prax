@@ -13,6 +13,7 @@
 			 The files will actually be included by the ResourceSet architecture. --%>
 		<link rel="stylesheet" type="text/css" href="/Content/CSS/YUI-Reset.css" />
 		<link rel="stylesheet" type="text/css" href="/Content/CSS/Site.css" />
+		<link rel="stylesheet" type="text/css" href="/Content/CSS/ProgressBar.css" />
 		<%} %>
 		<%=Html.Stylesheets(ResourceSet.GlobalCss) %>
 		<asp:ContentPlaceHolder runat="server" ID="HeadContent" />

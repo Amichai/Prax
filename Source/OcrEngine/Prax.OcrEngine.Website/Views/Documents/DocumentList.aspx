@@ -45,31 +45,6 @@
 		.Center {
 			text-align: center;
 		}
-		.ProgressContainer {
-			width: 100%;
-			position: relative;
-			background-color: #eee;
-			border: 1px solid black;
-			padding: 1px;
-			margin-right: -1px;
-			text-align: left;
-		}
-		.ProgressContainer .ProgressBar {
-			background-color: Blue;
-			position: relative;
-			overflow: hidden;
-			height: 1em;
-			padding-bottom: 2px;
-		}
-		.ProgressContainer span {
-			color: Black;
-			text-align: center;
-			width: 100%;
-			position: absolute;
-		}
-		.ProgressContainer .ProgressBar span {
-			color: White;
-		}
 		.SiteIntro {
 			width: 50%;
 			margin: 1.5em auto;
