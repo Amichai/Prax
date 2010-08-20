@@ -48,6 +48,7 @@ Prax.DocumentRow.prototype = {
 		this.owner.documents[newId] = this;
 
 		this.tr.find('.NameCell a').attr('href', this.getViewPath());
+		this.tr.find('.DeleteCell input').val('Delete ' + newId);
 	},
 	setProgress: function setProgress(caption, percent) {
 		if (percent < 0) {
@@ -88,7 +89,15 @@ Prax.DocumentTable.prototype = {
 					.append($('<td />', { 'class': "NameCell", text: name }))
 					.append($('<td />', { 'class': "SizeCell Right", text: Prax.toSizeString(size), title: size + ' bytes' }))
 					.append($('<td />', { 'class': "DateCell Right", text: (date || new Date()).toShortDateString() }))
-					.append($('<td class="StatusCell Center">Wait...</td>'));
+					.append($('<td class="StatusCell Center">Wait...</td>'))
+					.append($('<td class="DeleteCell" />').append(
+						$('<input />', { type: "submit", name: "id", title: "Delete " + name, value: "Delete " + id })
+					));
+
+		//The submit button passes the ID parameter to the form.
+		//Since the value attribute also controls the caption, I
+		//hide the caption using CSS.  For accessibility reasons,
+		//I include the word delete, which the action removes.--%>
 
 		tr.prependTo(this.table.children('tbody'));
 
