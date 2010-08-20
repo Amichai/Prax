@@ -13,7 +13,7 @@ if (!Array.prototype.indexOf) {
 			from += len;
 
 		for (; from < len; from++) {
-			if (from in this && this[from] === elt)
+			if (from in this && this[from] === item)
 				return from;
 		}
 		return -1;
