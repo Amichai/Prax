@@ -23,8 +23,13 @@ namespace Prax.OcrEngine.Website.Controllers {
 		}
 
 		[HttpPost]
-		public ActionResult Delete(Guid id) {
-			DocumentManager.DeleteDocument(id);
+		public ActionResult Delete(string id) {
+			//The ID parameter is passed from an <input> value.
+			//For accessibility reasons, it starts with delete.
+			if (id.StartsWith("Delete ", StringComparison.OrdinalIgnoreCase))
+				id = id.Substring("Delete ".Length);
+
+			DocumentManager.DeleteDocument(Guid.Parse(id.Trim()));
 			if (Request.IsAjaxRequest())
 				return Content("OK");
 			else

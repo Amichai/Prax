@@ -33,6 +33,7 @@
 			border: none;
 			cursor: pointer;
 			background: url('/Content/Images/DeleteSprite.gif') no-repeat 0 center;
+			text-indent: -8192px;
 		}
 		table#documents tbody td.DeleteCell input:hover {
 			background-position: -16px center;
@@ -130,6 +131,7 @@
 		You have no documents.<br />
 		Would you like to upload one?</p>
 	<%} %>
+	<%using (Html.BeginForm("Delete", "Documents")) { %>
 	<table id="documents" style="<%: Model.Documents.Count == 0?"display: none;" : "" %>">
 		<thead>
 			<tr>
@@ -154,14 +156,17 @@
 					<%:Html.Action("ProgressBar", doc)%>
 				</td>
 				<td class="DeleteCell">
-					<%using (Html.BeginForm("Delete", "documents", new { id = doc.Id })) { %>
-					<input type="submit" name="Delete" title="Delete <%:doc.Name%>" value=" " />
-					<%} %>
+					<%-- The submit button passes the ID parameter to the form.
+					 Since the value attribute also controls the caption, I
+					 hide the caption using CSS.  For accessibility reasons,
+					 I include the word delete, which the action removes.--%>
+					<input type="submit" name="id" title="Delete <%:doc.Name%>" value="Delete <%:doc.Id %>" />
 				</td>
 			</tr>
 			<%} %>
 		</tbody>
 	</table>
+	<%} %>
 
 	<script type="text/javascript">
 		var documents = new Prax.DocumentTable($('#documents'));
