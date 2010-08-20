@@ -19,6 +19,7 @@ Prax.DocumentRow = function DocumentRow(owner, tr) {
 	if (!tr.length) throw Error("No row");
 
 	this.tr = tr;
+	this.deleteButton = this.tr.find('.DeleteCell input');
 	this.owner = owner;
 
 	this.id = tr.attr('id').substr(Prax.DocumentRow.idPrefix.length);
@@ -27,11 +28,15 @@ Prax.DocumentRow = function DocumentRow(owner, tr) {
 	this.size = parseInt(this.tr.children('.SizeCell').attr('title'), 10);
 
 	this.statusCell = this.tr.children('.StatusCell');
+
+	var self = this;
+	this.deleteButton.click(function () { self.deleteDocument(); return false; });
 };
 Prax.DocumentRow.idPrefix = 'document-';
 Prax.DocumentRow.prototype = {
 	tr: $(),
 	statusCell: $(),
+	deleteButton: $(),
 	owner: null,
 	id: '',
 	name: '',
@@ -68,6 +73,18 @@ Prax.DocumentRow.prototype = {
 			bar.val(percent);
 			bar.text(caption);
 		}
+	},
+	deleteDocument: function deleteDocument() {
+		/// <summary>Deletes this document from the server.</summary>
+		/// <remarks>This method is replaced by DocumentUploader for rows that are still uploading.</remarks>
+
+		var self = this;
+		this.deleteButton.attr({ disabled: true, title: "Please wait..." });
+
+		this.deleteButton.addClass('LoadingButton');
+		$.post('/Documents/Delete', { id: this.id }, function (response) {
+			self.owner.removeRow(self);
+		});
 	}
 };
 Prax.DocumentTable = function DocumentTable(table) {
@@ -168,6 +185,8 @@ Prax.DocumentTable.prototype = {
 			//were deleted in another browser)
 			for (i = self.documents.length - 1; i >= 0; i--) {
 				doc = self.documents[i];
+				//Don't remove rows that are still uploading, 
+				//even though they're not on the server yet.
 				if (!existingIds[doc.id] && doc.state != Prax.DocumentState.uploading)
 					self.removeRow(doc);
 			}

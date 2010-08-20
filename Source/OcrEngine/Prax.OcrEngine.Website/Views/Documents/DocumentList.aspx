@@ -38,6 +38,9 @@
 		table#documents tbody td.DeleteCell input:hover {
 			background-position: -16px center;
 		}
+		input.LoadingButton {
+			background: url('/Content/Images/Loading16.gif') no-repeat 0 center !important;
+		}
 		
 		.Right {
 			text-align: right;
