@@ -30,7 +30,11 @@ namespace Prax.OcrEngine.Website {
 			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
 						.InstancePerDependency();
 
-			builder.RegisterType<Stubs.InMemoryDocumentManager>().As<IDocumentManager>();
+			builder.RegisterType<Stubs.InMemoryStorage>().As<IStorageClient>()
+				.SingleInstance();
+			builder.RegisterType<Stubs.SimpleProcessorController>().As<IProcessorController>()
+				.SingleInstance();
+			builder.RegisterType<DocumentManager>().As<IDocumentManager>();
 
 			builder.RegisterType<Stubs.InMemoryUserAccount>().As<IUserAccount>();
 

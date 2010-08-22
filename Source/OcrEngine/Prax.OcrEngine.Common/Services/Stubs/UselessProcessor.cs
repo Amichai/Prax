@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Threading;
+using System.ComponentModel;
 
 namespace Prax.OcrEngine.Services.Stubs {
 	///<summary>An IDocumentProcessor implementation that doesn't do anything.</summary>
@@ -18,6 +19,8 @@ namespace Prax.OcrEngine.Services.Stubs {
 
 			MaximumProgress = rand.Next(5, 15);
 			for (int i = 0; i < MaximumProgress; i++) {
+				if (CheckCancel()) break;
+
 				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(5, 35)));
 				CurrentProgress = i + 1;
 				OnProgressChanged();
@@ -43,5 +46,21 @@ namespace Prax.OcrEngine.Services.Stubs {
 			if (ProgressChanged != null)
 				ProgressChanged(this, e);
 		}
+
+		bool CheckCancel() {
+			var args = new CancelEventArgs();
+			OnCheckCanceled(args);
+			return args.Cancel;
+		}
+
+		///<summary>Occurs when the processor checks whether the operation has been canceled.</summary>
+		public event CancelEventHandler CheckCanceled;
+		///<summary>Raises the CheckCanceled event.</summary>
+		///<param name="e">A CancelEventArgs object that provides the event data.</param>
+		internal protected virtual void OnCheckCanceled(CancelEventArgs e) {
+			if (CheckCanceled != null)
+				CheckCanceled(this, e);
+		}
+
 	}
 }

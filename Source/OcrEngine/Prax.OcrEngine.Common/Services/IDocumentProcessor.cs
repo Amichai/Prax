@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.ComponentModel;
 
 namespace Prax.OcrEngine.Services {
 	///<summary>Performs OCR processing.</summary>
@@ -27,6 +28,8 @@ namespace Prax.OcrEngine.Services {
 
 		///<summary>Raised when the progress of the operation changes.</summary>
 		event EventHandler ProgressChanged;
+		///<summary>Raised to check whether the operation should be canceled.</summary>
+		event CancelEventHandler CheckCanceled;
 
 		//TODO: Add classes or interfaces to Common
 		//that store the OCR's results, then expose

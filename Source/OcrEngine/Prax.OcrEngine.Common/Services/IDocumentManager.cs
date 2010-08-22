@@ -7,7 +7,12 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Prax.OcrEngine.Services {
 	///<summary>Used by the website to interact with a user's documents in storage and with the scan workers.</summary>
+	///<remarks>This service is associated with a single user.</remarks>
 	public interface IDocumentManager {
+
+		///<summary>Gets the user ID to manage documents for.</summary>
+		Guid UserId { get; }
+
 		///<summary>Uploads a document to storage.</summary>
 		///<returns>The ID of the new document.</returns>
 		Guid UploadDocument(string name, Stream document, long length);
@@ -51,7 +56,7 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Gets the size of the underlying file.</summary>
 		public long Length { get; protected set; }
 	}
-	///<summary>Describes the state of an upload document.</summary>
+	///<summary>Describes the state of an uploaded document.</summary>
 	public enum DocumentState {
 		///<summary>The document has been uploaded and is queued to be scanned.</summary>
 		ScanQueued,

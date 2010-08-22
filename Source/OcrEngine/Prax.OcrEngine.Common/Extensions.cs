@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Reflection;
 using System.Globalization;
+using System.IO;
 
 namespace Prax.OcrEngine {
 	///<summary>Contains useful extension methods.</summary>
@@ -46,6 +47,28 @@ namespace Prax.OcrEngine {
 		}
 		#endregion
 
+		#region Streams
+		///<summary>Fills a byte array from a stream.</summary>
+		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the size of the array.</returns>
+		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
+		public static int ReadFill(this Stream stream, byte[] buffer) { return stream.ReadFill(buffer, buffer.Length); }
+		///<summary>Reads a given number of bytes into a byte array from a stream.</summary>
+		///<returns>The number of bytes read.  If the end of the stream was reached, this will be less than the length.</returns>
+		///<remarks>Stream.Read is not guaranteed to read length bytes even if it doesn't hit the end of the stream, so I wrote this method, which is.</remarks>
+		public static int ReadFill(this Stream stream, byte[] buffer, int length) {
+			if (stream == null) throw new ArgumentNullException("stream");
+			if (buffer == null) throw new ArgumentNullException("buffer");
+
+			int position = 0;
+			while (position < length) {
+				var bytesRead = stream.Read(buffer, position, length - position);
+				if (bytesRead == 0) break;
+				position += bytesRead;
+			}
+			return position;
+		}
+		#endregion
+
 		static readonly string[] sizes = { "bytes", "KB", "MB", "GB", "TB" };
 		///<summary>Converts a number of bytes to a string in the appropriate unit.</summary>
 		public static string ToSizeString(this long size) {
@@ -58,5 +81,13 @@ namespace Prax.OcrEngine {
 
 			return String.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", shrunkenSize, sizes[order]);
 		}
+
+
+		///<summary>Gets the progress of an IDocumentProcesor as a number between 0 and 100.</summary>
+		public static int ProgressPercentage(this Services.IDocumentProcessor processor) {
+			if (processor == null) throw new ArgumentNullException("processor");
+			return (int)(100 * (double)processor.CurrentProgress / processor.MaximumProgress);
+		}
 	}
+
 }

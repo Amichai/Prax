@@ -54,11 +54,16 @@
     <Compile Include="Services\IAuthenticator.cs" />
     <Compile Include="Services\IDocumentManager.cs" />
     <Compile Include="Services\IDocumentProcessor.cs" />
+    <Compile Include="Services\IProcessorController.cs" />
+    <Compile Include="Services\IStorageClient.cs" />
+    <Compile Include="Services\DocumentManager.cs" />
     <Compile Include="Services\Stubs\InMemoryDocumentManager.cs" />
     <Compile Include="Services\IUserAccount.cs" />
     <Compile Include="MimeTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Stubs\InMemoryStorage.cs" />
     <Compile Include="Services\Stubs\InMemoryUserAccount.cs" />
+    <Compile Include="Services\Stubs\SimpleProcessorController.cs" />
     <Compile Include="Services\Stubs\UselessProcessor.cs" />
     <Compile Include="Services\Stubs\UserlessAuthenticator.cs" />
   </ItemGroup>
