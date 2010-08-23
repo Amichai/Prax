@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentIdentifier.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Services\IAuthenticator.cs" />
     <Compile Include="Services\IDocumentManager.cs" />

@@ -23,13 +23,13 @@ namespace Prax.OcrEngine.Services.Stubs {
 		public Guid UploadDocument(string name, Stream document, long length) {
 			byte[] bytes = new byte[length];
 			document.ReadFill(bytes);
-			var doc = new InMemoryDocument(bytes) {
+			var doc = new InMemoryDocument(UserId, bytes) {
 				Name = name
 			};
 			documents.Add(doc);
 
 			ThreadPool.QueueUserWorkItem(delegate { DoProcess(doc); });
-			return doc.Id;
+			return doc.Id.DocumentId;
 		}
 
 		private void DoProcess(InMemoryDocument doc) {
@@ -45,16 +45,16 @@ namespace Prax.OcrEngine.Services.Stubs {
 		}
 
 		public Document GetDocument(Guid id) {
-			return documents.SingleOrDefault(d => d.Id == id);
+			return documents.SingleOrDefault(d => d.Id.DocumentId == id);
 		}
 
 		public void DeleteDocument(Guid id) {
-			documents.RemoveAll(d => d.Id == id);
+			documents.RemoveAll(d => d.Id.DocumentId == id);
 		}
 		class InMemoryDocument : Document {
 			readonly byte[] bytes;
-			public InMemoryDocument(byte[] bytes)
-				: base(Guid.NewGuid()) {
+			public InMemoryDocument(Guid userId, byte[] bytes)
+				: base(new DocumentIdentifier(userId, Guid.NewGuid())) {
 				this.bytes = bytes;
 				Length = bytes.Length;
 				DateUploaded = DateTime.Now;

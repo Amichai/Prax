@@ -77,7 +77,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 		static object GetJsonObject(Document doc) {
 			if (doc.State == DocumentState.Scanned)
 				return new {
-					id = doc.Id,
+					id = doc.Id.DocumentId,
 					state = "Scanned",
 
 					name = doc.Name,
@@ -86,7 +86,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 				};
 			else
 				return new {
-					id = doc.Id,
+					id = doc.Id.DocumentId,
 					state = doc.State.ToString(),
 					progress = doc.ScanProgress,
 					progressCaption = GetBarCaption(doc.State, doc.ScanProgress),

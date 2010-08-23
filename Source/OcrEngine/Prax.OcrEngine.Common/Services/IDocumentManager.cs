@@ -35,10 +35,10 @@ namespace Prax.OcrEngine.Services {
 	///<summary>A document that can be processed by the OCR engine.</summary>
 	public abstract class Document {
 		///<summary>Creates a new Document with the specified ID.</summary>
-		protected Document(Guid id) { Id = id; }
+		protected Document(DocumentIdentifier id) { Id = id; }
 
-		///<summary>Gets the document's unique ID.</summary>
-		public Guid Id { get; private set; }
+		///<summary>Gets the document's identifier.</summary>
+		public DocumentIdentifier Id { get; private set; }
 		///<summary>Gets the date that this document was initially uploaded into the system.</summary>
 		public DateTime DateUploaded { get; protected set; }
 

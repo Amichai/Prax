@@ -22,18 +22,21 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Gets the user ID that this instance manages.</summary>
 		public Guid UserId { get; private set; }
 
+		///<summary>Creates a DocumentIdentifier value from a document GUID for this user</summary>
+		private DocumentIdentifier MakeId(Guid documentId) { return new DocumentIdentifier(UserId, documentId); }
+
 		public Guid UploadDocument(string name, Stream document, long length) {
 			var id = StorageClient.UploadDocument(UserId, name, document, length);
-			ProcessorController.BeginProcessing(id);
+			ProcessorController.BeginProcessing(MakeId(id));
 			return id;
 		}
 
 		public IEnumerable<Document> GetDocuments() { return StorageClient.GetDocuments(UserId); }
-		public Document GetDocument(Guid id) { return StorageClient.GetDocument(id); }
+		public Document GetDocument(Guid id) { return StorageClient.GetDocument(MakeId(id)); }
 
 		public void DeleteDocument(Guid id) {
-			ProcessorController.CancelProcessing(id);	//TODO: Check state?
-			StorageClient.DeleteDocument(id);
+			ProcessorController.CancelProcessing(MakeId(id));	//TODO: Check state?
+			StorageClient.DeleteDocument(MakeId(id));
 		}
 	}
 }

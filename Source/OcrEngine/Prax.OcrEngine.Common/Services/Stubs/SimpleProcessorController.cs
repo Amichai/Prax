@@ -10,7 +10,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 		public IStorageClient StorageClient { get; private set; }
 		public Func<IDocumentProcessor> ProcessorCreator { get; private set; }
 
-		readonly ConcurrentDictionary<Guid, bool> canceledDocuments = new ConcurrentDictionary<Guid, bool>();
+		readonly ConcurrentDictionary<DocumentIdentifier, bool> canceledDocuments = new ConcurrentDictionary<DocumentIdentifier, bool>();
 		public SimpleProcessorController(IStorageClient storageClient, Func<IDocumentProcessor> processorCreator) {
 			if (storageClient == null) throw new ArgumentNullException("storageClient");
 			if (processorCreator == null) throw new ArgumentNullException("processorCreator");
@@ -19,7 +19,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			ProcessorCreator = processorCreator;
 		}
 
-		public void BeginProcessing(Guid id) {
+		public void BeginProcessing(DocumentIdentifier id) {
 			ThreadPool.QueueUserWorkItem(delegate { DoProcess(StorageClient.GetDocument(id)); });
 		}
 
@@ -36,7 +36,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			StorageClient.SetState(doc.Id, DocumentState.Scanned);
 		}
 
-		public void CancelProcessing(Guid id) {
+		public void CancelProcessing(DocumentIdentifier id) {
 			canceledDocuments.AddOrUpdate(id, true, (otherId, v) => true);
 		}
 	}

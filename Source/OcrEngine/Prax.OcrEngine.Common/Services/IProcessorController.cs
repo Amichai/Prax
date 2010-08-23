@@ -7,9 +7,9 @@ namespace Prax.OcrEngine.Services {
 	///<summary>Controls document processors, possibly on remote computers.</summary>
 	public interface IProcessorController {
 		///<summary>Causes the document with the given ID to start processing.</summary>
-		void BeginProcessing(Guid id);
+		void BeginProcessing(DocumentIdentifier id);
 
 		///<summary>Cancels the document with the given ID.</summary>
-		void CancelProcessing(Guid id);
+		void CancelProcessing(DocumentIdentifier id);
 	}
 }

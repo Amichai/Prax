@@ -17,44 +17,42 @@ namespace Prax.OcrEngine.Services.Stubs {
 
 			lock (list)
 				list.Add(doc);
-			return doc.Id;
+			return doc.Id.DocumentId;
 		}
 
 		public IEnumerable<Document> GetDocuments(Guid userId) {
 			lock (list)
-				return list.Where(d => d.UserId == userId);
+				return list.Where(d => d.Id.UserId == userId);
 		}
 
-		public Document GetDocument(Guid id) {
+		public Document GetDocument(DocumentIdentifier id) {
 			lock (list)
 				return list.Single(d => d.Id == id);
 		}
 
-		public void DeleteDocument(Guid id) {
+		public void DeleteDocument(DocumentIdentifier id) {
 			lock (list)
 				list.RemoveAll(d => d.Id == id);
 		}
 
-		public void SetScanProgress(Guid id, int progress) {
+		public void SetScanProgress(DocumentIdentifier id, int progress) {
 			var doc = GetDocument(id);
 			doc.ScanProgress = progress;
 			doc.State = DocumentState.Scanning;
 		}
 
-		public void SetState(Guid id, DocumentState state) {
+		public void SetState(DocumentIdentifier id, DocumentState state) {
 			GetDocument(id).State = state;
 		}
 
 		class InMemoryDocument : Document {
 			readonly byte[] bytes;
 			public InMemoryDocument(Guid userId, byte[] bytes)
-				: base(Guid.NewGuid()) {
+				: base(new DocumentIdentifier(userId, Guid.NewGuid())) {
 				this.bytes = bytes;
 				Length = bytes.Length;
 				DateUploaded = DateTime.Now;
-				UserId = userId;
 			}
-			public Guid UserId { get; private set; }
 
 			public override MemoryStream Read() { return new MemoryStream(bytes, false); }
 		}
