@@ -54,7 +54,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				DateUploaded = DateTime.Now;
 			}
 
-			public override MemoryStream Read() { return new MemoryStream(bytes, false); }
+			public override Stream Read() { return new MemoryStream(bytes, false); }
 		}
 	}
 }

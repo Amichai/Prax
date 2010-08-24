@@ -74,7 +74,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				set { }
 			}
 
-			public override MemoryStream Read() { return new MemoryStream(bytes, false); }
+			public override Stream Read() { return new MemoryStream(bytes, false); }
 		}
 	}
 }
