@@ -180,6 +180,10 @@
       <Project>{0507F74F-3DB1-4FBE-A804-664D2FE52CA5}</Project>
       <Name>Prax.OcrEngine.Engine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Prax.OcrEngine.Services.Azure\Prax.OcrEngine.Services.Azure.csproj">
+      <Project>{1DD058C8-68CD-408A-AF17-CA14CDBDFCCD}</Project>
+      <Name>Prax.OcrEngine.Services.Azure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

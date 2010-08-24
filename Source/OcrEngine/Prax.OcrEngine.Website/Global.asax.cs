@@ -9,12 +9,22 @@ using Autofac.Integration.Web.Mvc;
 using Autofac;
 using Prax.OcrEngine.Services;
 using Stubs = Prax.OcrEngine.Services.Stubs;
+using Azure = Prax.OcrEngine.Services.Azure;
+using Microsoft.WindowsAzure;
 
 namespace Prax.OcrEngine.Website {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
 	// visit http://go.microsoft.com/?LinkId=9394801
 
 	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
+		static CloudStorageAccount CreateFiddlerAccount() {
+			string baseDomain = "http://perforce";
+			return new CloudStorageAccount(
+				new StorageCredentialsAccountAndKey("devstoreaccount1", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="), 
+				new Uri(baseDomain + ":10000/devstoreaccount1"), new Uri(baseDomain + ":10001/devstoreaccount1"), new Uri(baseDomain + ":10002/devstoreaccount1")
+			);
+		}
+
 		///<summary>Registers components with Autofac.</summary>
 		static void RegisterComponents(ContainerBuilder builder) {
 			//Register Resources components
@@ -26,12 +36,15 @@ namespace Prax.OcrEngine.Website {
 			builder.RegisterInstance(new Resources.StylesheetDebuggingResolver()).As<Resources.IResourceResolver>()
 				.PropertiesAutowired();
 
+			builder.RegisterInstance(CreateFiddlerAccount()).As<CloudStorageAccount>();
+
+			builder.RegisterType<Azure.AzureStorageClient>().As<IStorageClient>();
 			//Register engine services
 			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
 						.InstancePerDependency();
 
-			builder.RegisterType<Stubs.InMemoryStorage>().As<IStorageClient>()
-				.SingleInstance();
+			//builder.RegisterType<Stubs.InMemoryStorage>().As<IStorageClient>()
+			//    .SingleInstance();
 			builder.RegisterType<Stubs.SimpleProcessorController>().As<IProcessorController>()
 				.SingleInstance();
 			builder.RegisterType<DocumentManager>().As<IDocumentManager>();
