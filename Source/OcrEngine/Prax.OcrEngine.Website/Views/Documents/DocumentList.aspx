@@ -123,9 +123,10 @@
 		</thead>
 		<tbody>
 			<%foreach (var doc in Model.Documents) { %>
-			<tr id="document-<%:doc.Id %>">
+			<tr id="document-<%:doc.Id.DocumentId %>">
 				<td class="NameCell">
-					<%:Html.ActionLink(doc.Name, "View", new { doc.Id, doc.Name }, new { target = "DocumentPreview" })%></td>
+					<%:Html.ActionLink(doc.Name, "View", new { id = doc.Id.DocumentId,  doc.Name }, new { target = "DocumentPreview" })%>
+				</td>
 				<td class="SizeCell Right" title="<%:doc.Length.ToString()%> bytes">
 					<%:doc.Length.ToSizeString()%></td>
 				<td class="DateCell Right">
@@ -138,7 +139,7 @@
 					 Since the value attribute also controls the caption, I
 					 hide the caption using CSS.  For accessibility reasons,
 					 I include the word delete, which the action removes.--%>
-					<input type="submit" name="id" title="Delete <%:doc.Name%>" value="Delete <%:doc.Id %>" />
+					<input type="submit" name="id" title="Delete <%:doc.Name%>" value="Delete <%:doc.Id.DocumentId	 %>" />
 				</td>
 			</tr>
 			<%} %>
