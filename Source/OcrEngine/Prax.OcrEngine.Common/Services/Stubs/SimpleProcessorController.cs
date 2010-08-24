@@ -31,7 +31,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			processor.ProgressChanged += delegate { StorageClient.SetScanProgress(doc.Id, processor.ProgressPercentage()); };
 			//In the Azure worker, ProgressChanged will update the blob metadata on a worker thread.
 
-			processor.ProcessDocument(doc.Read());
+			processor.ProcessDocument(doc.OpenRead());
 
 			StorageClient.SetState(doc.Id, DocumentState.Scanned);
 		}

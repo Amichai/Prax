@@ -36,7 +36,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			var processor = ProcessorCreator();
 			doc.State = DocumentState.Scanning;
 			doc.SetProcessor(processor);
-			processor.ProcessDocument(doc.Read());
+			processor.ProcessDocument(doc.OpenRead());
 			doc.State = DocumentState.Scanned;
 		}
 
@@ -74,7 +74,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				set { }
 			}
 
-			public override Stream Read() { return new MemoryStream(bytes, false); }
+			public override Stream OpenRead() { return new MemoryStream(bytes, false); }
 		}
 	}
 }

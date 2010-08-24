@@ -60,7 +60,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 
 		public ActionResult View(Guid id, string name = null) {
 			var doc = DocumentManager.GetDocument(id);
-			return File(doc.Read(), MimeTypes.ForExtension(Path.GetExtension(doc.Name)));
+			return File(doc.OpenRead(), MimeTypes.ForExtension(Path.GetExtension(doc.Name)));
 		}
 
 		///<summary>Gets the document list in JSON format for table updates.</summary>

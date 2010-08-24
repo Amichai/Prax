@@ -49,7 +49,7 @@ namespace Prax.OcrEngine.Services.Azure {
 				base.State = (DocumentState)Enum.Parse(typeof(DocumentState), blob.Metadata["State"]);
 			}
 
-			public override Stream Read() { return blob.OpenRead(); }
+			public override Stream OpenRead() { return blob.OpenRead(); }
 		}
 
 		static readonly BlobRequestOptions GetDocsOptions = new BlobRequestOptions { BlobListingDetails = BlobListingDetails.Metadata, UseFlatBlobListing = true };

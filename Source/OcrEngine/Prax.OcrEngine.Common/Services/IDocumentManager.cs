@@ -50,9 +50,10 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Gets or sets the progress of the scan operation as a number between 0 and 100.</summary>
 		public virtual int ScanProgress { get; set; }
 
-		///<summary>Returns a read-only Stream containing the underlying file.</summary>
+		///<summary>Returns a new read-only Stream containing the underlying file.</summary>
+		///<returns>A read-only stream, which the caller must close.</returns>
 		///<remarks>The cloud implementation can stream directly from the storage service, and can in turn be streamed directly to the client browser.</remarks>
-		public abstract Stream Read();
+		public abstract Stream OpenRead();
 		///<summary>Gets the size of the underlying file.</summary>
 		public long Length { get; protected set; }
 	}
