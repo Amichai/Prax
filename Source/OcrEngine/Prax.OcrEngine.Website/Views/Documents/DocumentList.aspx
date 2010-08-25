@@ -5,6 +5,9 @@
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="HeadContent" runat="server">
 	<style type="text/css">
+		p#noDocumentsMessage {
+			text-align: center;
+		}
 		table#documents {
 			margin-top: 1em;
 			width: 100%;
@@ -106,8 +109,7 @@
 	<%  } %>
 	<%if (Model.Documents.Count == 0) { %>
 	<p id="noDocumentsMessage">
-		You have no documents.<br />
-		Would you like to upload one?</p>
+		Would you like to upload a document?</p>
 	<%} %>
 	<%using (Html.BeginForm("Delete", "Documents")) { %>
 	<table id="documents" style="<%: Model.Documents.Count == 0?"display: none;" : "" %>">
