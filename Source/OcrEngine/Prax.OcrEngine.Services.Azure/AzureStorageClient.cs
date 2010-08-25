@@ -74,9 +74,20 @@ namespace Prax.OcrEngine.Services.Azure {
 		//overwrite all existing metadata.
 		//Therefore, I fetch all existing 
 		//metadata before writing it.
+
+		//If a blob is deleted while being
+		//scanned, the processor may still
+		//report progress.  In such cases,
+		//we swallow an exception that the
+		//blob no longer exists.
+		//The processor should be canceled
+		//by other means.
 		public void SetScanProgress(DocumentIdentifier id, int progress) {
 			var blob = CreateBlob(id);
-			blob.FetchAttributes();
+			try {
+				blob.FetchAttributes();
+			} catch (StorageClientException) { return; }	//If the blob was deleted, don't do anything.
+
 			blob.Metadata["Progress"] = progress.ToString(CultureInfo.InvariantCulture);
 			blob.Metadata["State"] = DocumentState.Scanning.ToString();
 			blob.SetMetadata();
@@ -84,7 +95,10 @@ namespace Prax.OcrEngine.Services.Azure {
 
 		public void SetState(DocumentIdentifier id, DocumentState state) {
 			var blob = CreateBlob(id);
-			blob.FetchAttributes();
+			try {
+				blob.FetchAttributes();
+			} catch (StorageClientException) { return; }	//If the blob was deleted, don't do anything.
+
 			blob.Metadata["State"] = state.ToString();
 			blob.SetMetadata();
 		}
