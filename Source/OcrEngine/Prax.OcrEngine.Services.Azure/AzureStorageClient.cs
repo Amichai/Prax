@@ -28,7 +28,7 @@ namespace Prax.OcrEngine.Services.Azure {
 			blob.Properties.ContentType = MimeTypes.ForExtension(Path.GetExtension(name));
 
 			blob.Metadata.Add("Name", Uri.EscapeDataString(name));
-			blob.Metadata.Add("Date", DateTime.Now.ToString("u", CultureInfo.InvariantCulture));
+			blob.Metadata.Add("Date", DateTime.UtcNow.ToString("u", CultureInfo.InvariantCulture));
 			blob.Metadata.Add("Progress", "0");
 			blob.Metadata.Add("State", DocumentState.ScanQueued.ToString());
 
@@ -43,7 +43,7 @@ namespace Prax.OcrEngine.Services.Azure {
 				this.blob = blob;
 				base.Length = blob.Properties.Length;
 
-				base.DateUploaded = DateTime.Parse(blob.Metadata["Date"], CultureInfo.InvariantCulture);
+				base.DateUploaded = DateTime.Parse(blob.Metadata["Date"], CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
 				base.Name = Uri.UnescapeDataString(blob.Metadata["Name"]);
 				base.ScanProgress = int.Parse(blob.Metadata["Progress"], CultureInfo.InvariantCulture);
 				base.State = (DocumentState)Enum.Parse(typeof(DocumentState), blob.Metadata["State"]);

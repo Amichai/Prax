@@ -39,7 +39,7 @@ namespace Prax.OcrEngine.Services {
 
 		///<summary>Gets the document's identifier.</summary>
 		public DocumentIdentifier Id { get; private set; }
-		///<summary>Gets the date that this document was initially uploaded into the system.</summary>
+		///<summary>Gets the UTC timestamp that this document was initially uploaded into the system.</summary>
 		public DateTime DateUploaded { get; protected set; }
 
 		///<summary>Gets or sets the name of the document.</summary>

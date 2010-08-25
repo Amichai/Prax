@@ -51,7 +51,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				: base(new DocumentIdentifier(userId, Guid.NewGuid())) {
 				this.bytes = bytes;
 				Length = bytes.Length;
-				DateUploaded = DateTime.Now;
+				DateUploaded = DateTime.UtcNow;
 			}
 
 			public override Stream OpenRead() { return new MemoryStream(bytes, false); }
