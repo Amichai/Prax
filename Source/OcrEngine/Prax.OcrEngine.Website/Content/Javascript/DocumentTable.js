@@ -30,7 +30,12 @@ Prax.DocumentRow = function DocumentRow(owner, tr) {
 	this.statusCell = this.tr.children('.StatusCell');
 
 	var self = this;
-	this.deleteButton.click(function () { self.deleteDocument(); return false; });
+	this.deleteButton.click(function () {
+		if (!confirm("Are you sure you want to delete " + self.name + "?"))
+			return;
+		self.deleteDocument();
+		return false;
+	});
 };
 Prax.DocumentRow.idPrefix = 'document-';
 Prax.DocumentRow.prototype = {
