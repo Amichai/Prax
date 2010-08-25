@@ -18,14 +18,19 @@ namespace Prax.OcrEngine {
 			{ ".pdf",	"application/pdf" },
 		};
 
+		const string DefaultType = "application/octet-stream";
 		///<summary>Gets the MIME type for the given file extension.</summary>
 		public static string ForExtension(string extension) {
+			if (string.IsNullOrEmpty(extension))
+				return DefaultType;
+
 			if (extension[0] != '.')
 				extension = "." + extension;
 			string retVal;
 			if (ExtensionMap.TryGetValue(extension, out retVal))
 				return retVal;
-			return "application/octet-stream";
+
+			return DefaultType;
 		}
 	}
 }
