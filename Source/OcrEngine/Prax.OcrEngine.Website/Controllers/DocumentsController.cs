@@ -67,7 +67,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 		public ActionResult Data() {
 			var documents = DocumentManager.GetDocuments().OrderByDescending(d => d.DateUploaded).ToArray();
 
-			TimeSpan? refreshTimeout = documents.Max(d => d.GetRefreshTime());
+			TimeSpan? refreshTimeout = documents.Min(d => d.GetRefreshTime());
 
 			return Json(new {
 				refreshTimeout = (refreshTimeout ?? TimeSpan.Zero).TotalMilliseconds,

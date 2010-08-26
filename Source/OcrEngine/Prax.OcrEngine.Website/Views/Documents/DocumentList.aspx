@@ -152,7 +152,7 @@
 	<script type="text/javascript">
 		var documents = new Prax.DocumentTable($('#documents'));
 		var uploader = new Prax.DocumentUploader(documents, '#uploadForm');
-		var refreshDelay = parseInt('<%:(Model.Documents.Max(d => d.GetRefreshTime()) ?? TimeSpan.Zero).TotalMilliseconds %>', 10); //Using a string fixes VS's syntax parser
+		var refreshDelay = parseInt('<%:(Model.Documents.Min(d => d.GetRefreshTime()) ?? TimeSpan.Zero).TotalMilliseconds %>', 10); //Using a string fixes VS's syntax parser
 		if (refreshDelay > 0)
 			setTimeout(function () { documents.updateData(); }, refreshDelay);
 	</script>
