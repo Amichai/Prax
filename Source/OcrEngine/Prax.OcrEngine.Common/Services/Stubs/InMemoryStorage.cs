@@ -13,7 +13,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 		public Guid UploadDocument(Guid userId, string name, Stream document, long length) {
 			byte[] bytes = new byte[length];
 			document.ReadFill(bytes);
-			var doc = new InMemoryDocument(userId, bytes) { Name = name };
+			var doc = new InMemoryDocument(userId, name, bytes);
 
 			lock (list)
 				list.Add(doc);
@@ -25,9 +25,12 @@ namespace Prax.OcrEngine.Services.Stubs {
 				return list.Where(d => d.Id.UserId == userId);
 		}
 
+		///<summary>Finds the document with the given ID.</summary>
+		///<remarks>Must be called inside lock(list).</remarks>
+		InMemoryDocument FindDoc(DocumentIdentifier id) { return list.SingleOrDefault(d => d.Id == id); }
 		public Document GetDocument(DocumentIdentifier id) {
 			lock (list)
-				return list.Single(d => d.Id == id);
+				return FindDoc(id);
 		}
 
 		public void DeleteDocument(DocumentIdentifier id) {
@@ -36,23 +39,33 @@ namespace Prax.OcrEngine.Services.Stubs {
 		}
 
 		public void SetScanProgress(DocumentIdentifier id, int progress) {
-			var doc = GetDocument(id);
-			doc.ScanProgress = progress;
-			doc.State = DocumentState.Scanning;
+			InMemoryDocument doc;
+			lock (list)
+				doc = FindDoc(id);
+			if (doc != null)
+				doc.SetScanProgress(progress);
 		}
 
 		public void SetState(DocumentIdentifier id, DocumentState state) {
-			GetDocument(id).State = state;
+			InMemoryDocument doc;
+			lock (list)
+				doc = FindDoc(id);
+			if (doc != null)
+				doc.SetState(state);
 		}
 
 		class InMemoryDocument : Document {
 			readonly byte[] bytes;
-			public InMemoryDocument(Guid userId, byte[] bytes)
+			public InMemoryDocument(Guid userId, string name, byte[] bytes)
 				: base(new DocumentIdentifier(userId, Guid.NewGuid())) {
+				base.Name = name;
 				this.bytes = bytes;
 				Length = bytes.Length;
 				DateUploaded = DateTime.UtcNow;
 			}
+
+			public void SetScanProgress(int progress) { base.ScanProgress = progress; base.State = DocumentState.Scanning; }
+			public void SetState(DocumentState state) { base.State = state; }
 
 			public override Stream OpenRead() { return new MemoryStream(bytes, false); }
 		}

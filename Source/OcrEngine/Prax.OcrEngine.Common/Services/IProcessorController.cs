@@ -12,4 +12,6 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Cancels the document with the given ID.</summary>
 		void CancelProcessing(DocumentIdentifier id);
 	}
+	//The Azure implementation will probably
+	//use this pattern: http://azure.snagy.name/blog/?p=219
 }

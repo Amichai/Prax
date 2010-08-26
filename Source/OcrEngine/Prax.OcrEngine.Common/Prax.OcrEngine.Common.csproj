@@ -58,7 +58,6 @@
     <Compile Include="Services\IProcessorController.cs" />
     <Compile Include="Services\IStorageClient.cs" />
     <Compile Include="Services\DocumentManager.cs" />
-    <Compile Include="Services\Stubs\InMemoryDocumentManager.cs" />
     <Compile Include="Services\IUserAccount.cs" />
     <Compile Include="MimeTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
