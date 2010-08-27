@@ -51,7 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureProcessorController.cs" />
+    <Compile Include="AzureScanWorker.cs" />
     <Compile Include="AzureStorageClient.cs" />
+    <Compile Include="InMemoryWorkerPool.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
