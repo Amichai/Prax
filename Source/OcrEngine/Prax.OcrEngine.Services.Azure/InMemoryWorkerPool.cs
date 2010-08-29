@@ -13,6 +13,7 @@ namespace Prax.OcrEngine.Services.Azure {
 
 		public void StartPool() {
 			for (int i = 0; i < 4; i++) {
+				Thread.Sleep(1000);	//Prevent lock convoy in Autofac
 				new Thread(RunWorker).Start();
 			}
 		}
