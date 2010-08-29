@@ -7,6 +7,7 @@
 	<style type="text/css">
 		p#noDocumentsMessage {
 			text-align: center;
+			margin-top: 1em;
 		}
 		table#documents {
 			margin-top: 1em;
