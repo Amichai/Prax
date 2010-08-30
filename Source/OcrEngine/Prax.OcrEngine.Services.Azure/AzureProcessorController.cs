@@ -21,8 +21,10 @@ namespace Prax.OcrEngine.Services.Azure {
 			queue.AddMessage(new CloudQueueMessage(id.FileName()));
 		}
 
-		public void CancelProcessing(DocumentIdentifier id) {
-			throw new NotImplementedException();
-		}
+		//The DocumentManager should already update the
+		//CancellationPending property of the document.
+		//We do not support active cancellation, so we 
+		//can't do anything in this method.
+		public void CancelProcessing(DocumentIdentifier id) {	}
 	}
 }

@@ -28,9 +28,18 @@ namespace Prax.OcrEngine.Services.Azure {
 				var message = queue.GetMessage();
 
 				var document = storage.GetDocument(Utils.ParseName(message.AsString));
+				if (document == null) {	//If the document was deleted while still in the queue, skip it.
+					queue.DeleteMessage(message);
+					return;
+				}
 
 				if (document.State != DocumentState.ScanQueued)
 					return;		//TODO: Log (How can this happen?)
+				if (document.CancellationPending) {
+					//TODO: Set state
+					queue.DeleteMessage(message);
+					return;
+				}
 
 				storage.SetState(document.Id, DocumentState.Scanning);
 
@@ -41,6 +50,7 @@ namespace Prax.OcrEngine.Services.Azure {
 					reporter.StartReporter();
 
 					processor.ProgressChanged += (sender, e) => reporter.SetProgress(processor.ProgressPercentage());
+					processor.CheckCanceled += (sender, e) => e.Cancel = reporter.CancellationPending;
 
 					processor.ProcessDocument(document.OpenRead());
 					reporter.StopReporter();
@@ -59,8 +69,6 @@ namespace Prax.OcrEngine.Services.Azure {
 			readonly DocumentIdentifier documentId;
 			public ProgressReporter(IStorageClient storage, DocumentIdentifier documentId) { this.storage = storage; this.documentId = documentId; }
 
-			//TODO: Check cancellation
-
 			readonly AutoResetEvent notifier = new AutoResetEvent(false);
 			volatile int currentProgress;
 
@@ -69,6 +77,8 @@ namespace Prax.OcrEngine.Services.Azure {
 				currentProgress = progress;
 				notifier.Set();
 			}
+
+			public volatile bool CancellationPending;
 
 			//Since the scan will usually take a long time, this isn't a ManualResetEventSlim.
 			readonly ManualResetEvent reporterStoppedEvent = new ManualResetEvent(false);
@@ -97,18 +107,30 @@ namespace Prax.OcrEngine.Services.Azure {
 			///<summary>Runs the reporter listener synchronously.</summary>
 			void RunReporter() {
 				while (true) {
-					notifier.WaitOne();
+					//Check for cancellation at  intervals.
+					//In addition, if the progress changes,
+					//update the progress immediately.
+					notifier.WaitOne(TimeSpan.FromSeconds(15));	//TODO: Increase timeout?
+
 					var progress = currentProgress;	//Read the volatile cross-thread field
 
-					if (progress < 0) {
-						reporterStoppedEvent.Set();
-						return;
+					if (progress < 0)
+						break;
+					//TODO: Reduce storage calls.  We end up calling GetMetadata twice.
+					if (!CancellationPending) {
+						var doc = storage.GetDocument(documentId);
+						if (doc == null || doc.CancellationPending)
+							CancellationPending = true;
+						if (doc == null) 
+							break;			//If the document was deleted, there's no point in reporting progress.
 					}
+
 					if (lastProgress == progress) continue;
 					lastProgress = progress;
 
 					storage.SetScanProgress(documentId, progress);
 				}
+				reporterStoppedEvent.Set();
 			}
 
 			public void Dispose() { notifier.Dispose(); reporterStoppedEvent.Dispose(); }

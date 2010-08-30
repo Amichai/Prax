@@ -10,8 +10,11 @@ namespace Prax.OcrEngine.Services {
 		void BeginProcessing(DocumentIdentifier id);
 
 		///<summary>Cancels the document with the given ID.</summary>
+		///<remarks>This method supports active cancellation.
+		///If the processor controller cannot perform active
+		///cancellation, it doesn't need to do anything here.
+		///The DocumentManager will set CancellationPending 
+		///on the document, supporting passive cancellation.</remarks>
 		void CancelProcessing(DocumentIdentifier id);
 	}
-	//The Azure implementation will probably
-	//use this pattern: http://azure.snagy.name/blog/?p=219
 }

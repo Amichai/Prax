@@ -53,6 +53,13 @@ namespace Prax.OcrEngine.Services.Stubs {
 			if (doc != null)
 				doc.SetState(state);
 		}
+		public void SetCancelPending(DocumentIdentifier id, bool pending) {
+			InMemoryDocument doc;
+			lock (list)
+				doc = FindDoc(id);
+			if (doc != null)
+				doc.SetCancelPending(pending);
+		}
 
 		class InMemoryDocument : Document {
 			readonly byte[] bytes;
@@ -65,7 +72,12 @@ namespace Prax.OcrEngine.Services.Stubs {
 			}
 
 			public void SetScanProgress(int progress) { base.ScanProgress = progress; base.State = DocumentState.Scanning; }
-			public void SetState(DocumentState state) { base.State = state; }
+			public void SetCancelPending(bool pending) { base.CancellationPending = pending; }
+			public void SetState(DocumentState state) {
+				base.State = state;
+				if (state != DocumentState.Scanning)
+					CancellationPending = false;
+			}
 
 			public override Stream OpenRead() { return new MemoryStream(bytes, false); }
 		}

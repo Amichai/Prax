@@ -35,7 +35,11 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Sets the state of a specific document.</summary>
 		///<param name="id">The document ID.</param>
 		///<param name="progress">The current progress, between 0 and 100.</param>
+		///<remarks>Setting the state to anything other than Scanning should reset CancellationPending to false.</remarks>
 		void SetState(DocumentIdentifier id, DocumentState state);
+
+		///<summary>Sets the CancellationPending property of a specific document.</summary>
+		void SetCancelPending(DocumentIdentifier id, bool pending);
 
 		//TODO: Rename
 	}
@@ -52,10 +56,15 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Gets or sets the name of the document.</summary>
 		public string Name { get; protected set; }
 		///<summary>Gets or sets the state of this document.</summary>
-		public virtual DocumentState State { get; protected set; }
+		public DocumentState State { get; protected set; }
 
 		///<summary>Gets or sets the progress of the scan operation as a number between 0 and 100.</summary>
-		public virtual int ScanProgress { get; protected set; }
+		public int ScanProgress { get; protected set; }
+
+		///<summary>Indicates whether this document is waiting for processing to be cancelled.</summary>
+		///<remarks>This property supports passive cancellation.  
+		///It is separate from State to avoid race conditions.</remarks>
+		public bool CancellationPending { get; protected set; }
 
 		///<summary>Returns a new read-only Stream containing the underlying file.</summary>
 		///<returns>A read-only stream, which the caller must close.</returns>

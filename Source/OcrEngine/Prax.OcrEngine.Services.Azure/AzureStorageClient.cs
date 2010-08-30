@@ -30,6 +30,7 @@ namespace Prax.OcrEngine.Services.Azure {
 			blob.Metadata.Add("Name", Uri.EscapeDataString(name));
 			blob.Metadata.Add("Date", DateTime.UtcNow.ToString("u", CultureInfo.InvariantCulture));
 			blob.Metadata.Add("Progress", "0");
+			blob.Metadata.Add("CancellationPending", "false");
 			blob.Metadata.Add("State", DocumentState.ScanQueued.ToString());
 
 			blob.UploadFromStream(document);
@@ -43,9 +44,14 @@ namespace Prax.OcrEngine.Services.Azure {
 				this.blob = blob;
 				base.Length = blob.Properties.Length;
 
+				//When adding new properties, be sure to maintain 
+				//backwards compatibility with existing documents.
+				//(Or update them manually)
+
 				base.DateUploaded = DateTime.Parse(blob.Metadata["Date"], CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal);
 				base.Name = Uri.UnescapeDataString(blob.Metadata["Name"]);
 				base.ScanProgress = int.Parse(blob.Metadata["Progress"], CultureInfo.InvariantCulture);
+				base.CancellationPending = bool.Parse(blob.Metadata["CancellationPending"]);
 				base.State = (DocumentState)Enum.Parse(typeof(DocumentState), blob.Metadata["State"]);
 			}
 
@@ -82,25 +88,32 @@ namespace Prax.OcrEngine.Services.Azure {
 		//blob no longer exists.
 		//The processor should be canceled
 		//by other means.
-		public void SetScanProgress(DocumentIdentifier id, int progress) {
+		void UpdateDocument(DocumentIdentifier id, Action<CloudBlob> updater) {
 			var blob = CreateBlob(id);
 			try {
 				blob.FetchAttributes();
 			} catch (StorageClientException) { return; }	//If the blob was deleted, don't do anything.
 
-			blob.Metadata["Progress"] = progress.ToString(CultureInfo.InvariantCulture);
-			blob.Metadata["State"] = DocumentState.Scanning.ToString();
+			updater(blob);
 			blob.SetMetadata();
+		}
+		public void SetScanProgress(DocumentIdentifier id, int progress) {
+			UpdateDocument(id, blob => {
+				blob.Metadata["Progress"] = progress.ToString(CultureInfo.InvariantCulture);
+				blob.Metadata["State"] = DocumentState.Scanning.ToString();
+			});
 		}
 
 		public void SetState(DocumentIdentifier id, DocumentState state) {
-			var blob = CreateBlob(id);
-			try {
-				blob.FetchAttributes();
-			} catch (StorageClientException) { return; }	//If the blob was deleted, don't do anything.
+			UpdateDocument(id, blob => {
+				blob.Metadata["State"] = state.ToString();
+				if (state != DocumentState.Scanning)
+					blob.Metadata["CancellationPending"] = "false";
 
-			blob.Metadata["State"] = state.ToString();
-			blob.SetMetadata();
+			});
+		}
+		public void SetCancelPending(DocumentIdentifier id, bool pending) {
+			UpdateDocument(id, blob => blob.Metadata["CancellationPending"] = pending.ToString());
 		}
 	}
 }
