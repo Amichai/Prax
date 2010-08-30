@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Services.Client;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.StorageClient;
-using System.Threading;
-using System.Collections.Concurrent;
 
 namespace Prax.OcrEngine.Services.Azure {
 	///<summary>Reads messages from an Azure queue, guaranteeing that each message will only be returned once.</summary>
@@ -48,8 +49,8 @@ namespace Prax.OcrEngine.Services.Azure {
 				var pm = new ProcessedMessage(queue, message);
 				processedMessagesContext.AddObject(TableName, pm);
 				try {
-					processedMessagesContext.SaveChangesWithRetries();
-				} catch { continue; }	//If we failed to save, assume that a different machine already received the message.
+					processedMessagesContext.SaveChanges();
+				} catch (DataServiceClientException) { continue; }	//If we failed to save, assume that a different machine already received the message.
 				messages.AddOrUpdate(message, pm, (k, v) => pm);
 
 				return message;
