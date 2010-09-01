@@ -25,15 +25,25 @@ namespace Prax.OcrEngine.Services.Stubs {
 
 		private void DoProcess(Document doc) {
 			var processor = ProcessorCreator();
-			StorageClient.SetState(doc.Id, DocumentState.Scanning);
+			doc.State = DocumentState.Scanning;
+			doc.ScanProgress = 0;
+			StorageClient.UpdateDocument(doc);
 
 			processor.CheckCanceled += (sender, e) => e.Cancel = canceledDocuments.ContainsKey(doc.Id);
-			processor.ProgressChanged += delegate { StorageClient.SetScanProgress(doc.Id, processor.ProgressPercentage()); };
+			processor.ProgressChanged += delegate {
+				doc = StorageClient.GetDocument(doc.Id);
+				if (doc == null) return;
+				doc.ScanProgress = processor.ProgressPercentage();
+				StorageClient.UpdateDocument(doc);
+			};
 			//In the Azure worker, ProgressChanged will update the blob metadata on a worker thread.
 
 			processor.ProcessDocument(doc.OpenRead());
 
-			StorageClient.SetState(doc.Id, DocumentState.Scanned);
+			doc = StorageClient.GetDocument(doc.Id);
+			doc.State = DocumentState.Scanned;
+			doc.ScanProgress = 100;
+			StorageClient.UpdateDocument(doc);
 		}
 
 		public void CancelProcessing(DocumentIdentifier id) {

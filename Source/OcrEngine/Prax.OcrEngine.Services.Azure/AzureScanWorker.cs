@@ -41,7 +41,8 @@ namespace Prax.OcrEngine.Services.Azure {
 					return;
 				}
 
-				storage.SetState(document.Id, DocumentState.Scanning);
+				document.State = DocumentState.Scanning;
+				storage.UpdateDocument(document);
 
 				queue.DeleteMessage(message);
 
@@ -54,7 +55,12 @@ namespace Prax.OcrEngine.Services.Azure {
 
 					processor.ProcessDocument(document.OpenRead());
 					reporter.StopReporter();
-					storage.SetState(document.Id, DocumentState.Scanned);
+
+					document = storage.GetDocument(document.Id);	//Refresh properties before saving them (eg, if it was renamed)
+					if (document == null) continue;					//If the document was just deleted, skip it.
+					document.ScanProgress = 100;
+					document.State = DocumentState.Scanned;
+					storage.UpdateDocument(document);
 				}
 			}
 		}
@@ -116,19 +122,21 @@ namespace Prax.OcrEngine.Services.Azure {
 
 					if (progress < 0)
 						break;
-					//TODO: Reduce storage calls.  We end up calling GetMetadata twice.
+
+
+					var doc = storage.GetDocument(documentId);	//Refresh the document from storage
 					if (!CancellationPending) {
-						var doc = storage.GetDocument(documentId);
 						if (doc == null || doc.CancellationPending)
 							CancellationPending = true;
-						if (doc == null) 
+						if (doc == null)
 							break;			//If the document was deleted, there's no point in reporting progress.
 					}
 
 					if (lastProgress == progress) continue;
 					lastProgress = progress;
 
-					storage.SetScanProgress(documentId, progress);
+					doc.ScanProgress = progress;
+					storage.UpdateDocument(doc);
 				}
 				reporterStoppedEvent.Set();
 			}

@@ -22,15 +22,17 @@ namespace Prax.OcrEngine.Services.Stubs {
 
 		public IEnumerable<Document> GetDocuments(Guid userId) {
 			lock (list)
-				return list.Where(d => d.Id.UserId == userId);
+				return list.Where(d => d.Id.UserId == userId).Select(d => d.Clone());
 		}
 
 		///<summary>Finds the document with the given ID.</summary>
 		///<remarks>Must be called inside lock(list).</remarks>
 		InMemoryDocument FindDoc(DocumentIdentifier id) { return list.SingleOrDefault(d => d.Id == id); }
 		public Document GetDocument(DocumentIdentifier id) {
+			InMemoryDocument doc;
 			lock (list)
-				return FindDoc(id);
+				doc = FindDoc(id);
+			return doc == null ? null : doc.Clone();
 		}
 
 		public void DeleteDocument(DocumentIdentifier id) {
@@ -38,31 +40,19 @@ namespace Prax.OcrEngine.Services.Stubs {
 				list.RemoveAll(d => d.Id == id);
 		}
 
-		public void SetScanProgress(DocumentIdentifier id, int progress) {
-			InMemoryDocument doc;
-			lock (list)
-				doc = FindDoc(id);
-			if (doc != null)
-				doc.SetScanProgress(progress);
-		}
+		public bool UpdateDocument(Document doc) {
+			lock (list) {
+				var index = list.FindIndex(d => d.Id == doc.Id);
+				if (index < 0)
+					return false;
 
-		public void SetState(DocumentIdentifier id, DocumentState state) {
-			InMemoryDocument doc;
-			lock (list)
-				doc = FindDoc(id);
-			if (doc != null)
-				doc.SetState(state);
+				list[index] = ((InMemoryDocument)doc).Clone();
+				return true;
+			}
 		}
-		public void SetCancelPending(DocumentIdentifier id, bool pending) {
-			InMemoryDocument doc;
-			lock (list)
-				doc = FindDoc(id);
-			if (doc != null)
-				doc.SetCancelPending(pending);
-		}
-
 		class InMemoryDocument : Document {
 			readonly byte[] bytes;
+
 			public InMemoryDocument(Guid userId, string name, byte[] bytes)
 				: base(new DocumentIdentifier(userId, Guid.NewGuid())) {
 				base.Name = name;
@@ -71,13 +61,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				DateUploaded = DateTime.UtcNow;
 			}
 
-			public void SetScanProgress(int progress) { base.ScanProgress = progress; base.State = DocumentState.Scanning; }
-			public void SetCancelPending(bool pending) { base.CancellationPending = pending; }
-			public void SetState(DocumentState state) {
-				base.State = state;
-				if (state != DocumentState.Scanning)
-					CancellationPending = false;
-			}
+			public InMemoryDocument Clone() { return (InMemoryDocument)MemberwiseClone(); }
 
 			public override Stream OpenRead() { return new MemoryStream(bytes, false); }
 		}

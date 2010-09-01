@@ -26,27 +26,22 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Deletes the document with the specified ID.</summary>
 		void DeleteDocument(DocumentIdentifier id);
 
-		///<summary>Sets the scan progress of a specific document.</summary>
-		///<param name="id">The document ID.</param>
-		///<param name="progress">The current progress, between 0 and 100.</param>
-		///<remarks>This method should also set state to Scanning.</remarks>
-		void SetScanProgress(DocumentIdentifier id, int progress);
-
-		///<summary>Sets the state of a specific document.</summary>
-		///<param name="id">The document ID.</param>
-		///<param name="progress">The current progress, between 0 and 100.</param>
-		///<remarks>Setting the state to anything other than Scanning should reset CancellationPending to false.</remarks>
-		void SetState(DocumentIdentifier id, DocumentState state);
-
-		///<summary>Sets the CancellationPending property of a specific document.</summary>
-		void SetCancelPending(DocumentIdentifier id, bool pending);
-
-		//TODO: Rename
+		///<summary>Updates the properties of the given document in storage.</summary>
+		///<param name="doc">The document to read updated properties from.</param>
+		///<returns>False if the document no longer exists in storage.</returns>
+		bool UpdateDocument(Document doc);
 	}
 	///<summary>A document that can be processed by the OCR engine.</summary>
 	public abstract class Document {
 		///<summary>Creates a new Document with the specified ID.</summary>
 		protected Document(DocumentIdentifier id) { Id = id; }
+
+		protected void SetInitialValues() {
+			DateUploaded = DateTime.UtcNow;
+			State = DocumentState.ScanQueued;
+			ScanProgress = 0;
+			CancellationPending = false;
+		}
 
 		///<summary>Gets the document's identifier.</summary>
 		public DocumentIdentifier Id { get; private set; }
@@ -54,17 +49,17 @@ namespace Prax.OcrEngine.Services {
 		public DateTime DateUploaded { get; protected set; }
 
 		///<summary>Gets or sets the name of the document.</summary>
-		public string Name { get; protected set; }
+		public string Name { get; set; }
 		///<summary>Gets or sets the state of this document.</summary>
-		public DocumentState State { get; protected set; }
+		public DocumentState State { get; set; }
 
 		///<summary>Gets or sets the progress of the scan operation as a number between 0 and 100.</summary>
-		public int ScanProgress { get; protected set; }
+		public int ScanProgress { get; set; }
 
 		///<summary>Indicates whether this document is waiting for processing to be cancelled.</summary>
 		///<remarks>This property supports passive cancellation.  
 		///It is separate from State to avoid race conditions.</remarks>
-		public bool CancellationPending { get; protected set; }
+		public bool CancellationPending { get; set; }
 
 		///<summary>Returns a new read-only Stream containing the underlying file.</summary>
 		///<returns>A read-only stream, which the caller must close.</returns>
