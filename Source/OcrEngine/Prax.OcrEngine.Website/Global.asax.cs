@@ -4,13 +4,13 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Autofac;
 using Autofac.Integration.Web;
 using Autofac.Integration.Web.Mvc;
-using Autofac;
-using Prax.OcrEngine.Services;
-using Stubs = Prax.OcrEngine.Services.Stubs;
-using Azure = Prax.OcrEngine.Services.Azure;
 using Microsoft.WindowsAzure;
+using Prax.OcrEngine.Services;
+using Azure = Prax.OcrEngine.Services.Azure;
+using Stubs = Prax.OcrEngine.Services.Stubs;
 
 namespace Prax.OcrEngine.Website {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
@@ -20,7 +20,7 @@ namespace Prax.OcrEngine.Website {
 		static CloudStorageAccount CreateFiddlerAccount() {
 			string baseDomain = "http://perforce";
 			return new CloudStorageAccount(
-				new StorageCredentialsAccountAndKey("devstoreaccount1", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="), 
+				new StorageCredentialsAccountAndKey("devstoreaccount1", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="),
 				new Uri(baseDomain + ":10000/devstoreaccount1"), new Uri(baseDomain + ":10001/devstoreaccount1"), new Uri(baseDomain + ":10002/devstoreaccount1")
 			);
 		}
@@ -38,15 +38,21 @@ namespace Prax.OcrEngine.Website {
 
 			builder.RegisterInstance(CreateFiddlerAccount()).As<CloudStorageAccount>();
 
+			builder.RegisterType<Azure.AzureProcessorController>().As<IProcessorController>();
 			builder.RegisterType<Azure.AzureStorageClient>().As<IStorageClient>();
+
+			builder.RegisterType<Azure.AzureScanWorker>();
+			builder.RegisterType<Azure.InMemoryWorkerPool>();
+
 			//Register engine services
 			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
 						.InstancePerDependency();
 
 			//builder.RegisterType<Stubs.InMemoryStorage>().As<IStorageClient>()
 			//    .SingleInstance();
-			builder.RegisterType<Stubs.SimpleProcessorController>().As<IProcessorController>()
-				.SingleInstance();
+			//builder.RegisterType<Stubs.SimpleProcessorController>().As<IProcessorController>()
+			//    .SingleInstance();
+
 			builder.RegisterType<DocumentManager>().As<IDocumentManager>();
 
 			builder.RegisterType<Stubs.InMemoryUserAccount>().As<IUserAccount>();
@@ -83,6 +89,8 @@ namespace Prax.OcrEngine.Website {
 			builder.RegisterControllers(typeof(PraxMvcApplication).Assembly);
 			containerProvider = new ContainerProvider(builder.Build());
 			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory(ContainerProvider));
+
+			containerProvider.ApplicationContainer.Resolve<Azure.InMemoryWorkerPool>().StartPool();
 
 			RegisterRoutes(RouteTable.Routes);
 		}
