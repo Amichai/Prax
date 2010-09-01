@@ -11,8 +11,8 @@ using Microsoft.WindowsAzure.StorageClient;
 namespace Prax.OcrEngine.Services.Azure {
 	///<summary>Reads messages from an Azure queue, guaranteeing that each message will only be returned once.</summary>
 	class SingleDeliveryQueueClient {
+		readonly CloudTableClient tableClient;
 		readonly CloudQueue queue;
-		readonly TableServiceContext processedMessagesContext;
 		const string TableName = "ProcessedMessages";
 
 		public SingleDeliveryQueueClient(CloudStorageAccount account, string queueName) {
@@ -20,9 +20,8 @@ namespace Prax.OcrEngine.Services.Azure {
 			queue = queueClient.GetQueueReference(queueName);
 			queue.CreateIfNotExist();
 
-			var tableClient = account.CreateCloudTableClient();
+			tableClient = account.CreateCloudTableClient();
 			tableClient.CreateTableIfNotExist(TableName);
-			processedMessagesContext = tableClient.GetDataServiceContext();
 		}
 
 		class ProcessedMessage : TableServiceEntity {
@@ -46,16 +45,18 @@ namespace Prax.OcrEngine.Services.Azure {
 					message = queue.GetMessage();
 				}
 
+				var dataContext = tableClient.GetDataServiceContext();
 				var pm = new ProcessedMessage(queue, message);
-				processedMessagesContext.AddObject(TableName, pm);
+				dataContext.AddObject(TableName, pm);
 				try {
-					processedMessagesContext.SaveChanges();
+					dataContext.SaveChanges();
 				} catch (DataServiceRequestException ex) {
 					if (ex.Response.All(o => o.StatusCode == 409))	//HTTP 409 Conflict
 						continue;
 					else
 						throw;
 				}	//If we failed to save, assume that a different machine already received the message.
+
 				messages.AddOrUpdate(message, pm, (k, v) => pm);
 
 				return message;
@@ -75,7 +76,11 @@ namespace Prax.OcrEngine.Services.Azure {
 
 				ProcessedMessage pm;
 				messages.TryRemove(message, out pm);
-				processedMessagesContext.DeleteObject(pm);
+
+				var dataContext = tableClient.GetDataServiceContext();
+				dataContext.AttachTo(TableName, pm);
+				dataContext.DeleteObject(pm);
+				dataContext.SaveChangesWithRetries();
 			}, null);
 		}
 	}
