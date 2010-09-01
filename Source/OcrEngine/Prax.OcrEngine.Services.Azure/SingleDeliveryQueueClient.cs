@@ -50,7 +50,12 @@ namespace Prax.OcrEngine.Services.Azure {
 				processedMessagesContext.AddObject(TableName, pm);
 				try {
 					processedMessagesContext.SaveChanges();
-				} catch (DataServiceClientException) { continue; }	//If we failed to save, assume that a different machine already received the message.
+				} catch (DataServiceRequestException ex) {
+					if (ex.Response.All(o => o.StatusCode == 409))	//HTTP 409 Conflict
+						continue;
+					else
+						throw;
+				}	//If we failed to save, assume that a different machine already received the message.
 				messages.AddOrUpdate(message, pm, (k, v) => pm);
 
 				return message;
