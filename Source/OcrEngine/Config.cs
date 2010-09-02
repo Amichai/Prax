@@ -43,6 +43,7 @@ namespace Prax.OcrEngine {
 
 			builder.DevelopmentStorage();
 			builder.AzureDocuments();
+
 			builder.InMemoryAzureProcessing();
 
 			builder.StubProcessor();
@@ -138,8 +139,8 @@ namespace Prax.OcrEngine.Configuration {
 		public static void InMemoryAzureProcessing(this ContainerBuilder builder) {
 			builder.RegisterType<Azure.InMemoryWorkerPool>();
 
-			//When the first AzureProcessorController is created, start the pool.
-			builder.RegisterDependency<Azure.AzureProcessorController>("In-memory pool starter",
+			//When the first ProcessorController is created, start the pool.
+			builder.RegisterDependency<IProcessorController>("In-memory pool starter",
 				c => c.Resolve<Azure.InMemoryWorkerPool>().StartPool()
 			);
 		}

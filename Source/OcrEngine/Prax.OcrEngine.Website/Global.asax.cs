@@ -48,8 +48,6 @@ namespace Prax.OcrEngine.Website {
 			containerProvider = new ContainerProvider(builder.Build());
 			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory(ContainerProvider));
 
-			containerProvider.ApplicationContainer.Resolve<Azure.InMemoryWorkerPool>().StartPool();
-
 			RegisterRoutes(RouteTable.Routes);
 		}
 
