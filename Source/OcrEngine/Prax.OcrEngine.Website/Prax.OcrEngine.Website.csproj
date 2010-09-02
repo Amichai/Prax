@@ -130,6 +130,7 @@
     <Content Include="Content\Uploadify\uploadify.allglyphs.swf" />
     <Content Include="Content\Uploadify\uploadify.swf" />
     <Content Include="Content\Javascript\ProgressBar.js" />
+    <Content Include="FavIcon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Views\Content\About.aspx" />
     <Content Include="Views\Content\Contact.aspx" />
