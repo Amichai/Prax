@@ -12,10 +12,14 @@ namespace Prax.OcrEngine.Services.Azure {
 		}
 
 		public void StartPool() {
-			for (int i = 0; i < 4; i++) {
-				Thread.Sleep(1000);	//Prevent lock convoy in Autofac
-				new Thread(RunWorker).Start();
-			}
+			//Run this in the background so that we don't block the first request
+			ThreadPool.QueueUserWorkItem(delegate {
+
+				for (int i = 0; i < 4; i++) {
+					//Thread.Sleep(1000);	//Prevent lock convoy in Autofac
+					new Thread(RunWorker).Start();
+				}
+			});
 		}
 		void RunWorker() {
 			var worker = workerCreator();
