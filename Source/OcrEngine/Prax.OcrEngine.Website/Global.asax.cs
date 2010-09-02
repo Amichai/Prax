@@ -17,49 +17,7 @@ namespace Prax.OcrEngine.Website {
 	// visit http://go.microsoft.com/?LinkId=9394801
 
 	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
-		static CloudStorageAccount CreateFiddlerAccount() {
-			string baseDomain = "http://perforce";
-			return new CloudStorageAccount(
-				new StorageCredentialsAccountAndKey("devstoreaccount1", "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="),
-				new Uri(baseDomain + ":10000/devstoreaccount1"), new Uri(baseDomain + ":10001/devstoreaccount1"), new Uri(baseDomain + ":10002/devstoreaccount1")
-			);
-		}
 
-		///<summary>Registers components with Autofac.</summary>
-		static void RegisterComponents(ContainerBuilder builder) {
-			//Register Resources components
-			builder.RegisterInstance(new Resources.MSAjaxScriptMinifier()).As<Resources.IMinifier>();
-			builder.RegisterInstance(new Resources.MSAjaxStylesheetMinifier()).As<Resources.IMinifier>();
-
-			builder.RegisterInstance(new Resources.ScriptDebuggingResolver()).As<Resources.IResourceResolver>()
-				.PropertiesAutowired();
-			builder.RegisterInstance(new Resources.StylesheetDebuggingResolver()).As<Resources.IResourceResolver>()
-				.PropertiesAutowired();
-
-			builder.RegisterInstance(CreateFiddlerAccount()).As<CloudStorageAccount>();
-
-			builder.RegisterType<Azure.AzureProcessorController>().As<IProcessorController>();
-			builder.RegisterType<Azure.AzureStorageClient>().As<IStorageClient>();
-
-			builder.RegisterType<Azure.AzureScanWorker>();
-			builder.RegisterType<Azure.InMemoryWorkerPool>();
-
-			//Register engine services
-			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
-						.InstancePerDependency();
-
-			//builder.RegisterType<Stubs.InMemoryStorage>().As<IStorageClient>()
-			//    .SingleInstance();
-			//builder.RegisterType<Stubs.SimpleProcessorController>().As<IProcessorController>()
-			//    .SingleInstance();
-
-			builder.RegisterType<DocumentManager>().As<IDocumentManager>();
-
-			builder.RegisterType<Stubs.InMemoryUserAccount>().As<IUserAccount>();
-
-			builder.RegisterType<Stubs.UserlessAuthenticator>().As<IAuthenticator>()
-						.SingleInstance();
-		}
 
 		public static void RegisterRoutes(RouteCollection routes) {
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
@@ -83,7 +41,7 @@ namespace Prax.OcrEngine.Website {
 			AreaRegistration.RegisterAllAreas();
 
 			var builder = new ContainerBuilder();
-			RegisterComponents(builder);
+			builder.Configure();
 
 			//Set up Autofac for MVC
 			builder.RegisterControllers(typeof(PraxMvcApplication).Assembly);

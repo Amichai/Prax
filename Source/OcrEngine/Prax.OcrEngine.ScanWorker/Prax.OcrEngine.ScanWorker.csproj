@@ -41,6 +41,9 @@
     <AssemblyOriginatorKeyFile>Prax.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\..\..\Assemblies\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.WindowsAzure.ServiceRuntime, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -69,6 +72,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Config.cs">
+      <Link>Config.cs</Link>
+    </Compile>
     <Compile Include="WorkerRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -80,6 +86,16 @@
     <CodeAnalysisDictionary Include="..\..\CustomDictionary.xml">
       <Link>CustomDictionary.xml</Link>
     </CodeAnalysisDictionary>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">
+      <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
+      <Name>Prax.OcrEngine.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Prax.OcrEngine.Services.Azure\Prax.OcrEngine.Services.Azure.csproj">
+      <Project>{1DD058C8-68CD-408A-AF17-CA14CDBDFCCD}</Project>
+      <Name>Prax.OcrEngine.Services.Azure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

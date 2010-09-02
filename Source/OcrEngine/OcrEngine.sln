@@ -13,6 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prax.OcrEngine.Common", "Pr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3F096772-39B9-4DAD-9D29-392F7BA63FA0}"
 	ProjectSection(SolutionItems) = preProject
+		Config.cs = Config.cs
 		..\CustomDictionary.xml = ..\CustomDictionary.xml
 		Local.testsettings = Local.testsettings
 		OcrEngine.vsmdi = OcrEngine.vsmdi
