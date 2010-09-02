@@ -7,7 +7,7 @@
     </ConfigurationSettings>
   </Role>
   <Role name="Prax.OcrEngine.ScanWorker">
-    <Instances count="1" />
+    <Instances count="4" />
     <ConfigurationSettings>
       <Setting name="DiagnosticsConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>

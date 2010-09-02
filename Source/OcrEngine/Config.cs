@@ -44,7 +44,7 @@ namespace Prax.OcrEngine {
 			builder.DevelopmentStorage();
 			builder.AzureDocuments();
 
-			builder.InMemoryAzureProcessing();
+			//builder.InMemoryAzureProcessing();
 
 			builder.StubProcessor();
 

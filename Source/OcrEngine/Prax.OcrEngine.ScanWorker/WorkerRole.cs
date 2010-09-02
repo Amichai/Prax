@@ -8,17 +8,17 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.StorageClient;
+using Autofac;
 
 namespace Prax.OcrEngine.ScanWorker {
 	public class WorkerRole : RoleEntryPoint {
 		public override void Run() {
-			// This is a sample worker implementation. Replace with your logic.
-			Trace.WriteLine("Prax.OcrEngine.ScanWorker entry point called", "Information");
+			var builder = new ContainerBuilder();
+			builder.Configure();
+			var container = builder.Build();
 
-			while (true) {
-				Thread.Sleep(10000);
-				Trace.WriteLine("Working", "Information");
-			}
+			var worker = container.Resolve<Services.Azure.AzureScanWorker>();
+			worker.RunWorker();
 		}
 
 		public override bool OnStart() {
