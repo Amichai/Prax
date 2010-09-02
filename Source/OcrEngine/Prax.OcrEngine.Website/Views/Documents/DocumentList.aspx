@@ -117,7 +117,7 @@
 		<thead>
 			<tr>
 				<th>Name</th>
-				<th class="Right">Size</th>
+				<th class="Right" style="width: 75px;">Size</th>
 				<th class="Right">Date</th>
 				<th class="Center" style="width: 135px">Progress</th>
 				<th>
