@@ -7,6 +7,7 @@
 			<asp:ContentPlaceHolder ID="TitleContent" runat="server">
 				Prax OCR</asp:ContentPlaceHolder>
 		</title>
+		<link rel="icon" type="image/vnd.microsoft.icon" href="/FavIcon.ico">
 		<%if (false) {%>
 		<%-- Add <script> and <link> tags here to convince Visual Studio that the 
 			 files are referenced for IntelliSense. 
