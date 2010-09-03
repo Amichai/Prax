@@ -11,14 +11,13 @@ using Microsoft.WindowsAzure;
 using Prax.OcrEngine.Services;
 using Azure = Prax.OcrEngine.Services.Azure;
 using Stubs = Prax.OcrEngine.Services.Stubs;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Prax.OcrEngine.Website {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
 	// visit http://go.microsoft.com/?LinkId=9394801
 
 	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
-
-
 		public static void RegisterRoutes(RouteCollection routes) {
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
@@ -37,22 +36,21 @@ namespace Prax.OcrEngine.Website {
 			);
 		}
 
+		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Automatically added event handler")]
 		protected void Application_Start() {
 			AreaRegistration.RegisterAllAreas();
 
-			var builder = new ContainerBuilder();
-			builder.Configure();
+			var config = Config.CreateCurrent();
 
-			//Set up Autofac for MVC
-			builder.RegisterControllers(typeof(PraxMvcApplication).Assembly);
-			containerProvider = new ContainerProvider(builder.Build());
-			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory(ContainerProvider));
+			containerProvider = config.CreateProvider();
 
 			RegisterRoutes(RouteTable.Routes);
 		}
 
-		static IContainerProvider containerProvider;
+		///<summary>Gets the Autofac container provider.</summary>
 		public IContainerProvider ContainerProvider { get { return containerProvider; } }
+		//This must be static, since HttpApplications are not reused.
+		static IContainerProvider containerProvider;
 	}
 
 	///<summary>An IRouteConstraint implementation that constrains a parameter to a fixed set of values.</summary>
@@ -62,20 +60,6 @@ namespace Prax.OcrEngine.Website {
 
 		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
 			return allowedValues.Contains((string)values[parameterName], StringComparer.OrdinalIgnoreCase);
-		}
-	}
-
-	///<summary>A ControllerFactory that adds the current RequestContext to the AutoFac registry.</summary>
-	class InjectingControllerFactory : AutofacControllerFactory {
-		readonly IContainerProvider containerProvider;
-		public InjectingControllerFactory(IContainerProvider containerProvider) : base(containerProvider) { this.containerProvider = containerProvider; }
-
-		protected override IController GetControllerInstance(RequestContext context, Type controllerType) {
-			var newBuilder = new ContainerBuilder();
-			newBuilder.RegisterInstance(context).As<RequestContext>();
-			newBuilder.Update(containerProvider.RequestLifetime.ComponentRegistry);
-
-			return base.GetControllerInstance(context, controllerType);
 		}
 	}
 }

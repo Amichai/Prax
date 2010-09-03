@@ -13,9 +13,8 @@ using Autofac;
 namespace Prax.OcrEngine.ScanWorker {
 	public class WorkerRole : RoleEntryPoint {
 		public override void Run() {
-			var builder = new ContainerBuilder();
-			builder.Configure();
-			var container = builder.Build();
+			var config = Config.CreateCurrent();
+			var container = config.CreateContainer();
 
 			var worker = container.Resolve<Services.Azure.AzureScanWorker>();
 			worker.RunWorker();
