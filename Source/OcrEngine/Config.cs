@@ -43,13 +43,16 @@ namespace Prax.OcrEngine {
 			DevelopmentStorage();
 			AzureDocuments();
 
-			//InMemoryAzureProcessing();
+			InMemoryAzureProcessing();
 
 			StubProcessor();
 
 #if WEB_ROLE
 			//Add website-only services here
 			MvcSetup();
+
+			ResourcesSetup();
+			StandardResourceLocators();
 			DebuggingResources();
 #endif
 		}
@@ -80,29 +83,54 @@ namespace Prax.OcrEngine {
 #region Website
 #if WEB_ROLE
 namespace Prax.OcrEngine {
+	using System.Reflection;
 	using System.Web.Mvc;
 	using System.Web.Routing;
+	using Autofac.Core;
+	//Add website-only namespaces here (inside the conditional)
+	using Autofac.Features.Indexed;
 	using Autofac.Integration.Web;
 	using Autofac.Integration.Web.Mvc;
-	//Add website-only namespaces here (inside the conditional)
-	using Resources = Website.Resources;
+	using Website;
+	using Website.Resources;
 
 	public partial class Config {
 		#region Resources
+		///<summary>Registers basic services used by the resources framework.</summary>
+		private void ResourcesSetup() {
+			Builder.RegisterGeneric(typeof(AutofacResourceService<>)).As(typeof(IResourceService<>)).SingleInstance();
+		}
+		///<summary>Implements the IResourceService interface using Autofac.</summary>
+		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instantiated by Autofac")]
+		class AutofacResourceService<TService> : IResourceService<TService> {
+			readonly IIndex<ResourceType, TService> index;
+			public AutofacResourceService(IIndex<ResourceType, TService> index) { this.index = index; }
+
+			public TService this[ResourceType type] { get { return index[type]; } }
+		}
+
+		///<summary>Registers the standard ResourceLocators.</summary>
+		private void StandardResourceLocators() {
+			Builder.RegisterInstance(new ResourceLocator(ResourceType.Javascript, folder: "~/Content/Javascript"))
+				.Keyed<IResourceLocator>(ResourceType.Javascript);
+
+			Builder.RegisterInstance(new ResourceLocator(ResourceType.Css, folder: "~/Content/CSS"))
+				.Keyed<IResourceLocator>(ResourceType.Css);
+		}
+
 		///<summary>Registers debug-friendly ResourceResolvers that resolve resources uncompressed and un-combined.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
 		private void DebuggingResources() {
-			Builder.RegisterType<Resources.ScriptDebuggingResolver>().As<Resources.IResourceResolver>()
-				.PropertiesAutowired();
-			Builder.RegisterType<Resources.StylesheetDebuggingResolver>().As<Resources.IResourceResolver>()
-				.PropertiesAutowired();
+			Builder.RegisterType<ResourceDebuggingResolver>().As<IResourceResolver>();
 		}
 
 		///<summary>Registers production-ready ResourceResolvers that resolve resources using a server-side cruncher.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
 		private void LocalCrunchedResources() {
-			Builder.RegisterInstance(new Website.Resources.MSAjaxScriptMinifier()).As<Website.Resources.IMinifier>();
-			Builder.RegisterInstance(new Website.Resources.MSAjaxStylesheetMinifier()).As<Website.Resources.IMinifier>();
+			Builder.RegisterInstance(new MSAjaxScriptMinifier())
+				.Keyed<IResourceLocator>(ResourceType.Javascript);
+			Builder.RegisterInstance(new MSAjaxStylesheetMinifier())
+				.Keyed<IResourceLocator>(ResourceType.Javascript);
 
 			//TODO: Cruncher
 		}
@@ -113,7 +141,10 @@ namespace Prax.OcrEngine {
 		///<summary>Sets up the Autofac container for the ASP.Net MVC framework.</summary>
 		private void MvcSetup() {
 			Builder.RegisterControllers(typeof(Website.PraxMvcApplication).Assembly);
+
 			Builder.Register(cc => requestContext).As<RequestContext>();
+			Builder.RegisterType<UrlHelper>().As<UrlHelper>();
+			Builder.RegisterType<HtmlHelper>().As<HtmlHelper>();
 		}
 		public ContainerProvider CreateProvider() {
 			var provider = new ContainerProvider(CreateContainer());

@@ -35,7 +35,7 @@ namespace Prax.OcrEngine.Website.Views {
 			if (html == null) throw new ArgumentNullException("html");
 			if (set == null) throw new ArgumentNullException("set");
 
-			var resolver = Container.Resolve<IEnumerable<IResourceResolver>>().First(r => r.Type == set.Type);
+			var resolver = Container.Resolve<IResourceResolver>();
 
 			return MvcHtmlString.Create(
 				String.Join(Environment.NewLine,

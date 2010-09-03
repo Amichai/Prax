@@ -7,9 +7,6 @@ using System.Web.Mvc;
 namespace Prax.OcrEngine.Website.Resources {
 	///<summary>Resolves resource sets to client URLs.</summary>
 	public interface IResourceResolver {
-		///<summary>Gets the type of resource that this resolver can resolver.</summary>
-		ResourceType Type { get; }
-
 		///<summary>Resolves a resource set to a set of URLs.</summary>
 		///<param name="resourceSet">The resource set to resolve.</param>
 		///<returns>A set of URLs to send to the client.</returns>

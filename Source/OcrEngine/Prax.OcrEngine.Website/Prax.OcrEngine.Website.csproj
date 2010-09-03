@@ -104,10 +104,13 @@
     <Compile Include="Models\DocumentModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResourceSets.cs" />
+    <Compile Include="Resources\IResourceLocator.cs" />
+    <Compile Include="Resources\IResourceService.cs" />
     <Compile Include="Resources\MSAjaxMinifier.cs" />
     <Compile Include="Resources\ResourceDebuggingResolver.cs" />
     <Compile Include="Resources\IMinifier.cs" />
     <Compile Include="Resources\IResourceResolver.cs" />
+    <Compile Include="Resources\ResourceLocator.cs" />
     <Compile Include="Views\ViewsExtensions.cs" />
     <Compile Include="WebRole.cs" />
   </ItemGroup>
