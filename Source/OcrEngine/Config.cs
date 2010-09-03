@@ -53,7 +53,8 @@ namespace Prax.OcrEngine {
 
 			ResourcesSetup();
 			StandardResourceLocators();
-			DebuggingResources();
+			//DebuggingResources();
+			LocalCrunchedResources();
 #endif
 		}
 
@@ -84,6 +85,7 @@ namespace Prax.OcrEngine {
 #if WEB_ROLE
 namespace Prax.OcrEngine {
 	using System.Reflection;
+	using System.Web;
 	using System.Web.Mvc;
 	using System.Web.Routing;
 	using Autofac.Core;
@@ -128,11 +130,11 @@ namespace Prax.OcrEngine {
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
 		private void LocalCrunchedResources() {
 			Builder.RegisterInstance(new MSAjaxScriptMinifier())
-				.Keyed<IResourceLocator>(ResourceType.Javascript);
+				.Keyed<IMinifier>(ResourceType.Javascript);
 			Builder.RegisterInstance(new MSAjaxStylesheetMinifier())
-				.Keyed<IResourceLocator>(ResourceType.Javascript);
+				.Keyed<IMinifier>(ResourceType.Css);
 
-			//TODO: Cruncher
+			Builder.RegisterType<ResourceCombiningResolver>().As<IResourceResolver>();
 		}
 
 		//TODO: CdnResources
@@ -141,6 +143,8 @@ namespace Prax.OcrEngine {
 		///<summary>Sets up the Autofac container for the ASP.Net MVC framework.</summary>
 		private void MvcSetup() {
 			Builder.RegisterControllers(typeof(Website.PraxMvcApplication).Assembly);
+
+			Builder.Register(cc => new HttpServerUtilityWrapper(HttpContext.Current.Server)).As<HttpServerUtilityBase>();
 
 			Builder.Register(cc => requestContext).As<RequestContext>();
 			Builder.RegisterType<UrlHelper>().As<UrlHelper>();

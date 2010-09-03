@@ -96,6 +96,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
+    <Compile Include="Controllers\ResourcesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -107,6 +108,7 @@
     <Compile Include="Resources\IResourceLocator.cs" />
     <Compile Include="Resources\IResourceService.cs" />
     <Compile Include="Resources\MSAjaxMinifier.cs" />
+    <Compile Include="Resources\ResourceCombiningResolver.cs" />
     <Compile Include="Resources\ResourceDebuggingResolver.cs" />
     <Compile Include="Resources\IMinifier.cs" />
     <Compile Include="Resources\IResourceResolver.cs" />

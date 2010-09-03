@@ -30,6 +30,9 @@ namespace Prax.OcrEngine.Website {
 			writableSets.Add(this);
 		}
 
+		///<summary>Gets the resource set with the given name, or null if there is no resource set with that name.</summary>
+		public static ResourceSet Get(string name) { return All.FirstOrDefault(s => s.SetName == name); }
+
 		///<summary>Gets the type of resource.</summary>
 		public ResourceType Type { get; private set; }
 
