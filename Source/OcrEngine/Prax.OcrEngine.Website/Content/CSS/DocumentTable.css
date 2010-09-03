@@ -1,0 +1,43 @@
+﻿table#documents {
+	margin-top: 1em;
+	width: 100%;
+	border: 1px solid black;
+}
+table#documents a {
+	color: Blue;
+}
+table#documents thead th {
+	background: LightGray;
+	border-bottom: 2px solid black;
+	font-weight: bold;
+	padding: 2px 5px;
+}
+table#documents tbody td {
+	padding: 2px 5px;
+	border-top: gray solid 1px;
+}
+table#documents tbody td.DeleteCell {
+	padding: 0 3px 0 10px;
+	width: 16px;
+}
+table#documents tbody td.DeleteCell input {
+	width: 16px;
+	height: 16px;
+	border: none;
+	cursor: pointer;
+	background: url('/Content/Images/DeleteSprite.gif') no-repeat 0 center;
+	text-indent: -8192px;
+}
+table#documents tbody td.DeleteCell input:hover {
+	background-position: -16px center;
+}
+input.LoadingButton {
+	background: url('/Content/Images/Loading16.gif') no-repeat 0 center !important;
+}
+
+.Right {
+	text-align: right;
+}
+.Center {
+	text-align: center;
+}

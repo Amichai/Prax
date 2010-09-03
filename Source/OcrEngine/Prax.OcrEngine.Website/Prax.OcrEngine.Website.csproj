@@ -121,6 +121,7 @@
       <Link>CustomDictionary.xml</Link>
       <SubType>Designer</SubType>
     </CodeAnalysisDictionary>
+    <Content Include="Content\CSS\DocumentTable.css" />
     <Content Include="Content\CSS\ProgressBar.css" />
     <Content Include="Content\CSS\YUI-Reset.css" />
     <Content Include="Content\Images\DeleteSprite.gif" />

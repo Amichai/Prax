@@ -14,8 +14,10 @@ namespace Prax.OcrEngine.Website {
 		public static readonly ReadOnlyCollection<ResourceSet> All = new ReadOnlyCollection<ResourceSet>(writableSets);
 
 		public static readonly ResourceSet GlobalCss = new ResourceSet(ResourceType.Css, "GlobalCss",
-			"YUI-Reset", "Site", "ProgressBar");
-		public static readonly ResourceSet DocListJavascript = new ResourceSet(ResourceType.Javascript, "DocListJavascript",
+			"YUI-Reset", "Site");
+		public static readonly ResourceSet DocumentsCss = new ResourceSet(ResourceType.Css, "DocumentsCss",
+			"ProgressBar", "DocumentTable");
+		public static readonly ResourceSet DocumentsJavascript = new ResourceSet(ResourceType.Javascript, "DocumentsJavascript",
 			"jQuery/jquery-1.4.1", "jQuery/SWFObject", "jQuery/jquery.uploadify.v2.1.0",
 			"Utilities", "ProgressBar", "DocumentTable", "DocumentUpload");
 

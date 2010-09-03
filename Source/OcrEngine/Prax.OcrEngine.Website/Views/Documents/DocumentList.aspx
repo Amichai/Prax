@@ -9,49 +9,6 @@
 			text-align: center;
 			margin-top: 1em;
 		}
-		table#documents {
-			margin-top: 1em;
-			width: 100%;
-			border: 1px solid black;
-		}
-		table#documents a {
-			color: Blue;
-		}
-		table#documents thead th {
-			background: LightGray;
-			border-bottom: 2px solid black;
-			font-weight: bold;
-			padding: 2px 5px;
-		}
-		table#documents tbody td {
-			padding: 2px 5px;
-			border-top: gray solid 1px;
-		}
-		table#documents tbody td.DeleteCell {
-			padding: 0 3px 0 10px;
-			width: 16px;
-		}
-		table#documents tbody td.DeleteCell input {
-			width: 16px;
-			height: 16px;
-			border: none;
-			cursor: pointer;
-			background: url('/Content/Images/DeleteSprite.gif') no-repeat 0 center;
-			text-indent: -8192px;
-		}
-		table#documents tbody td.DeleteCell input:hover {
-			background-position: -16px center;
-		}
-		input.LoadingButton {
-			background: url('/Content/Images/Loading16.gif') no-repeat 0 center !important;
-		}
-		
-		.Right {
-			text-align: right;
-		}
-		.Center {
-			text-align: center;
-		}
 		.SiteIntro {
 			width: 50%;
 			margin: 1.5em auto;
@@ -79,6 +36,7 @@
 	<%-- Add <script> and <link> tags here to convince Visual Studio that the 
 		 files are referenced for IntelliSense. 
 		 The files should actually be included by the ResourceSet architecture. --%>
+	<link href="../../Content/CSS/DocumentTable.css" rel="stylesheet" type="text/css" />
 
 	<script src="../../Content/Javascript/jQuery/jquery-1.4.1.js" type="text/javascript"></script>
 
@@ -95,7 +53,8 @@
 	<script src="../../Content/Javascript/DocumentUpload.js" type="text/javascript"></script>
 
 	<%} %>
-	<%=Html.Scripts(ResourceSet.DocListJavascript) %>
+	<%=Html.Stylesheets(ResourceSet.DocumentsCss) %>
+	<%=Html.Scripts(ResourceSet.DocumentsJavascript) %>
 </asp:Content>
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
 	<%if (Model.ShowSiteIntro)
