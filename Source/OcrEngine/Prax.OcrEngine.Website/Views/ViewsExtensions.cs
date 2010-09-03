@@ -12,15 +12,15 @@ using System.ComponentModel;
 namespace Prax.OcrEngine.Website.Views {
 	///<summary>Contains extensions methods used by MVC views.</summary>
 	public static class ViewsExtensions {
-		static Autofac.IContainer container;
+		static Autofac.IComponentContext container;
 
 		///<summary>Gets the Autofac container used to resolve dependencies.</summary>
 		///<remarks>I added this property since Autofac cannot build up a static class.
 		///In general, manual use of the Autofac container should be avoided.</remarks>
-		public static Autofac.IContainer Container {
+		public static Autofac.IComponentContext Container {
 			get {
 				return container ??	//I might want to explicitly set this in Global.asax.cs
-					   (container = ((IContainerProviderAccessor)HttpContext.Current.ApplicationInstance).ContainerProvider.ApplicationContainer);
+					   (container = ((IContainerProviderAccessor)HttpContext.Current.ApplicationInstance).ContainerProvider.RequestLifetime);
 			}
 			set { container = value; }	//Useful for unit tests, where there is no HttpContext
 		}
