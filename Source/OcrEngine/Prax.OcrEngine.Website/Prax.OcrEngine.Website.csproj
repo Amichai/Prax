@@ -107,7 +107,7 @@
     <Compile Include="Resources\MSAjaxMinifier.cs" />
     <Compile Include="Resources\ResourceDebuggingResolver.cs" />
     <Compile Include="Resources\IMinifier.cs" />
-    <Compile Include="Resources\IResourceLocator.cs" />
+    <Compile Include="Resources\IResourceResolver.cs" />
     <Compile Include="Views\ViewsExtensions.cs" />
     <Compile Include="WebRole.cs" />
   </ItemGroup>

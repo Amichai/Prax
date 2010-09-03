@@ -5,7 +5,7 @@ using System.Text;
 using System.Web.Mvc;
 
 namespace Prax.OcrEngine.Website.Resources {
-	///<summary>Resolves resource names	on disk.</summary>
+	///<summary>Resolves resource sets to client URLs.</summary>
 	public interface IResourceResolver {
 		///<summary>Gets the type of resource that this resolver can resolver.</summary>
 		ResourceType Type { get; }
