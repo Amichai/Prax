@@ -57,7 +57,7 @@ img {
 	border:0;
 }
 /*
-	TODO think about hanlding inheritence differently, maybe letting IE6 fail a bit...
+	TODO think about handling inheritance differently, maybe letting IE6 fail a bit...
 */
 address,
 caption,
@@ -118,7 +118,7 @@ select {
 input,
 textarea,
 select {
-	*font-size:100%;
+	font-size:100%;
 }
 /*because legend doesn't inherit in IE */
 legend {
