@@ -28,7 +28,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 				return RedirectToAction("Index");
 
 			//The ID parameter is passed from an <input> value.
-			//For accessibility reasons, it starts with delete.
+			//For accessibility reasons, it starts with Delete.
 			if (id.StartsWith("Delete ", StringComparison.OrdinalIgnoreCase))
 				id = id.Substring("Delete ".Length);
 
