@@ -45,5 +45,7 @@ div.Footer .Links {
 	margin-bottom: 5px;
 }
 .Sprite16 {
+	width: 16px;
+	height: 16px;
 	background: transparent url('/Content/Images/Sprite16.png') no-repeat 0 center;
 }

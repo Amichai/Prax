@@ -21,17 +21,39 @@ table#documents tbody td.DeleteCell {
 	width: 16px;
 }
 table#documents tbody td.DeleteCell input {
-	width: 16px;
-	height: 16px;
 	border: none;
 	cursor: pointer;
-	background-position: -32px center;
+	background-position: -16px center;
 	text-indent: -8192px;
 }
 table#documents tbody td.DeleteCell input:hover {
-	background-position: -16px center;
+	background-position: 0 center;
 }
-input.LoadingButton {
+
+/* Normal NameCells have a rename link that appears on hover. 
+ * Uploading rows cannot be renamed, so their links never appear.
+ * After a cell is renamed, it enters a loading state, and always appears.
+ * I use visibility: hidden instead of display:none so as not to affect layout on mouseover.
+ */
+table#documents tbody .NameCell .RenameLink {
+	visibility: hidden;
+	float: right;
+	background-position: -32px center;
+}
+table#documents tbody tr:hover .NameCell .RenameLink {
+	visibility: visible;
+}
+table#documents tbody tr.Uploading .NameCell .RenameLink {
+	visibility: hidden !important;
+}
+table#documents tbody tr:hover .NameCell .RenameLink {
+	visibility: visible;
+}
+table#documents tbody .NameCell .LoadingButton {
+	visibility: visible;
+}
+
+.LoadingButton {
 	background: url('/Content/Images/Loading16.gif') no-repeat 0 center !important;
 }
 

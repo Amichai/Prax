@@ -22,6 +22,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 			return View("DocumentList", new Models.DocumentListModel(true, DocumentManager.GetDocuments().OrderByDescending(d => d.DateUploaded)));
 		}
 
+		#region Document Actions
 		[HttpPost]
 		public ActionResult Delete(string id) {
 			if (String.IsNullOrWhiteSpace(id))
@@ -62,6 +63,13 @@ namespace Prax.OcrEngine.Website.Controllers {
 			var doc = DocumentManager.GetDocument(id);
 			return File(doc.OpenRead(), MimeTypes.ForExtension(Path.GetExtension(doc.Name)));
 		}
+
+		[HttpPost]
+		public ActionResult Rename(Guid id, string newName) {
+			DocumentManager.RenameDocument(id, newName);
+			return new EmptyResult();
+		}
+		#endregion
 
 		///<summary>Gets the document list in JSON format for table updates.</summary>
 		public ActionResult Data() {

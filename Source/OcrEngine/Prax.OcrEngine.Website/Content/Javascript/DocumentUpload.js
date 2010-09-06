@@ -56,6 +56,7 @@ Prax.DocumentUploader.prototype = {
 		row.setProgress('Waiting to upload', 0);
 
 		var uploader = this;
+		row.tr.addClass('Uploading');
 		row.deleteDocument = function deleteUploadingDocument() {
 			//Override the handler to remove the file from the queue.
 			//In this method, `this` refers to the DocumentRow object
@@ -101,6 +102,7 @@ Prax.DocumentUploader.prototype = {
 			row.setNameLink(true);
 			row.setProgress('Queued', 0);
 			row.state = Prax.DocumentState.scanning;
+			row.tr.removeClass('Uploading');
 
 			delete row.deleteDocument; //Remove our overridden delete handler and revert to the standard method from the prototype.
 

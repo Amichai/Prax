@@ -38,5 +38,13 @@ namespace Prax.OcrEngine.Services {
 			ProcessorController.CancelProcessing(MakeId(id));	//TODO: Check state?
 			StorageClient.DeleteDocument(MakeId(id));
 		}
+
+		public void RenameDocument(Guid id, string newName) {
+			if (String.IsNullOrWhiteSpace(newName)) throw new ArgumentNullException("newName");
+
+			var doc = StorageClient.GetDocument(MakeId(id));
+			doc.Name = newName;
+			StorageClient.UpdateDocument(doc);
+		}
 	}
 }

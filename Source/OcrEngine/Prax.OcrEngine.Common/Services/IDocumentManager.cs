@@ -9,7 +9,6 @@ namespace Prax.OcrEngine.Services {
 	///<summary>Used by the website to interact with a user's documents in storage and with the scan workers.</summary>
 	///<remarks>This service is associated with a single user.</remarks>
 	public interface IDocumentManager {
-
 		///<summary>Gets the user ID to manage documents for.</summary>
 		Guid UserId { get; }
 
@@ -27,6 +26,7 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Deletes the document with the specified ID.</summary>
 		void DeleteDocument(Guid id);
 
-		//TODO: Rename
+		///<summary>Renames the document with the specified ID.</summary>
+		void RenameDocument(Guid id, string newName);
 	}
 }

@@ -30,6 +30,11 @@ Prax.DocumentRow = function DocumentRow(owner, tr) {
 	this.statusCell = this.tr.children('.StatusCell');
 
 	var self = this;
+
+	this.renameButton = $('<a class="RenameLink Sprite16" href="#" title="Rename document" />')
+		.click(function () { self.interactiveRename(); return false; })
+		.appendTo(this.tr.children('.NameCell'));
+
 	this.deleteButton.click(function () {
 		if (!confirm("Are you sure you want to delete " + self.name + "?"))
 			return;
@@ -42,6 +47,7 @@ Prax.DocumentRow.prototype = {
 	tr: $(),
 	statusCell: $(),
 	deleteButton: $(),
+	renameButton: $(),
 	owner: null,
 	id: '',
 	name: '',
@@ -51,12 +57,14 @@ Prax.DocumentRow.prototype = {
 
 	getViewPath: function () { return '/Documents/View/' + this.id + '/' + this.name; },
 	setNameLink: function (on) {
-		if (on || arguments.length === 0) {
-			this.tr.children('.NameCell').empty().append(
-				$('<a />', { text: this.name, href: this.getViewPath(), target: 'DocumentPreview' })
-			);
-		} else
-			this.tr.children('.NameCell').text(this.name);
+		var newChild;
+
+		if (on || arguments.length === 0)
+			newChild = $('<a />', { text: this.name, href: this.getViewPath(), target: 'DocumentPreview' })
+		else
+			newChild = $('<span />').text(this.name);
+
+		this.tr.find('.NameCell :first-child').replaceWith(newChild);
 	},
 
 	setId: function setId(newId) {
@@ -89,6 +97,21 @@ Prax.DocumentRow.prototype = {
 		this.deleteButton.addClass('LoadingButton');
 		$.post('/Documents/Delete', { id: this.id }, function (response) {
 			self.owner.removeRow(self);
+		});
+	},
+	interactiveRename: function interactiveRename() {
+		if (this.renameButton.hasClass('LoadingButton')) return;
+
+		var newName = prompt('Please enter a new name', this.name);
+		if (!newName || newName === name) return;
+
+		this.renameButton.addClass('LoadingButton');
+		var self = this;
+		$.post('/Documents/Rename', { id: this.id, newName: newName }, function (response) {
+			self.renameButton.removeClass('LoadingButton');
+			self.name = newName;
+
+			self.tr.find('.NameCell :first-child').text(newName);
 		});
 	}
 };
@@ -123,12 +146,14 @@ Prax.DocumentTable.prototype = {
 		/// <returns type="Prax.DocumentRow" />
 
 		var tr = $('<tr />', { id: Prax.DocumentRow.idPrefix + id })
-					.append($('<td />', { 'class': "NameCell", text: name }))
+					.append(
+						$('<td class="NameCell" />').append($('<span />').text(name))
+					)
 					.append($('<td />', { 'class': "SizeCell Right", text: Prax.toSizeString(size), title: size + ' bytes' }))
 					.append($('<td />', { 'class': "DateCell Right", text: (date || new Date()).toShortDateString() }))
 					.append($('<td class="StatusCell Center">Wait...</td>'))
 					.append($('<td class="DeleteCell" />').append(
-						$('<input />', { type: "submit", name: "id", title: "Delete " + name, value: "Delete " + id, class: "Sprite16" })
+						$('<input />', { type: "submit", name: "id", title: "Delete " + name, value: "Delete " + id, "class": "Sprite16" })
 					));
 
 		//The submit button passes the ID parameter to the form.
