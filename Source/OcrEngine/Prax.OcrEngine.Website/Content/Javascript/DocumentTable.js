@@ -128,7 +128,7 @@ Prax.DocumentTable.prototype = {
 					.append($('<td />', { 'class': "DateCell Right", text: (date || new Date()).toShortDateString() }))
 					.append($('<td class="StatusCell Center">Wait...</td>'))
 					.append($('<td class="DeleteCell" />').append(
-						$('<input />', { type: "submit", name: "id", title: "Delete " + name, value: "Delete " + id })
+						$('<input />', { type: "submit", name: "id", title: "Delete " + name, value: "Delete " + id, class: "Sprite16" })
 					));
 
 		//The submit button passes the ID parameter to the form.
