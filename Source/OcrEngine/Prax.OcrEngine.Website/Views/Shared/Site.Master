@@ -17,6 +17,7 @@
 		<link rel="stylesheet" type="text/css" href="/Content/CSS/ProgressBar.css" />
 		<%} %>
 		<%=Html.Stylesheets(ResourceSet.GlobalCss) %>
+		<!--[if lte IE 6]><link href="/Content/CSS/Site-IE6.css" rel="stylesheet" type="text/css" /><![endif]-->
 		<asp:ContentPlaceHolder runat="server" ID="HeadContent" />
 	</head>
 

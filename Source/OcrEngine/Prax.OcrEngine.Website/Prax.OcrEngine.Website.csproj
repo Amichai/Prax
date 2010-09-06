@@ -123,10 +123,12 @@
     </CodeAnalysisDictionary>
     <Content Include="Content\CSS\DocumentTable.css" />
     <Content Include="Content\CSS\ProgressBar.css" />
+    <Content Include="Content\CSS\Site-IE6.css" />
     <Content Include="Content\CSS\YUI-Reset.css" />
-    <Content Include="Content\Images\DeleteSprite.gif" />
     <Content Include="Content\Images\Loading16.gif" />
     <Content Include="Content\Images\Logo.png" />
+    <Content Include="Content\Images\Sprite16.png" />
+    <Content Include="Content\Images\WhiteSprite16.gif" />
     <Content Include="Content\Javascript\DocumentUpload.js" />
     <Content Include="Content\Javascript\jQuery\jquery.tablesorter.js" />
     <Content Include="Content\Javascript\Utilities.js" />

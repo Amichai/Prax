@@ -101,7 +101,7 @@
 					 Since the value attribute also controls the caption, I
 					 hide the caption using CSS.  For accessibility reasons,
 					 I include the word delete, which the action removes.--%>
-					<input type="submit" name="id" title="Delete <%:doc.Name%>" value="Delete <%:doc.Id.DocumentId	 %>" />
+					<input type="submit" name="id" title="Delete <%:doc.Name%>" value="Delete <%:doc.Id.DocumentId	%>" class="Sprite16" />
 				</td>
 			</tr>
 			<%} %>

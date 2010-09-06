@@ -25,7 +25,7 @@ table#documents tbody td.DeleteCell input {
 	height: 16px;
 	border: none;
 	cursor: pointer;
-	background: url('/Content/Images/DeleteSprite.gif') no-repeat 0 center;
+	background-position: -32px center;
 	text-indent: -8192px;
 }
 table#documents tbody td.DeleteCell input:hover {
