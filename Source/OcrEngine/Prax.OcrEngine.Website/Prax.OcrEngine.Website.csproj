@@ -128,6 +128,7 @@
     <Content Include="Content\Images\Loading16.gif" />
     <Content Include="Content\Images\Logo.png" />
     <Content Include="Content\Javascript\DocumentUpload.js" />
+    <Content Include="Content\Javascript\jQuery\jquery.tablesorter.js" />
     <Content Include="Content\Javascript\Utilities.js" />
     <Content Include="Content\Uploadify\expressInstall.swf" />
     <Content Include="Content\Javascript\jQuery\jquery.uploadify.v2.1.0.js" />
