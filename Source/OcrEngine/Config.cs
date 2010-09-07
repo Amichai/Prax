@@ -7,6 +7,7 @@ using Microsoft.WindowsAzure;
 using Prax.OcrEngine.Services;
 using Azure = Prax.OcrEngine.Services.Azure;
 using Stubs = Prax.OcrEngine.Services.Stubs;
+using Microsoft.WindowsAzure.ServiceRuntime;
 
 #region Explanation
 /* This file contains all common configuration settings.
@@ -43,7 +44,8 @@ namespace Prax.OcrEngine {
 			DevelopmentStorage();
 			AzureDocuments();
 
-			InMemoryAzureProcessing();
+			if (!RoleEnvironment.IsAvailable)
+				InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
 
 			StubProcessor();
 
