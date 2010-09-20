@@ -2,9 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace Prax.OcrEngine.Services.Azure {
 	static class Utils {
+		public static byte[] SHA512Hash(this FileInfo file) {
+			using (var hasher = new SHA512Managed())
+			using (var stream = file.OpenRead())
+				return hasher.ComputeHash(stream);
+		}
+	}
+	static class IdUtils {
 		public static string FileName(this DocumentIdentifier id) {
 			return id.UserId + "/" + id.DocumentId;
 		}

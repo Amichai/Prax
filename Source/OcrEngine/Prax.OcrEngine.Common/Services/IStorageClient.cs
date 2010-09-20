@@ -65,6 +65,17 @@ namespace Prax.OcrEngine.Services {
 		///<returns>A read-only stream, which the caller must close.</returns>
 		///<remarks>The cloud implementation can stream directly from the storage service, and can in turn be streamed directly to the client browser.</remarks>
 		public abstract Stream OpenRead();
+
+		///<summary>Returns a new read-only Stream containing the an alternate data stream about the document.</summary>
+		///<param name="name">The name of the alternate data stream.</param>
+		///<returns>A read-only stream, which the caller must close.</returns>
+		public abstract Stream OpenStream(string name);
+		///<summary>Uploads an alternate data stream about the document.</summary>
+		///<param name="name">The name of the alternate data stream.</param>
+		///<param name="stream">The contents to upload.</param>
+		///<param name="length">The size of the stream.</param>
+		public abstract void UploadStream(string name, Stream stream, long length);
+
 		///<summary>Gets the size of the underlying file.</summary>
 		public long Length { get; protected set; }
 	}

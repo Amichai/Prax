@@ -45,7 +45,7 @@ namespace Prax.OcrEngine.Services.Azure {
 
 			///<summary>Creates a BlobDocument from an existing blob.</summary>
 			public BlobDocument(CloudBlob blob)
-				: base(Utils.ParseUri(blob.Uri)) {
+				: base(IdUtils.ParseUri(blob.Uri)) {
 				this.Blob = blob;
 				base.Length = blob.Properties.Length;
 
@@ -70,6 +70,21 @@ namespace Prax.OcrEngine.Services.Azure {
 			}
 
 			public override Stream OpenRead() { return Blob.OpenRead(); }
+
+			public override Stream OpenStream(string name) {
+				var client = Blob.ServiceClient;
+				return client.GetBlobReference(Id.FileName() + "." + name).OpenRead();
+			}
+
+			public override void UploadStream(string name, Stream stream, long length) {
+				var client = Blob.ServiceClient;
+				var subBlob = client.GetBlobReference(Id.FileName() + "." + name);
+				subBlob.UploadFromStream(stream);	//The PUT Blob operation will replace existing blobs.
+
+				//Update the list of child blobs in the metadata
+				Blob.Metadata["AlternateStreams"] += name + ";";		//This will result in a trailing `;`, which is ignored.
+				Blob.SetMetadata();
+			}
 		}
 
 		static readonly BlobRequestOptions GetDocsOptions = new BlobRequestOptions { BlobListingDetails = BlobListingDetails.Metadata, UseFlatBlobListing = true };
@@ -90,7 +105,13 @@ namespace Prax.OcrEngine.Services.Azure {
 		CloudBlob CreateBlob(DocumentIdentifier id) { return new CloudBlob(container.Name + "/" + id.FileName(), client); }
 
 		public void DeleteDocument(DocumentIdentifier id) {
-			CreateBlob(id).Delete();
+			var blob = CreateBlob(id);
+			foreach (var alternateStream in blob.Metadata["AlternateStreams"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+				var subBlob = client.GetBlobReference(id.FileName() + "." + alternateStream);
+				subBlob.Delete();
+			}
+
+			blob.Delete();
 		}
 
 		public bool UpdateDocument(Document doc) {

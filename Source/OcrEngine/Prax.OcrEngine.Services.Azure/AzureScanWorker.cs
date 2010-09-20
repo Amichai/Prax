@@ -27,7 +27,7 @@ namespace Prax.OcrEngine.Services.Azure {
 			while (true) {
 				var message = queue.GetMessage();
 
-				var document = storage.GetDocument(Utils.ParseName(message.AsString));
+				var document = storage.GetDocument(IdUtils.ParseName(message.AsString));
 				if (document == null) {	//If the document was deleted while still in the queue, skip it.
 					queue.DeleteMessage(message);
 					return;

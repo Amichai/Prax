@@ -51,6 +51,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			}
 		}
 		class InMemoryDocument : Document {
+			readonly ConcurrentDictionary<string, byte[]> dataStreams = new ConcurrentDictionary<string, byte[]>();
 			readonly byte[] bytes;
 
 			public InMemoryDocument(Guid userId, string name, byte[] bytes)
@@ -64,6 +65,16 @@ namespace Prax.OcrEngine.Services.Stubs {
 			public InMemoryDocument Clone() { return (InMemoryDocument)MemberwiseClone(); }
 
 			public override Stream OpenRead() { return new MemoryStream(bytes, false); }
+
+			public override Stream OpenStream(string name) {
+				return new MemoryStream(dataStreams[name], false);
+			}
+
+			public override void UploadStream(string name, Stream stream, long length) {
+				var bytes = new byte[length];
+				stream.ReadFill(bytes);
+				dataStreams.AddOrUpdate(name, bytes, (k, v) => bytes);
+			}
 		}
 	}
 }
