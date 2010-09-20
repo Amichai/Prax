@@ -43,6 +43,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +54,7 @@
     <Compile Include="DocumentIdentifier.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Services\IAuthenticator.cs" />
+    <Compile Include="Services\IDataCache.cs" />
     <Compile Include="Services\IDocumentManager.cs" />
     <Compile Include="Services\IDocumentProcessor.cs" />
     <Compile Include="Services\IProcessorController.cs" />
