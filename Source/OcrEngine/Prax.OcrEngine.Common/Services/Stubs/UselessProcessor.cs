@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using System.Threading;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Services.Stubs {
 	///<summary>An IDocumentProcessor implementation that doesn't do anything.</summary>
@@ -25,7 +26,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				CurrentProgress = i + 1;
 				OnProgressChanged();
 			}
-
+			Results = new ReadOnlyCollection<RecognizedSegment>(new RecognizedSegment[0]);
 			IsProcessing = false;
 		}
 		///<summary>Gets the current progress of the operation.</summary>
@@ -62,5 +63,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 				CheckCanceled(this, e);
 		}
 
+		public void Initialize() { }
+		public ReadOnlyCollection<RecognizedSegment> Results { get; private set; }
 	}
 }
