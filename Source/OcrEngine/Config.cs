@@ -41,6 +41,8 @@ namespace Prax.OcrEngine {
 
 			StubUserManagement();
 
+			//StubDocuments();
+
 			DevelopmentStorage();
 			AzureDocuments();
 
@@ -48,6 +50,7 @@ namespace Prax.OcrEngine {
 				InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
 
 			StubProcessor();
+			StubConverters();
 
 #if WEB_ROLE
 			//Add website-only services here
@@ -214,6 +217,13 @@ namespace Prax.OcrEngine {
 		private void StubProcessor() {
 			Builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
 						.InstancePerDependency();
+		}
+
+		///<summary>Registers useless result converters.</summary>
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
+		private void StubConverters() {
+			Builder.RegisterInstance(new Stubs.FixedTextConverter("OCR Results go here")).As<IResultsConverter>();
+			Builder.RegisterInstance(new Stubs.EmptyPdfConverter()).As<IResultsConverter>();
 		}
 		#endregion
 
