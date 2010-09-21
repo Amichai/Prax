@@ -96,8 +96,9 @@
 				<td class="StatusCell Center">
 					<%:Html.Action("ProgressBar", doc)%>
 					<%if (doc.State == DocumentState.Scanned) { %>
-					<%:Html.ResultsLink(doc, ResultFormat.PlainText) %>
-					<%:Html.ResultsLink(doc, ResultFormat.Pdf)%>
+					<%foreach (var format in doc.ResultFormats) {%>
+					<%:Html.ResultsLink(doc, format)%>
+					<%} %>
 					<%} %>
 				</td>
 				<td class="DeleteCell">

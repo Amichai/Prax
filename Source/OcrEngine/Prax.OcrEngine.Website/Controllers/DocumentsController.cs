@@ -96,6 +96,8 @@ namespace Prax.OcrEngine.Website.Controllers {
 					id = doc.Id.DocumentId,
 					state = "Scanned",
 
+					formats = doc.ResultFormats.Select(f => new { name = f.ToString(), extension = f.GetExtension() }).ToArray(),
+
 					name = doc.Name,
 					extension = MimeTypes.GetExtension(doc.MimeType),
 					size = doc.Length,

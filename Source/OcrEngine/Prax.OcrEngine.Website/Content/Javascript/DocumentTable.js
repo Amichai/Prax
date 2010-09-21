@@ -56,6 +56,7 @@ Prax.DocumentRow.prototype = {
 	date: new Date(),
 	size: -1,
 	state: null,
+	formats: [],
 
 	getViewPath: function () { return '/Documents/View/' + this.id + '/' + this.name + this.extension; },
 	setNameLink: function (on) {
@@ -88,6 +89,20 @@ Prax.DocumentRow.prototype = {
 			bar.val(percent);
 			bar.text(caption);
 		}
+	},
+	addDownloadLinks: function addDownloadLinks() {
+		this.statusCell.children('.DownloadIcon').remove();
+		for (var i = 0; i < this.formats.length; i++)
+			this.statusCell.append(this.createDownloadLink(this.formats[i]));
+	},
+	createDownloadLink: function createDownloadLink(format) {
+		var shortName = format.extension.substring(1).toUpperCase();
+		return $('<a />', {
+			class: "Sprite16 DownloadIcon " + shortName,
+			title: "Download OCR results as a " + shortName + " file",
+			target: "DocumentPreview",
+			href: "/Documents/" + this.id + "/" + format.name + "/" + this.name + format.extension.toLowerCase()
+		});
 	},
 	deleteDocument: function deleteDocument() {
 		/// <summary>Deletes this document from the server.</summary>
@@ -208,6 +223,8 @@ Prax.DocumentTable.prototype = {
 				if (doc.state === 'Scanned') {
 					docRow.statusCell.text('Scanned');
 					docRow.state = Prax.DocumentState.complete;
+					docRow.formats = doc.formats;
+					docRow.addDownloadLinks();
 				} else {
 					docRow.setProgress(doc.progressCaption, doc.progress);
 					docRow.state = Prax.DocumentState.scanning;
