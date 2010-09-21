@@ -31,7 +31,7 @@ namespace Prax.OcrEngine.Website {
 
 			routes.MapRoute("OCR Results",
 				"Documents/{id}/{format}/{name}",
-				new { action = "Results" },
+				new { controller = "Documents", action = "Results" },
 				new { id = GuidConstraint.Instance, format = new EnumConstraint(typeof(ResultFormat)) });
 
 			routes.MapRoute("Default route", // Route name
@@ -42,7 +42,7 @@ namespace Prax.OcrEngine.Website {
 
 		[SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Automatically added event handler")]
 		protected void Application_Start() {
-			AreaRegistration.RegisterAllAreas();
+			//AreaRegistration.RegisterAllAreas();
 
 			var config = Config.CreateCurrent();
 
@@ -63,7 +63,7 @@ namespace Prax.OcrEngine.Website {
 		public ValueListConstraint(IEnumerable<string> allowedValues) { this.allowedValues = allowedValues; }
 
 		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
-			return allowedValues.Contains((string)values[parameterName], StringComparer.OrdinalIgnoreCase);
+			return allowedValues.Contains(values[parameterName].ToString(), StringComparer.OrdinalIgnoreCase);
 		}
 	}
 	///<summary>An IRouteConstraint implementation that constrains a parameter to the names in an enum.</summary>
@@ -76,8 +76,9 @@ namespace Prax.OcrEngine.Website {
 		public static readonly GuidConstraint Instance = new GuidConstraint();
 
 		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
+			object value = values[parameterName];
 			Guid temp;
-			return Guid.TryParse((string)values[parameterName], out temp);
+			return value is Guid || Guid.TryParse((string)value, out temp);
 		}
 	}
 }
