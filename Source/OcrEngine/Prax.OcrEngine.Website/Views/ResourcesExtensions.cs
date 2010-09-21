@@ -11,7 +11,7 @@ using System.ComponentModel;
 
 namespace Prax.OcrEngine.Website.Views {
 	///<summary>Contains extensions methods used by MVC views.</summary>
-	public static class ViewsExtensions {
+	public static class ResourcesExtensions {
 		static Autofac.IComponentContext container;
 
 		///<summary>Gets the Autofac container used to resolve dependencies.</summary>

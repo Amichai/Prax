@@ -113,7 +113,7 @@
     <Compile Include="Resources\IMinifier.cs" />
     <Compile Include="Resources\IResourceResolver.cs" />
     <Compile Include="Resources\ResourceLocator.cs" />
-    <Compile Include="Views\ViewsExtensions.cs" />
+    <Compile Include="Views\ResourcesExtensions.cs" />
     <Compile Include="WebRole.cs" />
   </ItemGroup>
   <ItemGroup>
