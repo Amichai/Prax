@@ -5,6 +5,8 @@ using System.Web;
 using System.Reflection;
 using System.Globalization;
 using System.IO;
+using Prax.OcrEngine.Services;
+using System.ComponentModel;
 
 namespace Prax.OcrEngine {
 	///<summary>Contains useful extension methods.</summary>
@@ -88,6 +90,19 @@ namespace Prax.OcrEngine {
 			if (processor == null) throw new ArgumentNullException("processor");
 			return (int)(100 * (double)processor.CurrentProgress / processor.MaximumProgress);
 		}
-	}
 
+		///<summary>Gets the file extension of a result format.</summary>
+		public static string GetExtension(this ResultFormat format) {
+			switch (format) {
+				case ResultFormat.PlainText:
+					return ".txt";
+				case ResultFormat.Pdf:
+					return ".pdf";
+				default:
+					throw new InvalidEnumArgumentException("format", (int)format, typeof(ResultFormat));
+			}
+		}
+		///<summary>Gets the MIME type of a result format.</summary>
+		public static string GetMimeType(this ResultFormat format) { return MimeTypes.ForExtension(format.GetExtension()); }
+	}
 }

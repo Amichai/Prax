@@ -64,12 +64,4 @@ namespace Prax.OcrEngine.Services {
 
 		//TODO: Equals, GetHashCode, == operator
 	}
-
-	///<summary>Converts OCR results into an output format.</summary>
-	public interface IResultsConverter {
-		///<summary>Gets the name of the format that this service converts to.</summary>
-		string OutputFormat { get; }
-		///<summary>Converts a recognized image.</summary>
-		Stream Convert(Stream input, ReadOnlyCollection<RecognizedSegment> results);
-	}
 }

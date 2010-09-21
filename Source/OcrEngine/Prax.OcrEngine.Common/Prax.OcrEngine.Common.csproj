@@ -58,6 +58,7 @@
     <Compile Include="Services\IDocumentManager.cs" />
     <Compile Include="Services\IDocumentProcessor.cs" />
     <Compile Include="Services\IProcessorController.cs" />
+    <Compile Include="Services\IResultConverter.cs" />
     <Compile Include="Services\IStorageClient.cs" />
     <Compile Include="Services\DocumentManager.cs" />
     <Compile Include="Services\IUserAccount.cs" />
