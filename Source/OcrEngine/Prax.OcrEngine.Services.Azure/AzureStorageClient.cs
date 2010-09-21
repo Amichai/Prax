@@ -90,6 +90,10 @@ namespace Prax.OcrEngine.Services.Azure {
 				Blob.Metadata["AlternateStreams"] += name + ";";		//This will result in a trailing `;`, which is ignored.
 				Blob.SetMetadata();
 			}
+
+			public override IEnumerable<string> AlternateStreamNames {
+				get { return (Blob.Metadata["AlternateStreams"] ?? "").Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries); }
+			}
 		}
 
 		static readonly BlobRequestOptions GetDocsOptions = new BlobRequestOptions { BlobListingDetails = BlobListingDetails.Metadata, UseFlatBlobListing = true };
@@ -110,13 +114,14 @@ namespace Prax.OcrEngine.Services.Azure {
 		CloudBlob CreateBlob(DocumentIdentifier id) { return new CloudBlob(container.Name + "/" + id.FileName(), client); }
 
 		public void DeleteDocument(DocumentIdentifier id) {
-			var blob = CreateBlob(id);
-			foreach (var alternateStream in blob.Metadata["AlternateStreams"].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {
+			var doc = (BlobDocument)GetDocument(id);
+
+			foreach (var alternateStream in doc.AlternateStreamNames) {
 				var subBlob = client.GetBlobReference(id.FileName() + "." + alternateStream);
 				subBlob.Delete();
 			}
 
-			blob.Delete();
+			doc.Blob.Delete();
 		}
 
 		public bool UpdateDocument(Document doc) {

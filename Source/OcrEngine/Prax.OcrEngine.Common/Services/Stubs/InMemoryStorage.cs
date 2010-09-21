@@ -76,6 +76,10 @@ namespace Prax.OcrEngine.Services.Stubs {
 				stream.ReadFill(bytes);
 				dataStreams.AddOrUpdate(name, bytes, (k, v) => bytes);
 			}
+
+			public override IEnumerable<string> AlternateStreamNames {
+				get { return dataStreams.Keys.ToArray(); }
+			}
 		}
 	}
 }

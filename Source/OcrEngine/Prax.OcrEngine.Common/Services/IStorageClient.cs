@@ -79,6 +79,12 @@ namespace Prax.OcrEngine.Services {
 		///<param name="length">The size of the stream.</param>
 		public abstract void UploadStream(string name, Stream stream, long length);
 
+		///<summary>Gets the names of the alternate data streams in the document.</summary>
+		public abstract IEnumerable<string> AlternateStreamNames { get; }
+
+		///<summary>Gets the result formats that the document has been converted to.</summary>
+		public IEnumerable<ResultFormat> ResultFormats { get { return AlternateStreamNames.OrderBy(n => n).AsEnum<ResultFormat>(); } }
+
 		///<summary>Gets the size of the underlying file.</summary>
 		public long Length { get; protected set; }
 	}
