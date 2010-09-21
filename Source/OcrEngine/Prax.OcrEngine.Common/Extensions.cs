@@ -71,6 +71,17 @@ namespace Prax.OcrEngine {
 		}
 		#endregion
 
+		#region Collections
+		///<summary>Filters a set of strings to those that match elements of an enum.</summary>
+		public static IEnumerable<TEnum> AsEnum<TEnum>(this IEnumerable<string> source, bool ignoreCase = false) where TEnum : struct {
+			foreach (var str in source) {
+				TEnum value;
+				if (Enum.TryParse<TEnum>(str, ignoreCase, out value))
+					yield return value;
+			}
+		}
+		#endregion
+
 		static readonly string[] sizes = { "bytes", "KB", "MB", "GB", "TB" };
 		///<summary>Converts a number of bytes to a string in the appropriate unit.</summary>
 		public static string ToSizeString(this long size) {
