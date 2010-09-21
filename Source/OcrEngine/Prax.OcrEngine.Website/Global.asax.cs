@@ -29,8 +29,12 @@ namespace Prax.OcrEngine.Website {
 							new { action = new ValueListConstraint(Controllers.ContentController.Pages) }
 			);
 
-			routes.MapRoute(
-				"Default route", // Route name
+			routes.MapRoute("OCR Results",
+				"Documents/{id}/{format}/{name}",
+				new { action = "Results" },
+				new { id = GuidConstraint.Instance, format = new EnumConstraint(typeof(ResultFormat)) });
+
+			routes.MapRoute("Default route", // Route name
 				"{controller}/{action}/{id}/{name}", // URL with parameters
 				new { controller = "Home", action = "Index", id = UrlParameter.Optional, name = UrlParameter.Optional } // Parameter defaults
 			);
@@ -60,6 +64,20 @@ namespace Prax.OcrEngine.Website {
 
 		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
 			return allowedValues.Contains((string)values[parameterName], StringComparer.OrdinalIgnoreCase);
+		}
+	}
+	///<summary>An IRouteConstraint implementation that constrains a parameter to the names in an enum.</summary>
+	class EnumConstraint : ValueListConstraint {
+		public EnumConstraint(Type enumType) : base(Enum.GetNames(enumType)) { }
+	}
+	///<summary>An IRouteConstraint implementation that constrains a parameter to GUID.</summary>
+	class GuidConstraint : IRouteConstraint {
+		private GuidConstraint() { }
+		public static readonly GuidConstraint Instance = new GuidConstraint();
+
+		public bool Match(HttpContextBase httpContext, Route route, string parameterName, RouteValueDictionary values, RouteDirection routeDirection) {
+			Guid temp;
+			return Guid.TryParse((string)values[parameterName], out temp);
 		}
 	}
 }

@@ -63,6 +63,11 @@ namespace Prax.OcrEngine.Website.Controllers {
 			var doc = DocumentManager.GetDocument(id);
 			return File(doc.OpenRead(), MimeTypes.ForExtension(Path.GetExtension(doc.Name)));
 		}
+		public ActionResult Results(Guid id, ResultFormat format, string name = null) {
+			var doc = DocumentManager.GetDocument(id);
+
+			return File(doc.OpenStream(format.ToString()), format.GetMimeType());
+		}
 
 		[HttpPost]
 		public ActionResult Rename(Guid id, string newName) {
