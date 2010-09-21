@@ -10,7 +10,7 @@ using System.Text;
 using System.ComponentModel;
 
 namespace Prax.OcrEngine.Website.Views {
-	///<summary>Contains extensions methods used by MVC views.</summary>
+	///<summary>Contains extensions methods that render resource links in MVC views.</summary>
 	public static class ResourcesExtensions {
 		static Autofac.IComponentContext container;
 
