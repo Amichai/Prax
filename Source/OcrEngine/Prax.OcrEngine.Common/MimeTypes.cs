@@ -16,6 +16,7 @@ namespace Prax.OcrEngine {
 			{ ".bmp",	"image/bmp" },
 
 			{ ".pdf",	"application/pdf" },
+			{ ".txt",	"text/plain" },
 		};
 
 		const string DefaultType = "application/octet-stream";
