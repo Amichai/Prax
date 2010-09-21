@@ -76,15 +76,16 @@ namespace Prax.OcrEngine.Services.Azure {
 
 			public override Stream OpenRead() { return Blob.OpenRead(); }
 
+			internal CloudBlob CreateAlternateBlob(string name) {
+				return new CloudBlob(Blob.Container.Name + "/AlternateStreams/" + Id.FileName() + "." + name, Blob.ServiceClient);
+			}
+
 			public override Stream OpenStream(string name) {
-				var client = Blob.ServiceClient;
-				return client.GetBlobReference(Id.FileName() + "." + name).OpenRead();
+				return CreateAlternateBlob(name).OpenRead();
 			}
 
 			public override void UploadStream(string name, Stream stream, long length) {
-				var client = Blob.ServiceClient;
-				var subBlob = client.GetBlobReference(Id.FileName() + "." + name);
-				subBlob.UploadFromStream(stream);	//The PUT Blob operation will replace existing blobs.
+				CreateAlternateBlob(name).UploadFromStream(stream);	//The PUT Blob operation will replace existing blobs.
 
 				//Update the list of child blobs in the metadata
 				Blob.Metadata["AlternateStreams"] += name + ";";		//This will result in a trailing `;`, which is ignored.
@@ -117,8 +118,7 @@ namespace Prax.OcrEngine.Services.Azure {
 			var doc = (BlobDocument)GetDocument(id);
 
 			foreach (var alternateStream in doc.AlternateStreamNames) {
-				var subBlob = client.GetBlobReference(id.FileName() + "." + alternateStream);
-				subBlob.Delete();
+				doc.CreateAlternateBlob(alternateStream).Delete();
 			}
 
 			doc.Blob.Delete();
