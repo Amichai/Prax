@@ -6,7 +6,7 @@ div.Content {
 	margin: 0 auto;
 	text-align: left;
 	width: 700px;
-	padding-bottom: 60px;	/* This padding goes underneath the footer if the document scrolls */
+	padding-bottom: 60px; /* This padding goes underneath the footer if the document scrolls */
 }
 div.Content .Logo {
 	display: block;
@@ -48,4 +48,5 @@ div.Footer .Links {
 	width: 16px;
 	height: 16px;
 	background: transparent url('/Content/Images/Sprite16.png') no-repeat 0 center;
+	display: block;
 }

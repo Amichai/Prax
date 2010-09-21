@@ -95,6 +95,10 @@
 					<%:doc.DateUploaded.ToShortDateString()%></td>
 				<td class="StatusCell Center">
 					<%:Html.Action("ProgressBar", doc)%>
+					<%if (doc.State == DocumentState.Scanned) { %>
+					<%:Html.ResultsLink(doc, ResultFormat.PlainText) %>
+					<%:Html.ResultsLink(doc, ResultFormat.Pdf)%>
+					<%} %>
 				</td>
 				<td class="DeleteCell">
 					<%-- The submit button passes the ID parameter to the form.

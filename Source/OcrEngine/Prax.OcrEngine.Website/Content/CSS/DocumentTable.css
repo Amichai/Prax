@@ -29,6 +29,16 @@ table#documents tbody td.DeleteCell input {
 table#documents tbody td.DeleteCell input:hover {
 	background-position: 0 center;
 }
+.Sprite16.DownloadIcon {
+	/*text-indent: -8192px;*/
+	float: right;
+}
+.Sprite16.TXT {
+	background-position: -48px center;
+}
+.Sprite16.PDF {
+	background-position: -64px center;
+}
 
 /* Normal NameCells have a rename link that appears on hover. 
  * Uploading rows cannot be renamed, so their links never appear.
