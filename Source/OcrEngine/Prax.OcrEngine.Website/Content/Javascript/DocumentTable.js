@@ -5,7 +5,7 @@
 if (!Prax)
 	var Prax = {};
 
-Prax.DocumentState = function DocumentState(name) { this.name = name; }
+Prax.DocumentState = function DocumentState(name) { this.name = name; };
 Prax.DocumentState.prototype = { toString: function () { return this.name; } };
 
 Prax.DocumentState.uploading = new Prax.DocumentState("Uploading");
@@ -63,7 +63,7 @@ Prax.DocumentRow.prototype = {
 		var newChild;
 
 		if (on || arguments.length === 0)
-			newChild = $('<a />', { text: this.name, href: this.getViewPath(), target: 'DocumentPreview' })
+			newChild = $('<a />', { text: this.name, href: this.getViewPath(), target: 'DocumentPreview' });
 		else
 			newChild = $('<span />').text(this.name);
 
@@ -84,7 +84,7 @@ Prax.DocumentRow.prototype = {
 			this.statusCell.text(caption);
 		} else {
 			var bar = this.statusCell.children('.ProgressContainer').progressBar();
-			if (bar == null)
+			if (bar === null)	//If there is no .ProgressContainer element
 				bar = $('<div />').appendTo(this.statusCell.empty()).progressBar();
 			bar.val(percent);
 			bar.text(caption);
@@ -98,7 +98,7 @@ Prax.DocumentRow.prototype = {
 	createDownloadLink: function createDownloadLink(format) {
 		var shortName = format.extension.substring(1).toUpperCase();
 		return $('<a />', {
-			class: "Sprite16 DownloadIcon " + shortName,
+			"class": "Sprite16 DownloadIcon " + shortName,
 			title: "Download OCR results as a " + shortName + " file",
 			target: "DocumentPreview",
 			href: "/Documents/" + this.id + "/" + format.name + "/" + this.name + format.extension.toLowerCase()
