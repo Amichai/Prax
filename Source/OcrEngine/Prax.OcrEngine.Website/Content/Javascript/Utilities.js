@@ -36,8 +36,58 @@ if (!Array.prototype.indexOf) {
 		if (decimal < .1)
 			return integral + " " + units[order];
 		return integral + "." + Math.floor(decimal * 10) + " " + units[order];
-	}
+	};
 })();
+var Path = {
+	getFileName: function getFileName(path) {
+		/// <summary>Gets the filename of a path.</summary>
+		/// <param name="path" type="String">The path.</param>
+		/// <returns type="String" />
+		if (!path) return '';
+
+		for (var i = path.length; --i >= 0; ) {
+			var ch = path[i];
+			if (ch === '\\' || ch === '/' || ch === ':')
+				return path.Substring(i + 1, path.length - i - 1);
+
+		}
+		return path; //No folder
+	},
+
+	getFileNameWithoutExtension: function getFileNameWithoutExtension(path) {
+		/// <summary>Gets the filename of a path without its extension.</summary>
+		/// <param name="path" type="String">The path.</param>
+		/// <returns type="String" />
+		if (!path) return '';
+
+		path = Path.getFileName(path);
+
+		var i;
+		if ((i = path.lastIndexOf('.')) < 0)
+			return path; // No path extension found
+		else
+			return path.substring(0, i);
+	},
+	getExtension: function getExtension(path) {
+		/// <summary>Gets the extension of a path or filename.</summary>
+		/// <param name="path" type="String">The filename.</param>
+		/// <returns type="String" />
+		if (!path) return '';
+
+		for (var i = path.length; --i >= 0; ) {
+			var ch = path.charAt(i);
+			if (ch === '.') {
+				if (i != path.length - 1)
+					return path.substring(i);
+				else
+					return '';
+			}
+			if (ch === '\\' || ch === '/' || ch === ':')
+				break;
+		}
+		return '';
+	}
+};
 
 Date.prototype.toShortDateString = function toShortDateString() {
 	return (this.getMonth() + 1) + '/' + this.getDate() + '/' + this.getFullYear();
