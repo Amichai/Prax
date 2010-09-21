@@ -32,5 +32,11 @@ namespace Prax.OcrEngine {
 
 			return DefaultType;
 		}
+
+		///<summary>Gets the default extension for the given MIME type.</summary>
+		public static string GetExtension(string mimeType) {
+			//TODO: Reverse map with preferred extension
+			return ExtensionMap.FirstOrDefault(kvp => kvp.Value.Equals(mimeType, StringComparison.OrdinalIgnoreCase)).Key ?? "";
+		}
 	}
 }
