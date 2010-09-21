@@ -25,8 +25,8 @@ namespace Prax.OcrEngine.Services {
 		///<summary>Creates a DocumentIdentifier value from a document GUID for this user</summary>
 		private DocumentIdentifier MakeId(Guid documentId) { return new DocumentIdentifier(UserId, documentId); }
 
-		public Guid UploadDocument(string name, Stream document, long length) {
-			var id = StorageClient.UploadDocument(UserId, name, document, length);
+		public Guid UploadDocument(string name, string mimeType, Stream document, long length) {
+			var id = StorageClient.UploadDocument(UserId, name, mimeType, document, length);
 			ProcessorController.BeginProcessing(MakeId(id));
 			return id;
 		}

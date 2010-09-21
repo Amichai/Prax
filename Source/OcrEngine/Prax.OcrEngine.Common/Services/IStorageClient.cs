@@ -12,7 +12,7 @@ namespace Prax.OcrEngine.Services {
 	public interface IStorageClient {
 		///<summary>Uploads a document to storage.</summary>
 		///<returns>The GUID of the new document.</returns>
-		Guid UploadDocument(Guid userId, string name, Stream document, long length);
+		Guid UploadDocument(Guid userId, string name, string mimeType, Stream document, long length);
 
 		///<summary>Gets the documents belonging to a single user.</summary>
 		///<param name="userId">The ID of the owning user.</param>
@@ -47,6 +47,9 @@ namespace Prax.OcrEngine.Services {
 		public DocumentIdentifier Id { get; private set; }
 		///<summary>Gets the UTC timestamp that this document was initially uploaded into the system.</summary>
 		public DateTime DateUploaded { get; protected set; }
+
+		///<summary>Gets the MIME type of the document.</summary>
+		public virtual string MimeType { get; protected set; }
 
 		///<summary>Gets or sets the name of the document.</summary>
 		public string Name { get; set; }

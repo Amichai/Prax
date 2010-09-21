@@ -86,7 +86,7 @@ namespace Prax.OcrEngine.Services.Tests {
 		static Stream GetStream(string text) { return new MemoryStream(Encoding.UTF8.GetBytes(text), false); }
 		public static Guid UploadDocument(this IStorageClient client, Guid userId, string name, string text) {
 			var stream = GetStream(text);
-			return client.UploadDocument(userId, name, stream, stream.Length);
+			return client.UploadDocument(userId, name, MimeTypes.ForExtension(Path.GetExtension(name)), stream, stream.Length);
 		}
 		public static string DocumentText(this Document document) {
 			using (var reader = new StreamReader(document.OpenRead())) {

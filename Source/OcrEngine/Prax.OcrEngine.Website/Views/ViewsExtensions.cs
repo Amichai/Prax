@@ -16,8 +16,12 @@ namespace Prax.OcrEngine.Website.Views {
 				linkText: " ",
 				//linkText: "Download " + shortName,
 				actionName: "Results",
-				routeValues: new { controller = "Documents", format, id = doc.Id.DocumentId, name = Path.ChangeExtension(doc.Name, format.GetExtension()) },
-				htmlAttributes: new { @class = "DownloadIcon Sprite16 " + shortName, title = "Download OCR results as a " + shortName + " file" }
+				routeValues: new { controller = "Documents", format, id = doc.Id.DocumentId, name = doc.Name + format.GetExtension() },
+				htmlAttributes: new {
+					target = "DocumentPreview",
+					@class = "DownloadIcon Sprite16 " + shortName,
+					title = "Download OCR results as a " + shortName + " file"
+				}
 			);
 		}
 	}

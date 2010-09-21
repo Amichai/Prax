@@ -19,6 +19,7 @@ Prax.DocumentRow = function DocumentRow(owner, tr) {
 	if (!tr.length) throw Error("No row");
 
 	this.tr = tr;
+	this.extension = tr.attr('extension');
 	this.deleteButton = this.tr.find('.DeleteCell input');
 	this.owner = owner;
 
@@ -51,11 +52,12 @@ Prax.DocumentRow.prototype = {
 	owner: null,
 	id: '',
 	name: '',
+	extension: '',
 	date: new Date(),
 	size: -1,
 	state: null,
 
-	getViewPath: function () { return '/Documents/View/' + this.id + '/' + this.name; },
+	getViewPath: function () { return '/Documents/View/' + this.id + '/' + this.name + this.extension; },
 	setNameLink: function (on) {
 		var newChild;
 
@@ -112,6 +114,7 @@ Prax.DocumentRow.prototype = {
 			self.name = newName;
 
 			self.tr.find('.NameCell :first-child').text(newName);
+			//TODO: Update links & tooltips
 		});
 	}
 };
@@ -138,14 +141,15 @@ Prax.DocumentTable.prototype = {
 	updateTimer: false,
 	documents: [],
 
-	createRow: function createRow(id, name, size, date) {
+	createRow: function createRow(id, name, extension, size, date) {
 		/// <summary>Creates a new document row.  Does not interact with the server.</summary>
 		/// <param name="id" type="String">The ID of the document.</param>
 		/// <param name="name" type="String">The filename.</param>
+		/// <param name="extension" type="String">The document's extension.</param>
 		/// <param name="size" type="Number">The size of the file in bytes.</param>
 		/// <returns type="Prax.DocumentRow" />
 
-		var tr = $('<tr />', { id: Prax.DocumentRow.idPrefix + id })
+		var tr = $('<tr />', { id: Prax.DocumentRow.idPrefix + id, extension: extension })
 					.append(
 						$('<td class="NameCell" />').append($('<span />').text(name))
 					)
@@ -176,7 +180,7 @@ Prax.DocumentTable.prototype = {
 	},
 	removeRow: function (row) {
 		/// <summary>Removes a document row from the table.  Does not interact with the server.</summary>
-		/// <param name="row" type="Prax.DocumentRow">The DocumentRow instance to reomve.</param>
+		/// <param name="row" type="Prax.DocumentRow">The DocumentRow instance to remove.</param>
 		row.tr.remove();
 		this.documents.splice(this.documents.indexOf(row), 1);
 		delete this.documents[row.id];
@@ -197,7 +201,7 @@ Prax.DocumentTable.prototype = {
 				//was created in another instance)
 				if (!docRow) {
 					var date = new Date(parseInt(doc.date.substr('/Date('.length), 10)); //.Net sends dates through JSON as "\/Date(1282162655583)\/"
-					docRow = self.createRow(doc.id, doc.name, doc.size, date);
+					docRow = self.createRow(doc.id, doc.name, doc.extension, doc.size, date);
 					docRow.setNameLink(true);
 				}
 

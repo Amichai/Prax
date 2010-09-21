@@ -85,9 +85,9 @@
 		</thead>
 		<tbody>
 			<%foreach (var doc in Model.Documents) { %>
-			<tr id="document-<%:doc.Id.DocumentId %>">
+			<tr id="document-<%:doc.Id.DocumentId %>" extension="<%:MimeTypes.GetExtension(doc.MimeType) %>">
 				<td class="NameCell">
-					<%:Html.ActionLink(doc.Name, "View", new { id = doc.Id.DocumentId,  doc.Name }, new { target = "DocumentPreview" })%>
+					<%:Html.ActionLink(doc.Name, "View", new { id = doc.Id.DocumentId, name = doc.Name + MimeTypes.GetExtension(doc.MimeType) }, new { target = "DocumentPreview" })%>
 				</td>
 				<td class="SizeCell Right" title="<%:doc.Length.ToString()%> bytes">
 					<%:doc.Length.ToSizeString()%></td>

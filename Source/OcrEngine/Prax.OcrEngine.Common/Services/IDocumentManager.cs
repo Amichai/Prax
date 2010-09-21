@@ -14,7 +14,7 @@ namespace Prax.OcrEngine.Services {
 
 		///<summary>Uploads a document to storage.</summary>
 		///<returns>The ID of the new document.</returns>
-		Guid UploadDocument(string name, Stream document, long length);
+		Guid UploadDocument(string name,string mimeType, Stream document, long length);
 
 		///<summary>Gets all of the user's documents.</summary>
 		///<remarks>Calling this method might result in a network request.</remarks>

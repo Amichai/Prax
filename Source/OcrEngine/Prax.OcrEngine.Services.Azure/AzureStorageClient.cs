@@ -21,12 +21,12 @@ namespace Prax.OcrEngine.Services.Azure {
 			container.CreateIfNotExist();
 		}
 
-		public Guid UploadDocument(Guid userId, string name, Stream document, long length) {
+		public Guid UploadDocument(Guid userId, string name, string mimeType, Stream document, long length) {
 			var id = new DocumentIdentifier(userId, Guid.NewGuid());
 			var doc = new BlobDocument(id, name, CreateBlob(id));
 
 			doc.UpdateMetadata();
-			doc.Blob.Properties.ContentType = MimeTypes.ForExtension(Path.GetExtension(name));
+			doc.Blob.Properties.ContentType = mimeType;
 
 			doc.Blob.UploadFromStream(document);
 
@@ -67,6 +67,11 @@ namespace Prax.OcrEngine.Services.Azure {
 				Blob.Metadata["Progress"] = ScanProgress.ToString(CultureInfo.InvariantCulture);
 				Blob.Metadata["CancellationPending"] = CancellationPending.ToString();
 				Blob.Metadata["State"] = State.ToString();
+			}
+
+			public override string MimeType {
+				get { return Blob.Properties.ContentType; }
+				protected set { }
 			}
 
 			public override Stream OpenRead() { return Blob.OpenRead(); }

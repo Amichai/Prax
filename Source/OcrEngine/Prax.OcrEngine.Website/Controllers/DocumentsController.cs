@@ -45,7 +45,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 			if (file == null)
 				return RedirectToAction("Index");	//TODO: Show error message
 
-			DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
+			UploadFile(file);
 
 			return RedirectToAction("Index");
 		}
@@ -54,14 +54,17 @@ namespace Prax.OcrEngine.Website.Controllers {
 			if (file == null)
 				return Content("Error!");
 
-			var id = DocumentManager.UploadDocument(Path.GetFileName(file.FileName), file.InputStream, file.ContentLength);
+			var id = UploadFile(file);
 
 			return Content(id.ToString());
+		}
+		private Guid UploadFile(HttpPostedFileBase file) {
+			return DocumentManager.UploadDocument(Path.GetFileNameWithoutExtension(file.FileName), MimeTypes.ForExtension(Path.GetExtension(file.FileName)), file.InputStream, file.ContentLength);
 		}
 
 		public ActionResult View(Guid id, string name = null) {
 			var doc = DocumentManager.GetDocument(id);
-			return File(doc.OpenRead(), MimeTypes.ForExtension(Path.GetExtension(doc.Name)));
+			return File(doc.OpenRead(), doc.MimeType);
 		}
 		public ActionResult Results(Guid id, ResultFormat format, string name = null) {
 			var doc = DocumentManager.GetDocument(id);
@@ -94,6 +97,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 					state = "Scanned",
 
 					name = doc.Name,
+					extension = MimeTypes.GetExtension(doc.MimeType),
 					size = doc.Length,
 					date = doc.DateUploaded
 				};
@@ -105,6 +109,7 @@ namespace Prax.OcrEngine.Website.Controllers {
 					progressCaption = GetBarCaption(doc.State, doc.ScanProgress),
 
 					name = doc.Name,
+					extension = MimeTypes.GetExtension(doc.MimeType),
 					size = doc.Length,
 					date = doc.DateUploaded
 				};

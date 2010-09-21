@@ -51,7 +51,7 @@ Prax.DocumentUploader.prototype = {
 		$('#noDocumentsMessage').hide();
 		this.table.table.show();
 
-		var row = this.table.createRow(queueId, file.name, file.size);
+		var row = this.table.createRow(queueId, Path.getFileNameWithoutExtension(file.name), Path.getExtension(file.name), file.size);
 		row.state = Prax.DocumentState.uploading;
 		row.setProgress('Waiting to upload', 0);
 

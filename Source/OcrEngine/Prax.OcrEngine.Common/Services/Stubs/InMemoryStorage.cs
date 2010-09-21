@@ -10,10 +10,10 @@ namespace Prax.OcrEngine.Services.Stubs {
 	public class InMemoryStorage : IStorageClient {
 		readonly List<InMemoryDocument> list = new List<InMemoryDocument>();
 
-		public Guid UploadDocument(Guid userId, string name, Stream document, long length) {
+		public Guid UploadDocument(Guid userId, string name, string mimeType, Stream document, long length) {
 			byte[] bytes = new byte[length];
 			document.ReadFill(bytes);
-			var doc = new InMemoryDocument(userId, name, bytes);
+			var doc = new InMemoryDocument(userId, name, mimeType, bytes);
 
 			lock (list)
 				list.Add(doc);
@@ -54,9 +54,10 @@ namespace Prax.OcrEngine.Services.Stubs {
 			readonly ConcurrentDictionary<string, byte[]> dataStreams = new ConcurrentDictionary<string, byte[]>();
 			readonly byte[] bytes;
 
-			public InMemoryDocument(Guid userId, string name, byte[] bytes)
+			public InMemoryDocument(Guid userId, string name, string mimeType, byte[] bytes)
 				: base(new DocumentIdentifier(userId, Guid.NewGuid())) {
 				base.Name = name;
+				base.MimeType = mimeType;
 				this.bytes = bytes;
 				Length = bytes.Length;
 				DateUploaded = DateTime.UtcNow;
