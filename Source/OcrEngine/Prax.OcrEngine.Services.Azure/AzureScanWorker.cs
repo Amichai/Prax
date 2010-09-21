@@ -14,10 +14,12 @@ namespace Prax.OcrEngine.Services.Azure {
 		readonly IStorageClient storage;
 		readonly Func<IDocumentProcessor> processorCreator;
 		readonly SingleDeliveryQueueClient queue;
+		readonly IEnumerable<IResultsConverter> resultConverters;
 
-		public AzureScanWorker(IStorageClient storage, Func<IDocumentProcessor> processorCreator, CloudStorageAccount account) {
+		public AzureScanWorker(IStorageClient storage, Func<IDocumentProcessor> processorCreator,IEnumerable<IResultsConverter> resultConverters, CloudStorageAccount account) {
 			this.storage = storage;
 			this.processorCreator = processorCreator;
+			this.resultConverters = resultConverters;
 			queue = new SingleDeliveryQueueClient(account, "documents");
 		}
 
@@ -53,11 +55,18 @@ namespace Prax.OcrEngine.Services.Azure {
 					processor.ProgressChanged += (sender, e) => reporter.SetProgress(processor.ProgressPercentage());
 					processor.CheckCanceled += (sender, e) => e.Cancel = reporter.CancellationPending;
 
+					//TODO: Cache document stream
 					processor.ProcessDocument(document.OpenRead());
 					reporter.StopReporter();
 
 					document = storage.GetDocument(document.Id);	//Refresh properties before saving them (eg, if it was renamed)
 					if (document == null) continue;					//If the document was just deleted, skip it.
+
+					foreach (var converter in resultConverters) {
+						var stream = converter.Convert(document.OpenRead(), processor.Results);
+						document.UploadStream(converter.OutputFormat.ToString(), stream, stream.Length);
+					}
+
 					document.ScanProgress = 100;
 					document.State = DocumentState.Scanned;
 					storage.UpdateDocument(document);
