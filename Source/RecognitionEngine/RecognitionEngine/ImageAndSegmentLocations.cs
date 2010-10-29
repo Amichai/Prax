@@ -22,7 +22,7 @@ namespace Prax.Recognition
 
             string dataFileName = @"C:\Users\Amichai\Documents\doc.txt";
             string dataFontName = "Times New Roman";
-            string dataSize = "20";
+            string dataSize = "12";
             string dataStyle = "".ToLower();
 
             int width, height;
@@ -31,7 +31,7 @@ namespace Prax.Recognition
             FontStyle style = FontStyle.Regular;
             if (dataStyle.Contains("b"))
                 style |= FontStyle.Bold;
-            else if (dataStyle.Contains("i"))
+            if (dataStyle.Contains("i"))
                 style |= FontStyle.Italic;
             using (var font = new Font(dataFontName, float.Parse(dataSize), style, GraphicsUnit.Pixel))
             {
@@ -59,7 +59,10 @@ namespace Prax.Recognition
                 double expansionFactor = (double)7 / 5; //Magic number to create a visual equality between the whole doc rendered at once and individual letters
 
                 var size = TextRenderer.MeasureText(text, font);
-                using (var image = new Bitmap(size.Width, size.Height))
+                //using (var image = new Bitmap(size.Width, size.Height))
+                //using (var objGraphics = Graphics.FromImage(image))
+                
+                var image = new Bitmap(size.Width, size.Height);
                 using (var objGraphics = Graphics.FromImage(image))
                 {
                     objGraphics.Clear(Color.White);
@@ -263,8 +266,8 @@ namespace Prax.Recognition
         {
             int width, height;
 
-            width = (int)objGraphics.MeasureStringSize(text, font).Width;
-            height = (int)objGraphics.MeasureStringSize(text, font).Height;
+            width = (int)objGraphics.MeasureString(text, font).Width;
+            height = (int)objGraphics.MeasureString(text, font).Height;
             Rectangle textBound = new Rectangle(0, 0, width, height);
 
             int charHorizontalGap, charVerticalGap;
@@ -286,38 +289,38 @@ namespace Prax.Recognition
                     {
                         char c = convertUnicodeChar(word, ref i);
                         //char c = word[i];
-                        width = (int)objGraphics.MeasureStringSize(c.ToString(), font).Width;
-                        width = width * 2 / 3;
-                        height = (int)objGraphics.MeasureStringSize(c.ToString(), font).Height;
-                        TextRenderer.DrawText(objGraphics, c.ToString(), font, new Point(xIndex, yIndex), Color.Black);
-                        objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
+                        width = (int)objGraphics.MeasureString(c.ToString(), font).Width;
+                        width = width *2 / 3;
+                        height = (int)objGraphics.MeasureString(c.ToString(), font).Height;
+
+                        objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex), new StringFormat(StringFormatFlags.DirectionRightToLeft));
                         //xIndex += width;
                         xIndex -= width;
                         wordWidth += width;
                         segmentData.AddNode(xIndex, yIndex, width, c.ToString());
                     }
                     objGraphics.DrawString(" ", font, brush, xIndex, yIndex);
-                    width = (int)objGraphics.MeasureStringSize(" ", font).Width;
+                    width = (int)objGraphics.MeasureString(" ", font).Width;
                     //xIndex += width;
                     xIndex -= width;
                     //segmentData.AddNode(wordXidx, yIndex, wordWidth, word);
                     segmentData.AddNode(xIndex, yIndex, wordWidth, word);
                 }
-                height = (int)objGraphics.MeasureStringSize(line, font).Height;
+                height = (int)objGraphics.MeasureString(line, font).Height;
                 yIndex += height;
             }
         }
 
         private void CalculateGap(Graphics objGraphics, Font font, out int charHorizontalGap, out int charVerticalGap)
         {
-            int combinedWidth = (int)objGraphics.MeasureStringSize("ab", font).Width;
-            int aWidth = (int)objGraphics.MeasureStringSize("a", font).Width;
-            int bWidth = (int)objGraphics.MeasureStringSize("b", font).Width;
+            int combinedWidth = (int)objGraphics.MeasureString("ab", font).Width;
+            int aWidth = (int)objGraphics.MeasureString("a", font).Width;
+            int bWidth = (int)objGraphics.MeasureString("b", font).Width;
 
             charHorizontalGap = combinedWidth - aWidth - bWidth;
-            int combinedHeight = (int)objGraphics.MeasureStringSize("a" + Environment.NewLine + "b", font).Height;
-            int aHeight = (int)objGraphics.MeasureStringSize("a", font).Height;
-            int bHeight = (int)objGraphics.MeasureStringSize("b", font).Height;
+            int combinedHeight = (int)objGraphics.MeasureString("a" + Environment.NewLine + "b", font).Height;
+            int aHeight = (int)objGraphics.MeasureString("a", font).Height;
+            int bHeight = (int)objGraphics.MeasureString("b", font).Height;
             charVerticalGap = combinedHeight - aHeight - bHeight;
         }
 

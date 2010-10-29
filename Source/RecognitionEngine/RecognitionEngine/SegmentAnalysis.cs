@@ -10,7 +10,7 @@ namespace Prax.Recognition
 {
     class SegmentAnalysis
     {
-        List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();  
+        List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();
         OCRHandler wordOCR = new OCRHandler();
         List<RecognizedSegment> lettersResolvedFromWord = new List<RecognizedSegment>();
 
@@ -32,22 +32,22 @@ namespace Prax.Recognition
             {
                 RecognizedSegment recognizedLetter = new RecognizedSegment();
                 recognizedLetter = readSegment(segment);
-                if(recognizedLetter.Certainty > thresholdCertainty)
+                if (recognizedLetter.Certainty > thresholdCertainty)
                 {
                     //if (lettersResolvedFromWord.Count > 0 && recognizedLetter.Bounds.X - lettersResolvedFromWord[lettersResolvedFromWord.Count - 1].Bounds.X > thresholdDistance)
-                      //  lettersResolvedFromWord.Add(new RecognizedSegment());
-                    
+                    //  lettersResolvedFromWord.Add(new RecognizedSegment());
+
                     lettersResolvedFromWord.Add(recognizedLetter);
                 }
             }
         }
 
-        private void assessTheLettersResolvedFromWord() 
+        private void assessTheLettersResolvedFromWord()
         {
             int currentIndex = 0;
             List<Tuple<int, int>> overlap = new List<Tuple<int, int>>();
             int counter = 0;
-            foreach(RecognizedSegment seg in resolvedSegmentsList)
+            foreach (RecognizedSegment seg in resolvedSegmentsList)
             {
                 if (seg.Certainty > thresholdCertainty)
                 {
@@ -72,31 +72,22 @@ namespace Prax.Recognition
         private HashSet<int> determineIndiciesToSearchFor()
         {
             List<string> wordsToCheck = new List<string>();
-            //USE: wordOCR.listOfIndexLabels, lettersResolvedFromWord 
             string wordPattern = string.Empty;
             RecognizedSegment lastSegmentSeen = new RecognizedSegment();
-            int distanceThreshold = 5;
+            int distanceThreshold = 5; //TODO: insure that no letters will fit within the threshold (.*)
+
             foreach (RecognizedSegment seg in lettersResolvedFromWord)
             {
-                wordPattern += seg.Text;
-                if(lastSegmentSeen.Bounds != null && seg.Bounds.X - (lastSegmentSeen.Bounds.X + lastSegmentSeen.Bounds.Width) > distanceThreshold)
-                    wordPattern += ".*";
+                wordPattern += Regex.Escape(seg.Text);
+                if (lastSegmentSeen.Bounds != null && seg.Bounds.X - (lastSegmentSeen.Bounds.X + lastSegmentSeen.Bounds.Width) > distanceThreshold)
+                    wordPattern += ".+";
                 lastSegmentSeen = seg;
             }
-            wordPattern += ".*";
-
-            string regexPattern = "^" + wordPattern + "$";
-            int index = 0;
-            HashSet<int> indices = new HashSet<int>();
-            foreach (string s in wordOCR.listOfIndexLabels)
-            {
-                if (Regex.IsMatch(s, regexPattern))
-                {
-                    indices.Add(index);
-                }
-                index++;
-            }
-            return indices;
+            Regex regex = new Regex(wordPattern);
+            return new HashSet<int>(wordOCR.listOfIndexLabels
+                .Where(s => regex.IsMatch(s))
+                .Select((word, index) => index)
+            );
         }
 
         private HashSet<int> indiciesOfLettersOnly = new HashSet<int>();
@@ -105,7 +96,7 @@ namespace Prax.Recognition
         {
             Tuple<string, double> labelAndCertainty;
             labelAndCertainty = wordOCR.ReadDoubleArray(segment.InternalPoints);
-            
+
             if (!segment.ThisSegmentIsAWord)
                 wordOCR.IndiciesToCheck = indiciesOfLettersOnly;
             else
