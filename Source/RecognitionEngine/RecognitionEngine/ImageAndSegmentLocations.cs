@@ -17,16 +17,15 @@ namespace Prax.Recognition
         private Tree segmentData = new Tree();
         public Bitmap TrainingImage = new Bitmap(1, 1);
 
+        enum RenderMethod { letterByLetter, wholeTextAtOnce };
+
         public ImageAndSegmentLocations()
         {
-
+            RenderMethod renderMethod = RenderMethod.letterByLetter;
             string dataFileName = @"C:\Users\Amichai\Documents\doc.txt";
             string dataFontName = "Times New Roman";
-            string dataSize = "12";
+            string dataSize = "14";
             string dataStyle = "".ToLower();
-
-            int width, height;
-            width = height = 0;
 
             FontStyle style = FontStyle.Regular;
             if (dataStyle.Contains("b"))
@@ -35,8 +34,6 @@ namespace Prax.Recognition
                 style |= FontStyle.Italic;
             using (var font = new Font(dataFontName, float.Parse(dataSize), style, GraphicsUnit.Pixel))
             {
-
-                //Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("ar-AE");
                 string text = string.Empty;
                 StringCollection lines = new StringCollection();
                 int maxCharacters = 0;
@@ -51,33 +48,62 @@ namespace Prax.Recognition
                             maxCharacters = line.Length;
                     }
                 }
-                lines = GetAlteredLines(lines);
+                lines = getAlteredLines(lines);
                 foreach (string s in lines)
                 {
                     text += s + Environment.NewLine;
                 }
-                double expansionFactor = (double)7 / 5; //Magic number to create a visual equality between the whole doc rendered at once and individual letters
 
                 var size = TextRenderer.MeasureText(text, font);
-                //using (var image = new Bitmap(size.Width, size.Height))
-                //using (var objGraphics = Graphics.FromImage(image))
-                
-                var image = new Bitmap(size.Width, size.Height);
+                var image = new Bitmap(size.Width * 2, size.Height * 2);
+
                 using (var objGraphics = Graphics.FromImage(image))
                 {
+                    string imageFileName = string.Empty;
                     objGraphics.Clear(Color.White);
 
-                    DrawText(objGraphics, font, Brushes.Black, text, lines);
-
-                    //objGraphics.DrawString(text, font, brush, new PointF(0, 0)); //This is to see how the output should render
+                    if (renderMethod == RenderMethod.letterByLetter)
+                    {
+                        drawTextLetterByLetter(objGraphics, font, Brushes.Black, lines);
+                        imageFileName = "letterByLetter.bmp";
+                    }
+                    if (renderMethod == RenderMethod.wholeTextAtOnce)
+                    {
+                        objGraphics.DrawString(text, font, Brushes.Black, new PointF(image.Width, 0), new StringFormat(StringFormatFlags.DirectionRightToLeft));
+                        imageFileName = "wholeTextAtOnce.bmp";
+                    }
 
                     TrainingImage = image;
-                    image.Save("newimage.bmp", ImageFormat.Bmp);
+                    image.Save(imageFileName, ImageFormat.Bmp);
                 }
+            }
+            printSegmentData();
+        }
+
+        private void printSegmentData()
+        {
+            FileStream segmentDataFile = new FileStream("segmentData.txt", FileMode.Create);
+            StreamWriter writer = new StreamWriter(segmentDataFile);
+
+            for (int i = 0; i < segmentData.YCoordinates.Count; i++)
+            {
+                writer.Write("Y val: " + segmentData.YCoordinates[i].Value.ToString());
+                writer.Write(Environment.NewLine);
+                for (int j = 0; j < segmentData.YCoordinates[i].XCoordinates.Count(); j++)
+                {
+                    writer.Write("X val: " + segmentData.YCoordinates[i].XCoordinates[j].Value.ToString());
+                    foreach (KeyValuePair<int, string> l in segmentData.YCoordinates[i].XCoordinates[j].Texts)
+                    {
+                        writer.Write(" Width: " + l.Key.ToString() + " Char: " + l.Value);
+                    }
+
+                    writer.Write(Environment.NewLine);
+                }
+                writer.Write(Environment.NewLine + Environment.NewLine);
             }
         }
 
-        private StringCollection GetAlteredLines(StringCollection document)
+        private StringCollection getAlteredLines(StringCollection document)
         {
             StringCollection lines = new StringCollection();
 
@@ -110,11 +136,14 @@ namespace Prax.Recognition
             return lines;
         }
 
+        #region Tree Data Sturcture
         class Tree
         {
+            public List<Tuple<string, Rectangle>> AllItems = new List<Tuple<string, Rectangle>>();
             public List<YCoordinate> YCoordinates = new List<YCoordinate>();
-            public void AddNode(int xCoordinate, int yCoordinate, int width, string text)
+            public void AddNode(string text, int xCoordinate, int yCoordinate, int width, int height)
             {
+                AllItems.Add(new Tuple<string, Rectangle>(text, new Rectangle(xCoordinate, yCoordinate, width, height)));
                 YCoordinate existingCoordinate = GetExistingNode(yCoordinate);
                 if (existingCoordinate == null)
                 {
@@ -140,57 +169,52 @@ namespace Prax.Recognition
                 return null;
             }
 
-            public string DetermineSegmentText(Rectangle bounds)
+            public ReturnedSegment DetermineSegmentText(Rectangle bounds)
             {
-                List<YCoordinate> bestYCoordinate = new List<YCoordinate>();
+                List<YCoordinate> bestYCoordinates = new List<YCoordinate>();
                 int bestYDiff = int.MaxValue;
 
                 foreach (YCoordinate yCoordinate in this.YCoordinates)
                 {
                     if (Math.Abs(yCoordinate.Value - bounds.Y) == bestYDiff)
                     {
-                        bestYCoordinate.Add(yCoordinate);
+                        bestYCoordinates.Add(yCoordinate);
                     }
-                    if (Math.Abs(yCoordinate.Value - bounds.Y) < 4)
+                    if (Math.Abs(yCoordinate.Value - bounds.Y) < bestYDiff)
                     {
-                        bestYCoordinate.Add(yCoordinate);
-                    }
-                    if (Math.Abs(yCoordinate.Value - bounds.Y) < bestYDiff && Math.Abs(yCoordinate.Value - bounds.Y) >= 4)
-                    {
-                        bestYCoordinate = new List<YCoordinate>();
-                        bestYCoordinate.Add(yCoordinate);
+                        bestYCoordinates = new List<YCoordinate>();
+                        bestYCoordinates.Add(yCoordinate);
                         bestYDiff = Math.Abs(yCoordinate.Value - bounds.Y);
                     }
                 }
-                if (bestYCoordinate == null)
+                if (bestYCoordinates == null)
                     return null;
-                List<XCoordinate> bestXCoordinate = new List<XCoordinate>();
+                List<XCoordinate> bestXCoordinates = new List<XCoordinate>();
                 int bestXDiff = int.MaxValue;
-                foreach (YCoordinate yCoordinate in bestYCoordinate)
+                int bestYCoordinate = 0;
+                foreach (YCoordinate yCoordinate in bestYCoordinates)
                 {
                     foreach (XCoordinate xCoordinate in yCoordinate.XCoordinates)
                     {
                         if (Math.Abs(xCoordinate.Value - bounds.X) == bestXDiff)
                         {
-                            bestXCoordinate.Add(xCoordinate);
+                            bestXCoordinates.Add(xCoordinate);
                         }
-                        if (Math.Abs(xCoordinate.Value - bounds.X) < 4)
+                        if (Math.Abs(xCoordinate.Value - bounds.X) < bestXDiff)
                         {
-                            bestXCoordinate.Add(xCoordinate);
-                        }
-                        if (Math.Abs(xCoordinate.Value - bounds.X) < bestXDiff && Math.Abs(xCoordinate.Value - bounds.X) >= 4)
-                        {
-                            bestXCoordinate = new List<XCoordinate>();
-                            bestXCoordinate.Add(xCoordinate);
+                            bestXCoordinates = new List<XCoordinate>();
+                            bestXCoordinates.Add(xCoordinate);
                             bestXDiff = Math.Abs(xCoordinate.Value - bounds.X);
+                            bestYCoordinate = yCoordinate.Value;
                         }
                     }
                 }
-                if (bestXCoordinate == null)
+                if (bestXCoordinates == null)
                     return null;
                 string matchedWord = null;
                 double bestOverlapRatio = int.MinValue;
-                foreach (XCoordinate xCoordinate in bestXCoordinate)
+                int bestXCoordinate = 0;
+                foreach (XCoordinate xCoordinate in bestXCoordinates)
                 {
                     foreach (int i in xCoordinate.Texts.Keys)
                     {
@@ -203,6 +227,7 @@ namespace Prax.Recognition
                         {
                             bestOverlapRatio = overlapRatio;
                             matchedWord = xCoordinate.Texts[i];
+                            bestXCoordinate = xCoordinate.Value;
                         }
                         /*
                         Debug.Print("YDiff: " + bestYDiff.ToString());
@@ -210,8 +235,9 @@ namespace Prax.Recognition
                         Debug.Print("Overlap: " + bestOverlapRatio.ToString()); */
                     }
                 }
-                if (bestOverlapRatio > .81)
-                    return matchedWord;
+                ReturnedSegment determinedSegment = new ReturnedSegment(matchedWord, bestXDiff, bestYDiff, bestOverlapRatio);
+                if (bestOverlapRatio >= .8)
+                    return determinedSegment;
                 else
                     return null;
             }
@@ -261,52 +287,44 @@ namespace Prax.Recognition
             public int Value;
             public Dictionary<int, string> Texts = new Dictionary<int, string>();
         }
+        #endregion
 
-        private void DrawText(Graphics objGraphics, Font font, Brush brush, string text, StringCollection lines)
+        private void drawTextLetterByLetter(Graphics objGraphics, Font font, Brush brush, StringCollection lines)
         {
-            int width, height;
+            int docWidth, docHeight;
+            docWidth = (int)objGraphics.VisibleClipBounds.Size.Width;
+            docHeight = (int)objGraphics.VisibleClipBounds.Size.Height;
 
-            width = (int)objGraphics.MeasureString(text, font).Width;
-            height = (int)objGraphics.MeasureString(text, font).Height;
-            Rectangle textBound = new Rectangle(0, 0, width, height);
+            Rectangle textBound = new Rectangle(0, 0, docWidth, docHeight);
 
-            int charHorizontalGap, charVerticalGap;
-            CalculateGap(objGraphics, font, out charHorizontalGap, out charVerticalGap);
-
-            int yIndex = height / 4;
-            int xOffset =  width / 4;
-            int tempWidth = width;
+            int yIndex = docHeight / 4;
+            int tempWidth = docWidth - docWidth / 4;
+            int letterCompressionConstant = (int)font.Size / 4;
+            var spaceSize = Size.Truncate(objGraphics.MeasureString(" ", font));
             foreach (string line in lines)
             {
-                //int xIndex = xOffset;
-                
-                int xIndex = tempWidth - xOffset;
-                foreach (string word in line.Split(new char[] { ' ' }))
+                int xIndex = tempWidth - letterCompressionConstant;
+                foreach (string word in line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     int wordWidth = 0;
                     int wordXidx = xIndex;
+                    Size size;
                     for (int i = 0; i < word.Count(); i++)
                     {
                         char c = convertUnicodeChar(word, ref i);
-                        //char c = word[i];
-                        width = (int)objGraphics.MeasureString(c.ToString(), font).Width;
-                        width = width *2 / 3;
-                        height = (int)objGraphics.MeasureString(c.ToString(), font).Height;
-
-                        objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex), new StringFormat(StringFormatFlags.DirectionRightToLeft));
-                        //xIndex += width;
+                        size = Size.Truncate(objGraphics.MeasureString(c.ToString(), font));
+                        int width = size.Width - letterCompressionConstant;
                         xIndex -= width;
                         wordWidth += width;
-                        segmentData.AddNode(xIndex, yIndex, width, c.ToString());
+                        objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
+                        segmentData.AddNode(c.ToString(), xIndex, yIndex, width, size.Height);
                     }
                     objGraphics.DrawString(" ", font, brush, xIndex, yIndex);
-                    width = (int)objGraphics.MeasureString(" ", font).Width;
-                    //xIndex += width;
-                    xIndex -= width;
-                    //segmentData.AddNode(wordXidx, yIndex, wordWidth, word);
-                    segmentData.AddNode(xIndex, yIndex, wordWidth, word);
+                    var wordHeight = (int)objGraphics.MeasureStringSize(word, font).Height;
+                    xIndex -= spaceSize.Width;
+                    segmentData.AddNode(word, xIndex, yIndex, wordWidth, wordHeight);
                 }
-                height = (int)objGraphics.MeasureString(line, font).Height;
+                int height = (int)objGraphics.MeasureString(line, font).Height;
                 yIndex += height;
             }
         }
@@ -326,8 +344,12 @@ namespace Prax.Recognition
 
         public string LabelAtThisSegmentLocation(Rectangle segmentLocation)
         {
-            //TODO: test to see if the segment under inspection matches a defined label
-            return segmentData.DetermineSegmentText(segmentLocation);
+            return segmentData.AllItems.OrderBy(t => Rectangle.Intersect(t.Item2, segmentLocation).Area())
+                                       .ThenBy(t => t.Item2.Area())
+                                       .First().Item1;
+            ReturnedSegment determinedSegment = segmentData.DetermineSegmentText(segmentLocation);
+            ////TODO: test to see if the segment under inspection matches a defined label
+            //return determinedSegment;
         }
 
         #region letter conversion
@@ -356,6 +378,7 @@ namespace Prax.Recognition
             }
             return char.MinValue;
         }
+
         static private int[] RF = new int[] { 1570, 1571, 1573, 1575, 1577, 1583, 1584, 1585, 1586, 1608, 1609 };
         private HashSet<int> restrictedForms = new HashSet<int>(RF);
 

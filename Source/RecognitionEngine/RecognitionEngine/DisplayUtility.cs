@@ -81,9 +81,9 @@ namespace Prax.Recognition
                 displayMask[pixelToAdd.X][pixelToAdd.Y] = color;
             }
 
-            public void DisplayToUI()
+            public void RenderBitmap()
             {
-                Bitmap bitmapToRender = new Bitmap(width, height);
+                BitmapToRender = new Bitmap(width, height);
 
                 Color pixelColor;
 
@@ -115,14 +115,20 @@ namespace Prax.Recognition
                                 pixelColor = Color.FromArgb(displayMask[i][j] % 255, 0, 0);
                         }
 
-                        bitmapToRender.SetPixel(i, j, pixelColor);
+                        BitmapToRender.SetPixel(i, j, pixelColor);
                     }
                 }
+            }
 
+            public Bitmap BitmapToRender = null;
+
+            public void DisplayToUI()
+            {
+                RenderBitmap();
                 Image DocumentInspector = new Bitmap(width, height);
                 Graphics GraphDraw = Graphics.FromImage(DocumentInspector);
 
-                GraphDraw.DrawImage(bitmapToRender, 0, 0);
+                GraphDraw.DrawImage(BitmapToRender, 0, 0);
                 DefaultPictureBox.Image = DocumentInspector;
             }
         }

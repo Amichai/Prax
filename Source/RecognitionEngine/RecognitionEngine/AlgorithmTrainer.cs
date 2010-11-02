@@ -8,23 +8,36 @@ using System.Diagnostics;
 namespace Prax.Recognition
 {
     class AlgorithmTrainer
-    { 
+    {
+        private enum DisplayOptions { none, displayEverySegment, segmentsAndMatch, wordSegmentsAndMatch };
+
         public AlgorithmTrainer()
         {
-            ImageAndSegmentLocations generateTrainingSeg = new ImageAndSegmentLocations();  //A document of text is generted for training purposes
-            int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
+            //Define how the segmentation should be displayed for testing:
+            DisplayOptions testDisplayOptions = DisplayOptions.segmentsAndMatch;
 
+            DisplayUtility.NewFormForDisplay temp;
+            //Generate a document image:
+            ImageAndSegmentLocations generateTrainingSeg = new ImageAndSegmentLocations();  
+            int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
+            
             Segmentator segmentation = new Segmentator(uploadedDocument);
             OCRHandler ocrHandler = new OCRHandler();
-            //foreach (OCRSegment segment in segmentation.DefineSegments())
+            foreach (OCRSegment segment in segmentation.DefineSegments())
             {
-                //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints);
-                //string labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation);
-                //if (labelToTrainWith != null)
+                if (testDisplayOptions == DisplayOptions.displayEverySegment)
+                    temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints);
+
+                string labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation);
+                if (labelToTrainWith != null)
                 {
-                    DisplayUtility.NewFormForDisplay temp2;
-                   // if(segment.ThisSegmentIsAWord == true)
-                     //   temp2 = new DisplayUtility.NewFormForDisplay(segment.InternalPoints, labelToTrainWith);
+                    if ((segment.ThisSegmentIsAWord == true && testDisplayOptions == DisplayOptions.wordSegmentsAndMatch)
+                                    || testDisplayOptions == DisplayOptions.segmentsAndMatch)
+                    {
+                        //Debug.Print("xDiscrep: " + labelToTrainWith.XDiscrep + " yDiscrep: " + labelToTrainWith.YDiscrep + " overlap: " + labelToTrainWith.OverlapRatio);
+                        Debug.Print("X: " + segment.SegmentLocation.X + " Y: " + segment.SegmentLocation.Y + " width: " + segment.SegmentLocation.Width);
+                        temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints, labelToTrainWith);
+                    }
                     //ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith);
                 }
             }

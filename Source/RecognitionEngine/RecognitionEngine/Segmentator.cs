@@ -190,14 +190,26 @@ namespace Prax.Recognition
         {
             int rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width,
                 bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
+
             if (pointToAdd.X < discreteLoopRectangle.X)
                 discreteLoopRectangle.X = pointToAdd.X;
             if (pointToAdd.Y < discreteLoopRectangle.Y)
                 discreteLoopRectangle.Y = pointToAdd.Y;
             if (pointToAdd.X > rightBound)
+            {
                 discreteLoopRectangle.Width = pointToAdd.X - discreteLoopRectangle.X;
+                rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width;
+            }
             if (pointToAdd.Y > bottomBound)
+            { 
                 discreteLoopRectangle.Height = pointToAdd.Y - discreteLoopRectangle.Y;
+                bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
+            }
+            if (bottomBound < int.MaxValue)
+
+                discreteLoopRectangle.Height = bottomBound - discreteLoopRectangle.Y;
+            if (rightBound < int.MaxValue)
+                discreteLoopRectangle.Width = rightBound - discreteLoopRectangle.X;
         }
 
         private IEnumerable<List<Point>> defineDiscreteLoops(List<Point> internalLoopPoints)
@@ -213,6 +225,7 @@ namespace Prax.Recognition
                 {
                     associatedUnexaminedPoints.Add(internalLoopPoints[k]);
                     List<Point> resolvedLoop = new List<Point>();
+                    //DisplayUtility.DisplayMask tempDisplay = new DisplayUtility.DisplayMask(uploadedDocument);
                     discreteLoopRectangle = new Rectangle(int.MaxValue, int.MaxValue, 0, 0);
                     while (associatedUnexaminedPoints.Count > 0)
                     {
@@ -224,10 +237,13 @@ namespace Prax.Recognition
                                                                     listOfAllAssociatedPoints, associatedUnexaminedPoints))
                         {
                             resolvedLoop.Add(pointToAdd);
+                            //tempDisplay.PixelToDisplay(pointToAdd, 900);
                             reassessBounds(pointToAdd);
                         }
                         associatedUnexaminedPoints.RemoveAt(index);
                     }
+                    //tempDisplay.RenderBitmap();
+
                     CurrentProgress += resolvedLoop.Count + 1;
                     float currentPercentProgress = (((float)CurrentProgress / MaxProgress) * 100);
                     yield return resolvedLoop;
