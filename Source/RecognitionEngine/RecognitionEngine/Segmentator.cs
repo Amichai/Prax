@@ -284,8 +284,8 @@ namespace Prax.Recognition
                     {
                         correctedX = i - (leftBound) + (segBorder / 2);
                         correctedY = j - (topBound) + (segBorder / 2);
-                        segment.InternalPoints[correctedX][correctedY] = uploadedDocument[i][j];
-                    }
+                        segment.InternalPoints[correctedX][correctedY] = uploadedDocument[i][j];  //TODO: This is not being rendered with a border of five on each side
+                    }                                                                   //Figure out the border offset and then replace the magic number 4 as the offset when rendering subsegments
                 }
             }
             return segment;
@@ -367,7 +367,7 @@ namespace Prax.Recognition
         public int MinimumSubSegmentWidth = 2;
         
 
-        private IEnumerable<OCRSegment> takeSegmentBreaksAndReturnSubSegments(OCRSegment wordSegment, List<int> breakPoints, int height)
+        private IEnumerable<OCRSegment> takeSegmentBreaksAndReturnSubSegments(OCRSegment wordSegment, List<int> breakPoints, int height, int borderOffset)
         {
             int subSegmentWidth = 0;
             OCRSegment subSegmentToReturn = new OCRSegment();
@@ -387,7 +387,8 @@ namespace Prax.Recognition
                     {
                         for (int j = 0; j < height; j++)
                         {
-                            newSegmentToReturn[i][j] = wordSegment.InternalPoints[i + breakPoints[startIdx]][j];
+                            int xRenderIndex = i + breakPoints[startIdx] + borderOffset;
+                            newSegmentToReturn[i][j] = wordSegment.InternalPoints[xRenderIndex][j];
                         }
                     }
                     newSegmentToReturn = addBorder(newSegmentToReturn);
@@ -462,7 +463,7 @@ namespace Prax.Recognition
             segmentBreakPoints.Add(border - 1);
             segmentBreakPoints.Sort();
 
-            foreach (OCRSegment subSegToReturn in takeSegmentBreaksAndReturnSubSegments(wordSegment, segmentBreakPoints, height))
+            foreach (OCRSegment subSegToReturn in takeSegmentBreaksAndReturnSubSegments(wordSegment, segmentBreakPoints, height, border - 1))
                 yield return subSegToReturn;
         }
         #endregion

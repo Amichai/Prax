@@ -9,7 +9,7 @@ namespace Prax.Recognition
 {
     class AlgorithmTrainer
     {
-        private enum DisplayOptions { none, displayEverySegment, segmentsAndMatch, wordSegmentsAndMatch };
+        private enum DisplayOptions { none, everySegment, segmentsAndMatch, wordSegmentsAndMatch };
 
         public AlgorithmTrainer()
         {
@@ -25,7 +25,7 @@ namespace Prax.Recognition
             OCRHandler ocrHandler = new OCRHandler();
             foreach (OCRSegment segment in segmentation.DefineSegments())
             {
-                if (testDisplayOptions == DisplayOptions.displayEverySegment)
+                if (testDisplayOptions == DisplayOptions.everySegment)
                     temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints);
 
                 string labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation);

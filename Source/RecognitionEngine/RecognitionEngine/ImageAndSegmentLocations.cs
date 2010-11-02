@@ -312,6 +312,7 @@ namespace Prax.Recognition
                     for (int i = 0; i < word.Count(); i++)
                     {
                         char c = convertUnicodeChar(word, ref i);
+                        if (c == 0) continue;
                         size = Size.Truncate(objGraphics.MeasureString(c.ToString(), font));
                         int width = size.Width - letterCompressionConstant;
                         xIndex -= width;
@@ -344,12 +345,60 @@ namespace Prax.Recognition
 
         public string LabelAtThisSegmentLocation(Rectangle segmentLocation)
         {
-            return segmentData.AllItems.OrderBy(t => Rectangle.Intersect(t.Item2, segmentLocation).Area())
-                                       .ThenBy(t => t.Item2.Area())
-                                       .First().Item1;
-            ReturnedSegment determinedSegment = segmentData.DetermineSegmentText(segmentLocation);
-            ////TODO: test to see if the segment under inspection matches a defined label
-            //return determinedSegment;
+            var overlapingRects = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
+            /*
+            for (int i = 0; i < overlapingRects.Count(); i++)
+            {
+                double Area = overlapingRects[i].Item2.Area();
+                int Overlap = Rectangle.Intersect(segmentLocation, overlapingRects[i].Item2).Area();
+                double Val = Overlap / ((Area - Overlap) + (segmentLocation.Area() - Overlap));
+            }
+            */
+            if (overlapingRects.Count > 0)
+            {
+                var maxText = overlapingRects
+                        .Select(t => new { Text = t.Item1, Area = (double)t.Item2.Area(), Overlap = Rectangle.Intersect(segmentLocation, t.Item2).Area() })
+                        .Select(t => new { Text = t.Text, Val = (t.Overlap) / ((t.Area - t.Overlap) + (segmentLocation.Area() - t.Overlap)) })
+                        .OrderBy(t => t.Val).Last();
+                double thresholdOverlap = .9;
+                Debug.Print(maxText.Val.ToString());
+                if (maxText.Val > thresholdOverlap)
+                    return maxText.Text;
+                else
+                    return null;
+            }
+            else return null;
+            /*
+            List<int> excludedRectArea = new List<int>();
+            for (int i = 0; i < overlapingRects.Count(); i++)
+            {
+                excludedRectArea.Add(overlapingRects[i].Item2.Area() - Rectangle.Intersect(segmentLocation, overlapingRects[i].Item2).Area());
+            }
+            var overlapingRectsExcludedParts = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
+
+            double maxOverlapPercentage = 0;
+            string bestMatchString = null;
+            double overlapPercentage;
+            for (int i = 0; i < overlapingRects.Count(); i++)
+            {
+                if (overlapingRects[i].Item2.Area() >= segmentLocation.Area())
+                    overlapPercentage = segmentLocation.Area() / (double)overlapingRects[i].Item2.Area();
+                else
+                    overlapPercentage = (double)overlapingRects[i].Item2.Area() / segmentLocation.Area();
+
+                if (overlapPercentage > maxOverlapPercentage)
+                {
+                    maxOverlapPercentage = overlapPercentage;
+                    bestMatchString = overlapingRects[i].Item1;
+                }
+            }*/
+            
+            //if (maxText > thresholdOverlap)
+                //return bestMatchString;
+            return null;
+            
+            /*var segmentData2 = segmentData.AllItems.OrderBy(t => (t.Item2.Area()) / (double)segmentLocation.Area())
+                                       .OrderBy(t => Rectangle.Intersect(t.Item2, segmentLocation).Area()); */
         }
 
         #region letter conversion
