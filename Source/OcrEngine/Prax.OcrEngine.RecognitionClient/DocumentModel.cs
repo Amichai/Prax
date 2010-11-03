@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using System.IO;
-using Prax.OcrEngine.Services;
 using System.Threading;
+using Prax.OcrEngine.Services;
 
 namespace Prax.OcrEngine.RecognitionClient {
 	///<summary>The document model class bound to the ListView in the UI.</summary>
@@ -65,7 +62,6 @@ namespace Prax.OcrEngine.RecognitionClient {
 				syncContext.Post(delegate { handler(this, e); }, null);
 			else
 				handler(this, e);
-
 		}
 	}
 }
