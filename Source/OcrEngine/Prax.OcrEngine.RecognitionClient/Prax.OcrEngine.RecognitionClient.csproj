@@ -74,6 +74,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DocumentModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -106,6 +107,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Prax.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">
+      <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
+      <Name>Prax.OcrEngine.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Open16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ClearAll16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
