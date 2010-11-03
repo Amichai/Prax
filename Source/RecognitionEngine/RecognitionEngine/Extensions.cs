@@ -109,5 +109,35 @@ namespace Prax.Recognition
                 }
             }
         }
+
+        ///<summary>Converts a double array to Bitmap.</summary>
+        public static Bitmap ConvertDoubleArrayToBitmap(this int[][] doubleArray, Color defaultColor)
+        {
+            int width = doubleArray.GetLength(0);
+            int height = doubleArray[0].GetLength(0);
+            Bitmap bitmapReturn = new Bitmap(width, height);
+
+            Color pixelColor;
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    pixelColor = defaultColor;
+
+                    if (doubleArray[i][j] >= 0 && doubleArray[i][j] < 256)
+                        pixelColor = Color.FromArgb(doubleArray[i][j], doubleArray[i][j], doubleArray[i][j]);
+                    else if (doubleArray[i][j] >= 256 && doubleArray[i][j] < 512)
+                        pixelColor = Color.FromArgb(0, 0, doubleArray[i][j] % 255);
+                    else if (doubleArray[i][j] >= 512 && doubleArray[i][j] < 768)
+                        pixelColor = Color.FromArgb(0, doubleArray[i][j] % 255, 0);
+                    else if (doubleArray[i][j] >= 768 && doubleArray[i][j] < 1024)
+                        pixelColor = Color.FromArgb(doubleArray[i][j] % 255, 0, 0);
+
+                    bitmapReturn.SetPixel(i, j, pixelColor);
+                }
+            }
+            return bitmapReturn;
+        }
     }
 }

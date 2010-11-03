@@ -255,39 +255,49 @@ namespace Prax.Recognition
         private OCRSegment defineSegmentObjectToReturn(List<Point> loopOfPoints)
         {
             OCRSegment segment = new OCRSegment();
+            int segmentWidthIncrease = 2; // this adds some columns & rows of pixels to get back the information lost at the segment edges
 
-            int segWidth = discreteLoopRectangle.Width + segBorder,
-                segHeight = discreteLoopRectangle.Height + segBorder;
+            int segWidth = discreteLoopRectangle.Width + segBorder + segmentWidthIncrease,
+                segHeight = discreteLoopRectangle.Height + segBorder + segmentWidthIncrease;
+
             segment.InternalPoints = new int[segWidth][];
             for (int i = 0; i < segWidth; i++)
-            {
                 segment.InternalPoints[i] = new int[segHeight];
-            }
+
             for (int i = 0; i < segWidth; i++)
-            {
                 for (int j = 0; j < segHeight; j++)
-                {
                     segment.InternalPoints[i][j] = 255;
-                }
-            }
+
             int leftBound = discreteLoopRectangle.X,
                 rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width,
                 topBound = discreteLoopRectangle.Y,
                 bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
+
+            int lowestXVal = int.MaxValue,
+                lowestYVal = int.MaxValue,
+                highestYVal = int.MinValue,
+                highestXVal = int.MinValue;
+
             int correctedX, correctedY;
-            for (int i = leftBound - 1; i <= rightBound + 1; i++)
+            for (int i = leftBound - 1; i <= rightBound; i++)
             {
-                for (int j = topBound - 1; j <= bottomBound + 1; j++)
+                for (int j = topBound - 1; j <= bottomBound; j++)
                 {
                     bool inBounds = i < labeledPixels.GetLength(0) && j < labeledPixels.GetLength(1) && i > 0 && j > 0;
                     if (inBounds && labeledPixels[i, j] != 1)
                     {
-                        correctedX = i - (leftBound) + (segBorder / 2);
-                        correctedY = j - (topBound) + (segBorder / 2);
-                        segment.InternalPoints[correctedX][correctedY] = uploadedDocument[i][j];  //TODO: This is not being rendered with a border of five on each side
-                    }                                                                   //Figure out the border offset and then replace the magic number 4 as the offset when rendering subsegments
+                        correctedX = i - (leftBound) + (segBorder / 2) + 1; //This insures a buffer of 5 white pixels on every border
+                        correctedY = j - (topBound) + (segBorder / 2) + 1;
+                        segment.InternalPoints[correctedX][correctedY] = uploadedDocument[i][j];
+                        if (i < lowestXVal) lowestXVal = i;
+                        if (i > highestXVal) highestXVal = i;
+                        if (j < lowestYVal) lowestYVal = j;
+                        if (j > highestYVal) highestYVal = j;
+                    }
                 }
             }
+            //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints);
+            segment.SegmentLocation = new Rectangle(lowestXVal, lowestYVal, highestXVal - lowestXVal, highestYVal - lowestYVal);
             return segment;
         }
 
@@ -316,13 +326,15 @@ namespace Prax.Recognition
                     wordSegment = defineSegmentObjectToReturn(discreteLoop);
                     if (testSegmentForPlausibilty(wordSegment)) //Factor out all sanity testing into one centralized place. Problem. Eliminate this method.
                     {
-                        wordSegment.SegmentLocation = discreteLoopRectangle;
+                        //wordSegment.SegmentLocation = discreteLoopRectangle;
                         wordSegment.ThisSegmentIsAWord = true;
                         foreach (OCRSegment subSegment in defineSubSegments(wordSegment))
                         {
                             subSegment.ThisSegmentIsAWord = false;
+                            //DisplayUtility.NewFormForDisplay temp2 = new DisplayUtility.NewFormForDisplay(subSegment.InternalPoints, subSegment.SegmentLocation.ToString());
                             yield return subSegment;
                         }
+                        //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(wordSegment.InternalPoints, wordSegment.SegmentLocation.ToString());
                         yield return wordSegment;
                     }
                 }
@@ -399,14 +411,14 @@ namespace Prax.Recognition
                                                                         breakPoints[endIndex] - breakPoints[startIdx],
                                                                         wordSegment.SegmentLocation.Height);
                     endIndex++;
-
+//                    DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(subSegmentToReturn.InternalPoints);
                     yield return subSegmentToReturn;
                 }
             }
         }
 
         private IEnumerable<OCRSegment> defineSubSegments(OCRSegment wordSegment)
-        {
+        { 
             int width = wordSegment.InternalPoints.Length,
                 height = wordSegment.InternalPoints[0].Length;
             int border = segBorder / 2;
@@ -415,7 +427,7 @@ namespace Prax.Recognition
             for (int i = border; i < width - border; i++)
             {
                 int verticalSum = 0;
-                for (int j = 2; j < height - 2; j++)
+                for (int j = 0; j < height; j++)
                 {
                     verticalSum += wordSegment.InternalPoints[i][j];
                 }
@@ -460,10 +472,10 @@ namespace Prax.Recognition
                 }
             }
             segmentBreakPoints.Add(width - border);
-            segmentBreakPoints.Add(border - 1);
+            segmentBreakPoints.Add(border);
             segmentBreakPoints.Sort();
 
-            foreach (OCRSegment subSegToReturn in takeSegmentBreaksAndReturnSubSegments(wordSegment, segmentBreakPoints, height, border - 1))
+            foreach (OCRSegment subSegToReturn in takeSegmentBreaksAndReturnSubSegments(wordSegment, segmentBreakPoints, height, border))
                 yield return subSegToReturn;
         }
         #endregion

@@ -465,7 +465,9 @@ namespace Prax.Recognition
             double[] totalComparison_test = new double[numberOfLabelsToCount];
 
             if (variances == null)
+            {
                 variances = new variancesForEachHeuristic(sizeOfHeuristicArray);
+            }
             
 
             for (int i = 0; i < numberOfLabelsToCount; i++)

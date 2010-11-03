@@ -29,14 +29,16 @@ namespace Prax.Recognition
             for (int i = sortedOutput.Count - 1; i >= 0; i--)
             {
                 if (i != 0 && (sortedOutput[i].Bounds.Y - sortedOutput[i - 1].Bounds.Y) < 4)
+                {
                     indiciesToAdjust++;
+                }
                 else
                 {
                     for (int j = 1; j <= indiciesToAdjust; j++)
                     {
-                        System.Drawing.Rectangle newBounds = new System.Drawing.Rectangle(sortedOutput[i + j].Bounds.X, 
-                                                                                            sortedOutput[i].Bounds.Y, 
-                                                                                            sortedOutput[i + j].Bounds.Width, 
+                        System.Drawing.Rectangle newBounds = new System.Drawing.Rectangle(sortedOutput[i + j].Bounds.X,
+                                                                                            sortedOutput[i].Bounds.Y,
+                                                                                            sortedOutput[i + j].Bounds.Width,
                                                                                             sortedOutput[i + j].Bounds.Height);
                         sortedOutput[i + j] = new RecognizedSegment(newBounds, sortedOutput[i + j].Text, sortedOutput[i + j].Certainty);
                     }

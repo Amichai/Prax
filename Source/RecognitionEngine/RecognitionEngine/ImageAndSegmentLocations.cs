@@ -297,35 +297,33 @@ namespace Prax.Recognition
 
             Rectangle textBound = new Rectangle(0, 0, docWidth, docHeight);
 
-            int yIndex = docHeight / 4;
-            int tempWidth = docWidth - docWidth / 4;
-            int letterCompressionConstant = (int)font.Size / 4;
-            var spaceSize = Size.Truncate(objGraphics.MeasureString(" ", font));
+            float yIndex = docHeight / 4;
+            float tempWidth = docWidth - docWidth / 4;
+            SizeF spaceSize = objGraphics.MeasureStringSize(" ", font);
             foreach (string line in lines)
             {
-                int xIndex = tempWidth - letterCompressionConstant;
+                float xIndex = tempWidth;
                 foreach (string word in line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    int wordWidth = 0;
-                    int wordXidx = xIndex;
-                    Size size;
+                    float wordWidth = 0;
+                    float wordXidx = xIndex;
                     for (int i = 0; i < word.Count(); i++)
                     {
                         char c = convertUnicodeChar(word, ref i);
-                        if (c == 0) continue;
-                        size = Size.Truncate(objGraphics.MeasureString(c.ToString(), font));
-                        int width = size.Width - letterCompressionConstant;
+                        if (c == 0) continue;                        
+                        SizeF size = objGraphics.MeasureStringSize(c.ToString(), font);
+                        float width = size.Width;
                         xIndex -= width;
                         wordWidth += width;
                         objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
-                        segmentData.AddNode(c.ToString(), xIndex, yIndex, width, size.Height);
+                        segmentData.AddNode(c.ToString(), (int)Math.Round(xIndex), (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height));
                     }
                     objGraphics.DrawString(" ", font, brush, xIndex, yIndex);
-                    var wordHeight = (int)objGraphics.MeasureStringSize(word, font).Height;
+                    var wordHeight = objGraphics.MeasureStringSize(word, font).Height;
                     xIndex -= spaceSize.Width;
-                    segmentData.AddNode(word, xIndex, yIndex, wordWidth, wordHeight);
+                    segmentData.AddNode(word, (int)Math.Round(xIndex), (int)Math.Round(yIndex), (int)Math.Round(wordWidth), (int)Math.Round(wordHeight));
                 }
-                int height = (int)objGraphics.MeasureString(line, font).Height;
+                float height = objGraphics.MeasureString(line, font).Height;
                 yIndex += height;
             }
         }
@@ -346,59 +344,31 @@ namespace Prax.Recognition
         public string LabelAtThisSegmentLocation(Rectangle segmentLocation)
         {
             var overlapingRects = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
-            /*
-            for (int i = 0; i < overlapingRects.Count(); i++)
-            {
-                double Area = overlapingRects[i].Item2.Area();
-                int Overlap = Rectangle.Intersect(segmentLocation, overlapingRects[i].Item2).Area();
-                double Val = Overlap / ((Area - Overlap) + (segmentLocation.Area() - Overlap));
-            }
-            */
+
             if (overlapingRects.Count > 0)
             {
-                var maxText = overlapingRects
-                        .Select(t => new { Text = t.Item1, Area = (double)t.Item2.Area(), Overlap = Rectangle.Intersect(segmentLocation, t.Item2).Area() })
-                        .Select(t => new { Text = t.Text, Val = (t.Overlap) / ((t.Area - t.Overlap) + (segmentLocation.Area() - t.Overlap)) })
-                        .OrderBy(t => t.Val).Last();
-                double thresholdOverlap = .9;
-                Debug.Print(maxText.Val.ToString());
-                if (maxText.Val > thresholdOverlap)
-                    return maxText.Text;
-                else
-                    return null;
-            }
-            else return null;
-            /*
-            List<int> excludedRectArea = new List<int>();
-            for (int i = 0; i < overlapingRects.Count(); i++)
-            {
-                excludedRectArea.Add(overlapingRects[i].Item2.Area() - Rectangle.Intersect(segmentLocation, overlapingRects[i].Item2).Area());
-            }
-            var overlapingRectsExcludedParts = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
-
-            double maxOverlapPercentage = 0;
-            string bestMatchString = null;
-            double overlapPercentage;
-            for (int i = 0; i < overlapingRects.Count(); i++)
-            {
-                if (overlapingRects[i].Item2.Area() >= segmentLocation.Area())
-                    overlapPercentage = segmentLocation.Area() / (double)overlapingRects[i].Item2.Area();
-                else
-                    overlapPercentage = (double)overlapingRects[i].Item2.Area() / segmentLocation.Area();
-
-                if (overlapPercentage > maxOverlapPercentage)
+                string text = null;
+                double area, overlap, overlapRating;
+                List<Tuple<string, double>> labelsAndOverlapRating = new List<Tuple<string, double>>();
+                for (int i = 0; i < overlapingRects.Count(); i++)
                 {
-                    maxOverlapPercentage = overlapPercentage;
-                    bestMatchString = overlapingRects[i].Item1;
+                    text = overlapingRects[i].Item1;
+                    area = overlapingRects[i].Item2.Area();
+                    overlap = Rectangle.Intersect(segmentLocation, overlapingRects[i].Item2).Area();
+                    if (segmentLocation != overlapingRects[i].Item2)
+                        overlapRating = (overlap) / ((area - overlap) + (segmentLocation.Area() - overlap));
+                    else
+                        overlapRating = int.MaxValue;
+                    labelsAndOverlapRating.Add(new Tuple<string, double>(text, overlapRating));
                 }
-            }*/
-            
-            //if (maxText > thresholdOverlap)
-                //return bestMatchString;
+                double thresholdOverlap = .3;
+                labelsAndOverlapRating = labelsAndOverlapRating.Where(t => t.Item2 > thresholdOverlap).ToList();
+                if (labelsAndOverlapRating.Count() > 0)
+                {
+                    return labelsAndOverlapRating.OrderBy(t => t.Item2).Last().Item1;
+                }
+            }
             return null;
-            
-            /*var segmentData2 = segmentData.AllItems.OrderBy(t => (t.Item2.Area()) / (double)segmentLocation.Area())
-                                       .OrderBy(t => Rectangle.Intersect(t.Item2, segmentLocation).Area()); */
         }
 
         #region letter conversion
