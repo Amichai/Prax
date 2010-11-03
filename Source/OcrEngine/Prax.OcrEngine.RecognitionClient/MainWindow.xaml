@@ -1,0 +1,25 @@
+﻿<Window x:Class="Prax.OcrEngine.RecognitionClient.MainWindow" x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+	<Window.Resources>
+		<DataTemplate x:Key="ProgressTemplate">
+
+		</DataTemplate>
+	</Window.Resources>
+	<DockPanel>
+		<ToolBar DockPanel.Dock="Top">
+			<Button Click="AddImage_Click">Open</Button>
+			<Button Click="CancelAll_Click"></Button>
+		</ToolBar>
+		<ListView>
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="Name" DisplayMemberBinding="{Binding FileName}" />
+					<GridViewColumn Header="Size" DisplayMemberBinding="{Binding SizeString}" />
+					<GridViewColumn Header="Progress" DisplayMemberBinding="{Binding Progress}" CellTemplate="{StaticResource ProgressTemplate}"/>
+				</GridView>
+			</ListView.View>
+		</ListView>
+	</DockPanel>
+</Window>
