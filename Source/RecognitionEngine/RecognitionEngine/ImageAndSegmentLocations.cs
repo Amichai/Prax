@@ -313,10 +313,13 @@ namespace Prax.Recognition
                         if (c == 0) continue;                        
                         SizeF size = objGraphics.MeasureStringSize(c.ToString(), font);
                         float width = size.Width;
+
                         xIndex -= width;
-                        wordWidth += width;
                         objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
-                        segmentData.AddNode(c.ToString(), (int)Math.Round(xIndex), (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height));
+                        segmentData.AddNode(c.ToString(), (int)Math.Round(xIndex) + 2, (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height));
+
+                        
+                        wordWidth += width;
                     }
                     objGraphics.DrawString(" ", font, brush, xIndex, yIndex);
                     var wordHeight = objGraphics.MeasureStringSize(word, font).Height;
