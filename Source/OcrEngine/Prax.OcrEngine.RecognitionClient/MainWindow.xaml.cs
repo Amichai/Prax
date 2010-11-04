@@ -43,8 +43,9 @@ namespace Prax.OcrEngine.RecognitionClient {
 			}
 		}
 
+		static readonly LimitedConcurrencyLevelTaskScheduler scheduler = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount);
 		static DocumentModel StartProcessing(DocumentModel doc) {
-			new Task(() => ProcessorWorker(doc)).Start();
+			new Task(() => ProcessorWorker(doc)).Start(scheduler);
 			return doc;
 		}
 		static void ProcessorWorker(DocumentModel doc) {
