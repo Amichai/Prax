@@ -23,8 +23,17 @@
 			</DataTemplate.Triggers>
 		</DataTemplate>
 	</Window.Resources>
-	<DockPanel>
-		<ToolBar DockPanel.Dock="Top">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="5" />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+		<ToolBar Grid.Row="0" Grid.ColumnSpan="3">
 			<Button Click="AddImage_Click" ToolTip="Open">
 				<Image Source="Images/Open16.png" Stretch="Uniform" Height="16px" Width="16px" />
 			</Button>
@@ -33,7 +42,7 @@
 				<Image Source="Images/ClearAll16.png" Stretch="Uniform" Height="16px" Width="16px" />
 			</Button>
 		</ToolBar>
-		<ListView Name="filesList">
+		<ListView Name="filesList" Grid.Row="1" SelectedIndex="1">
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
 					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -57,5 +66,7 @@
 				</GridView>
 			</ListView.View>
 		</ListView>
-	</DockPanel>
+		<GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		<Image Stretch="Uniform" Grid.Row="1" Grid.Column="2"  Source="{Binding ElementName=filesList, Path=SelectedItem.FilePath}" />
+	</Grid>
 </Window>
