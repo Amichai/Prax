@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -74,12 +76,15 @@ namespace Prax.OcrEngine.RecognitionClient {
 
 		static readonly DocumentState[] eligibleStates = { DocumentState.ScanQueued, DocumentState.Scanning, DocumentState.Scanned };
 		static readonly Random rand = new Random();
+		static IEnumerable<DocumentModel> CreateDummyList() {
+			return Directory.EnumerateFiles(ImagePath, "*.jpg", SearchOption.AllDirectories)
+							.Select(p => new DocumentModel(p) {
+								Progress = rand.Next(0, 100),
+								State = eligibleStates[rand.Next(eligibleStates.Length)]
+							});
+		}
+
 		public DummyDocumentList()
-			: base(
-				Directory.EnumerateFiles(ImagePath, "*.jpg", SearchOption.AllDirectories)
-				.Select(p => new DocumentModel(p) {
-					Progress = rand.Next(0, 100),
-					State = eligibleStates[rand.Next(eligibleStates.Length)]
-				})) { }
+			: base(LicenseManager.UsageMode == LicenseUsageMode.Runtime ? Enumerable.Empty<DocumentModel>() : CreateDummyList()) { }
 	}
 }
