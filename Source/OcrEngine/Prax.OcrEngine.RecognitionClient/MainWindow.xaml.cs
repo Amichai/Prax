@@ -14,12 +14,12 @@ namespace Prax.OcrEngine.RecognitionClient {
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	partial class MainWindow : Window {
-		static IDocumentProcessor CreateProcessor() { return new Services.Stubs.UselessProcessor(); }
-
+		readonly Func<IDocumentProcessor> processorCreator;
 		readonly ObservableCollection<DocumentModel> documents = new ObservableCollection<DocumentModel>();
 
-		public MainWindow() {
+		public MainWindow(Func<IDocumentProcessor> processorCreator) {
 			InitializeComponent();
+			this.processorCreator = processorCreator;
 			filesList.ItemsSource = documents;
 		}
 
@@ -44,12 +44,12 @@ namespace Prax.OcrEngine.RecognitionClient {
 		}
 
 		static readonly LimitedConcurrencyLevelTaskScheduler scheduler = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount);
-		static DocumentModel StartProcessing(DocumentModel doc) {
+		DocumentModel StartProcessing(DocumentModel doc) {
 			new Task(() => ProcessorWorker(doc)).Start(scheduler);
 			return doc;
 		}
-		static void ProcessorWorker(DocumentModel doc) {
-			var processor = CreateProcessor();
+		void ProcessorWorker(DocumentModel doc) {
+			var processor = processorCreator();
 			processor.ProgressChanged += (sender, e) => doc.Progress = processor.ProgressPercentage();
 			processor.CheckCanceled += (sender, e) => e.Cancel = doc.CancelPending;
 
