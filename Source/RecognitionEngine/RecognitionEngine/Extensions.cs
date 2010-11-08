@@ -110,6 +110,31 @@ namespace Prax.Recognition
             }
         }
 
+        /// <summary>Returns the factorial of a number.</summary>
+        public static int Factorial(this int num)
+        {
+            int factorial = 1;
+            for (int i = num; i > 0; i--)
+            {
+                factorial *= i;
+            }
+            return factorial;
+        }
+        /// <summary>
+        /// Returns a list of lists of combinations
+        /// </summary>
+        public static IEnumerable<IEnumerable<T>> GetPermutations<T>(this IEnumerable<T> source, int count)
+        {
+            IEnumerable<IEnumerable<T>> seed = new[] { Enumerable.Empty<T>() };
+            return Enumerable.Repeat(source, count)
+                .Aggregate(
+                    seed,
+                    (accumulator, sequence) =>
+                        from acc in accumulator
+                        from item in sequence.Except(acc)
+                        select acc.Concat(new[] { item }));
+        }
+
         ///<summary>Converts a double array to Bitmap.</summary>
         public static Bitmap ConvertDoubleArrayToBitmap(this int[][] doubleArray, Color defaultColor)
         {

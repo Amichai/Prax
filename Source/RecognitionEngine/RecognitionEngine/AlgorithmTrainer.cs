@@ -14,7 +14,7 @@ namespace Prax.Recognition
         public AlgorithmTrainer()
         {
             //Define how the segmentation should be displayed for testing:
-            DisplayOptions testDisplayOptions = DisplayOptions.segmentsAndMatch;
+            DisplayOptions testDisplayOptions = DisplayOptions.none;
 
             DisplayUtility.NewFormForDisplay temp;
             //Generate a document image:
@@ -28,17 +28,15 @@ namespace Prax.Recognition
                 if (testDisplayOptions == DisplayOptions.everySegment)
                     temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints);
 
-                string labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation);
+                Tuple<string, double> labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation);
                 if (labelToTrainWith != null)
                 {
                     if ((segment.ThisSegmentIsAWord == true && testDisplayOptions == DisplayOptions.wordSegmentsAndMatch)
                                     || testDisplayOptions == DisplayOptions.segmentsAndMatch)
                     {
-                        //Debug.Print("xDiscrep: " + labelToTrainWith.XDiscrep + " yDiscrep: " + labelToTrainWith.YDiscrep + " overlap: " + labelToTrainWith.OverlapRatio);
-                        Debug.Print("X: " + segment.SegmentLocation.X + " Y: " + segment.SegmentLocation.Y + " width: " + segment.SegmentLocation.Width);
-                        temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints, labelToTrainWith);
+                        temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints, labelToTrainWith.Item1, labelToTrainWith.Item2.ToString());
                     }
-                    //ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith);
+                    ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
                 }
             }
             ocrHandler.SaveTrainingData();

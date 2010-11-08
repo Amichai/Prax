@@ -59,12 +59,10 @@ namespace Prax.Recognition
                     i = listOfIndexLabels.Count;
                 }
             }
-            List<int> tempListToAdd = new List<int>();
             if (isThisLabelUnique)
             {
                 listOfIndexLabels.Add(label);
-                tempListToAdd.Add(trainingLibrary.Count - 1);
-                listOfIndicies.Add(tempListToAdd);
+                listOfIndicies.Add(new List<int> { trainingLibrary.Count - 1 });
             }
             else
             {
@@ -458,7 +456,8 @@ namespace Prax.Recognition
         public Tuple<string, double> readNextSegment()
         {
             numberOfUniqueLabels = listOfIndexLabels.Count;
-            int numberOfLabelsToCount = numberOfUniqueLabels - IndiciesToCheck.Count;
+            //int numberOfLabelsToCount = numberOfUniqueLabels - IndiciesToCheck.Count;
+            int numberOfLabelsToCount = numberOfUniqueLabels;
             double[][] probabilityFromEachHeuristic = new double[numberOfLabelsToCount][];
             double[][] lblComparisonResults = new double[numberOfLabelsToCount][];
             double[] labelProbability;
@@ -478,8 +477,8 @@ namespace Prax.Recognition
 
             for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++)
             {
-                foreach(int inspectionLbl in getInspectionLabelIdicies())
-                //for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++) //This is the label we are trying to get information about. We want to know how feasible this label is given our current array
+                //foreach(int inspectionLbl in getInspectionLabelIdicies())
+                for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++) //This is the label we are trying to get information about. We want to know how feasible this label is given our current array
                 {
                     for (int lblTrialIdx = 0; lblTrialIdx < listOfIndicies[inspectionLbl].Count; lblTrialIdx++)
                     { //Iterate through every heuristic array within our given label
@@ -490,8 +489,8 @@ namespace Prax.Recognition
                     }
                     totalComparison_test[inspectionLbl] += lblComparisonResults[inspectionLbl][heurIdx];
                 }
-                //for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++)
-                foreach (int labelIndex in getInspectionLabelIdicies())
+                for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++)
+                //foreach (int labelIndex in getInspectionLabelIdicies())
                 {
                     lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)listOfIndicies[labelIndex].Count;
                 }
@@ -508,16 +507,16 @@ namespace Prax.Recognition
             double aprioriProb = 1.0 / (double)numberOfLabelsToCount;
             double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
 
-            //for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++)
-            foreach (int inspectionLbl in getInspectionLabelIdicies())
+            for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++)
+            //foreach (int inspectionLbl in getInspectionLabelIdicies())
             {
                 labelProbability[inspectionLbl] = 1.0 / (double)numberOfLabelsToCount;
                 for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++)
                 {
                     double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
                     double comparisonToOtherLabels = 0;
-                    //for (int comparisonLbl = 0; comparisonLbl < numberOfUniqueLabels; comparisonLbl++)
-                    foreach (int comparisonLbl in getInspectionLabelIdicies())
+                    for (int comparisonLbl = 0; comparisonLbl < numberOfUniqueLabels; comparisonLbl++)
+                    //foreach (int comparisonLbl in getInspectionLabelIdicies())
                     {
                         if (inspectionLbl != comparisonLbl)
                             comparisonToOtherLabels += lblComparisonResults[comparisonLbl][heurIdx];

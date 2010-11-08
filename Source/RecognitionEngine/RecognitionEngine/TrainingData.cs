@@ -10,15 +10,17 @@ namespace Prax.Recognition
     class TrainingData
     {
         public List<Tuple<string, List<int>>> trainingLibrary { get; private set; }
+        //TODO: remove the frist redundant string. Also possibly build indicies when reading
         public List<List<int>> listOfIndicies { get; private set; }
         public List<string> listOfIndexLabels { get; private set; }
+        //TODO: make these DS private and expose the data as functions (as few as possible)
 
         public TrainingData() 
         {
             int piecesOfTrainingData = 0;
             string fileName = string.Empty;
                 
-            fileName = "Words.dat";
+            fileName = "TrainingData.dat";
 
             if (File.Exists(fileName))
             {

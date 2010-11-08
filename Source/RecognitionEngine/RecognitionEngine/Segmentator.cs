@@ -438,7 +438,7 @@ namespace Prax.Recognition
             {
                 diffVerticalSums.Add(listOfVerticalSums[i - 1] - listOfVerticalSums[i]);
             }
-            int numberOfBreaks = width / 6;
+            int numberOfBreaks = (width - segBorder);
 
             var sortedVerticalSums = listOfVerticalSums.Select((x, i) => new KeyValuePair<int, int>(x, i))
                                             .OrderBy(x => x.Key).ToList();
