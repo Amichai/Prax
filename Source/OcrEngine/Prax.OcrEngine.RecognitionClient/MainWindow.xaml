@@ -8,7 +8,21 @@
 			<Grid>
 				<ProgressBar Name="progress" Value="{Binding Progress}" Maximum="100" Visibility="Collapsed" />
 				<TextBlock Name="queued" Text="Queued"	Visibility="Collapsed" HorizontalAlignment="Center" />
-				<TextBlock Name="done"	 Text="Done!"	Visibility="Collapsed" HorizontalAlignment="Center" />
+				<ItemsControl Name="done" Visibility="Collapsed" ItemsSource="{x:Static local:App.BindableConverters}" HorizontalAlignment="Center">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Horizontal" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+					<ItemsControl.ItemTemplate>
+						<DataTemplate>
+							<Button ToolTip="{Binding ToolTip}" Margin="4 0" Click="ResultLink_Click" Tag="{Binding Converter}">
+								<Image Source="{Binding Path=ImagePath}" Stretch="None" Width="16px" Height="16px" 
+									   SnapsToDevicePixels="True" />
+							</Button>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
 			</Grid>
 			<DataTemplate.Triggers>
 				<DataTrigger Binding="{Binding State}" Value="ScanQueued">
@@ -53,6 +67,7 @@
 				<Style TargetType="ListViewItem">
 					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 					<Setter Property="VerticalContentAlignment" Value="Stretch" />
+					<!--<Setter Property="Height" Value="36px" />-->
 				</Style>
 			</ListView.ItemContainerStyle>
 			<ListView.ItemsSource>
@@ -77,6 +92,6 @@
 			   HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
 			Select an image to see a preview
 		</Label>
-		<Image Stretch="Uniform" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"  Source="{Binding ElementName=filesList, Path=SelectedItem.FilePath}" />
+		<Image Stretch="Uniform" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" StretchDirection="DownOnly" Source="{Binding ElementName=filesList, Path=SelectedItem.FilePath}" />
 	</Grid>
 </Window>

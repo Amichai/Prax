@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using Prax.OcrEngine.Services;
+using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.RecognitionClient {
 	///<summary>The document model class bound to the ListView in the UI.</summary>
@@ -19,8 +20,11 @@ namespace Prax.OcrEngine.RecognitionClient {
 			syncContext = SynchronizationContext.Current;
 		}
 
+		///<summary>Gets the results of the OCR.</summary>
+		public ReadOnlyCollection<RecognizedSegment> Results { get; set; }
+
 		///<summary>Gets or sets whether the scan operation should be cancelled.</summary>
-		public bool CancelPending {
+		public bool CancelPending {	//Volatile backing field
 			get { return cancelPending; }
 			set { cancelPending = value; }
 		}

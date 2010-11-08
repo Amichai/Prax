@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Win32;
 using Prax.OcrEngine.Services;
+using System.Windows.Controls;
+using System.Diagnostics;
+using System.Windows.Media;
 
 namespace Prax.OcrEngine.RecognitionClient {
 	/// <summary>
@@ -57,14 +60,38 @@ namespace Prax.OcrEngine.RecognitionClient {
 			using (var stream = File.OpenRead(doc.FilePath))
 				processor.ProcessDocument(stream);
 
-			//TODO: Results
-			//foreach (var converter in resultConverters) {
-			//    var stream = converter.Convert(document.OpenRead(), processor.Results);
-			//    document.UploadStream(converter.OutputFormat.ToString(), stream, stream.Length);
-			//}
+			doc.Results = processor.Results;
 
 			doc.Progress = 100;
 			doc.State = DocumentState.Scanned;
+		}
+
+		static T FindAncestor<T>(DependencyObject child) where T : DependencyObject {
+			var elem = VisualTreeHelper.GetParent(child);
+			T retVal;
+			while (null == (retVal = elem as T) && elem != null)
+				elem = VisualTreeHelper.GetParent(elem);
+
+			return retVal;
+		}
+
+		private void ResultLink_Click(object sender, RoutedEventArgs e) {
+			var button = (Button)sender;
+			var converter = (IResultsConverter)button.Tag;	//The Tag is databound to a property on an anonymous type
+
+			var item = FindAncestor<ListViewItem>(button);
+			var doc = (DocumentModel)item.Content;
+
+			var fileName = Path.GetTempFileName();
+			File.Delete(fileName);
+			fileName = Path.ChangeExtension(fileName, converter.OutputFormat.GetExtension());
+
+			using (var originalFile = File.OpenRead(doc.FilePath))
+			using (var source = converter.Convert(originalFile, null))
+			using (var outputFile = File.Create(fileName)) {
+				source.CopyTo(outputFile);
+			}
+			Process.Start(fileName);
 		}
 	}
 	///<summary>Used to provide a list of documents for the XAML designer.</summary>
