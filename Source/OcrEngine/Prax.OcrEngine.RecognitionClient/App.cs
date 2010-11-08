@@ -7,6 +7,7 @@ using Autofac;
 using Stubs = Prax.OcrEngine.Services.Stubs;
 using Prax.OcrEngine.Services;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Prax.OcrEngine.RecognitionClient {
 	class App : Application {
@@ -20,6 +21,7 @@ namespace Prax.OcrEngine.RecognitionClient {
 			Converter = c
 		}).ToList();
 
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "XAML Databinding")]
 		public static object BindableConverters { get { return bindableConverters; } }
 
 		public static ReadOnlyCollection<IResultsConverter> Converters { get { return resultConverters; } }
