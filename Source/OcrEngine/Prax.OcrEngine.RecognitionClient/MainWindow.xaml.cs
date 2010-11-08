@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.Win32;
 using Prax.OcrEngine.Services;
-using System.Windows.Controls;
-using System.Diagnostics;
-using System.Windows.Media;
 
 namespace Prax.OcrEngine.RecognitionClient {
 	/// <summary>
@@ -52,6 +53,7 @@ namespace Prax.OcrEngine.RecognitionClient {
 			return doc;
 		}
 		void ProcessorWorker(DocumentModel doc) {
+			if (doc.CancelPending) return;	//In case the document was cancelled while queued
 			var processor = processorCreator();
 			processor.ProgressChanged += (sender, e) => doc.Progress = processor.ProgressPercentage();
 			processor.CheckCanceled += (sender, e) => e.Cancel = doc.CancelPending;
@@ -87,11 +89,23 @@ namespace Prax.OcrEngine.RecognitionClient {
 			fileName = Path.ChangeExtension(fileName, converter.OutputFormat.GetExtension());
 
 			using (var originalFile = File.OpenRead(doc.FilePath))
-			using (var source = converter.Convert(originalFile, null))
+			using (var source = converter.Convert(originalFile, doc.Results))
 			using (var outputFile = File.Create(fileName)) {
 				source.CopyTo(outputFile);
 			}
 			Process.Start(fileName);
+		}
+
+		private void FilesList_KeyUp(object sender, KeyEventArgs e) {
+			switch (e.Key) {
+				case Key.Delete:
+					var models = filesList.SelectedItems.Cast<DocumentModel>().ToList();
+					foreach (var d in models) {
+						d.CancelPending = true;
+						documents.Remove(d);
+					}
+					break;
+			}
 		}
 	}
 	///<summary>Used to provide a list of documents for the XAML designer.</summary>
