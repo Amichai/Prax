@@ -24,7 +24,7 @@ namespace Prax.Recognition
             RenderMethod renderMethod = RenderMethod.letterByLetter;
             string dataFileName = @"C:\Users\Amichai\Documents\doc.txt";
             string dataFontName = "Times New Roman";
-            string dataSize = "14";
+            string dataSize = "16";
             string dataStyle = "".ToLower();
 
             FontStyle style = FontStyle.Regular;
@@ -313,10 +313,13 @@ namespace Prax.Recognition
                         if (c == 0) continue;                        
                         SizeF size = objGraphics.MeasureStringSize(c.ToString(), font);
                         float width = size.Width;
+
                         xIndex -= width;
-                        wordWidth += width;
                         objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
-                        segmentData.AddNode(c.ToString(), (int)Math.Round(xIndex), (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height));
+                        segmentData.AddNode(c.ToString(), (int)Math.Round(xIndex) + 2, (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height));
+
+                        
+                        wordWidth += width;
                     }
                     objGraphics.DrawString(" ", font, brush, xIndex, yIndex);
                     var wordHeight = objGraphics.MeasureStringSize(word, font).Height;
@@ -341,31 +344,58 @@ namespace Prax.Recognition
             charVerticalGap = combinedHeight - aHeight - bHeight;
         }
 
-        public string LabelAtThisSegmentLocation(Rectangle segmentLocation)
+        private Tuple<string, double> getTextAndRating(Tuple<string, Rectangle> rect, Rectangle segmentLocation)
         {
-            var overlapingRects = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
+            string text = null;
+            double area, overlap, overlapRating;
+            text = rect.Item1;
+            area = rect.Item2.Area();
+            overlap = Rectangle.Intersect(segmentLocation, rect.Item2).Area();
+            if (segmentLocation != rect.Item2) //Test for exact match lest divide by 0 error
+                overlapRating = (overlap) / ((area - overlap) + (segmentLocation.Area() - overlap));
+            else
+                overlapRating = int.MaxValue;
+            return new Tuple<string, double>(text, overlapRating);
+        }
 
-            if (overlapingRects.Count > 0)
+        private double getOverlapRating(Rectangle rect, Rectangle segmentLocation)
+        {
+            double area, overlap, overlapRating;
+            area = rect.Area();
+            overlap = Rectangle.Intersect(segmentLocation, rect).Area();
+            if (segmentLocation != rect) //Test for exact match lest divide by 0 error
+                overlapRating = (overlap) / ((area - overlap) + (segmentLocation.Area() - overlap));
+            else
+                overlapRating = int.MaxValue;
+            return overlapRating;
+        }
+
+        public Tuple<string, double> LabelAtThisSegmentLocation(Rectangle segmentLocation)
+        {
+            var newRectangles = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
+            
+            List<Tuple<string, double>> labelsAndOverlapRating = new List<Tuple<string, double>>();
+            for (int i = 0; i < newRectangles.Count(); i++)
             {
-                string text = null;
-                double area, overlap, overlapRating;
-                List<Tuple<string, double>> labelsAndOverlapRating = new List<Tuple<string, double>>();
-                for (int i = 0; i < overlapingRects.Count(); i++)
+                Tuple<string, double> textAndRating = getTextAndRating(newRectangles[i], segmentLocation);
+                labelsAndOverlapRating.Add(textAndRating);
+            }
+            double thresholdOverlap = .3;
+
+            var newRects = newRectangles
+                .Where(r => Rectangle.Intersect(r.Item2, segmentLocation).Width / (double)r.Item2.Width > thresholdOverlap);
+            if (newRects.Count() > 0)
+            {
+                newRects.OrderBy(r => r.Item2.X);
+                int width = newRects.Max(r => r.Item2.X + r.Item2.Width) - newRects.Min(r => r.Item2.X);
+                Rectangle newRect = new Rectangle(newRects.Min(r => r.Item2.X), newRects.Min(r => r.Item2.Y), 
+                                            width,
+                                            newRects.Max(r => r.Item2.Height));
+                string newString = string.Concat(newRects.Select(t => t.Item1));
+                double overlapRating = getOverlapRating(newRect, segmentLocation);
+                if (overlapRating > thresholdOverlap && (double)segmentLocation.Width / newRect.Width > .8)
                 {
-                    text = overlapingRects[i].Item1;
-                    area = overlapingRects[i].Item2.Area();
-                    overlap = Rectangle.Intersect(segmentLocation, overlapingRects[i].Item2).Area();
-                    if (segmentLocation != overlapingRects[i].Item2)
-                        overlapRating = (overlap) / ((area - overlap) + (segmentLocation.Area() - overlap));
-                    else
-                        overlapRating = int.MaxValue;
-                    labelsAndOverlapRating.Add(new Tuple<string, double>(text, overlapRating));
-                }
-                double thresholdOverlap = .3;
-                labelsAndOverlapRating = labelsAndOverlapRating.Where(t => t.Item2 > thresholdOverlap).ToList();
-                if (labelsAndOverlapRating.Count() > 0)
-                {
-                    return labelsAndOverlapRating.OrderBy(t => t.Item2).Last().Item1;
+                    return new Tuple<string,double>(newString, overlapRating);
                 }
             }
             return null;

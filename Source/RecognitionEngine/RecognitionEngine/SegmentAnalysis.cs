@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.RegularExpressions;
+using Prax.OcrEngine.Services;
 
 namespace Prax.Recognition
 {
@@ -102,16 +103,18 @@ namespace Prax.Recognition
             else
                 wordOCR.IndiciesToCheck = determineIndiciesToSearchFor();
 
-            return new RecognizedSegment(segment.SegmentLocation,
-                                            labelAndCertainty.Item1,
-                                            labelAndCertainty.Item2);
+            if (labelAndCertainty != null)
+                return new RecognizedSegment(segment.SegmentLocation,
+                                                labelAndCertainty.Item1,
+                                                labelAndCertainty.Item2);
+            else return new RecognizedSegment();
         }
 
         public void PrintOutput()
         {
             ReadOnlyCollection<RecognizedSegment> readOnlyResults = resolvedSegmentsList.AsReadOnly();
             OutputRenderer outputRenderer = new OutputRenderer();
-            FileStream outputFile = (FileStream)outputRenderer.RenderFile(readOnlyResults);
+            FileStream outputFile = (FileStream)outputRenderer.Convert(null, readOnlyResults);
             outputFile.Close();
         }
     }

@@ -6,24 +6,22 @@ using System.Collections.ObjectModel;
 using System.IO;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
-
+using Prax.OcrEngine.Services;
 namespace Prax.Recognition
 {
-    class OutputRenderer
+    class OutputRenderer:IResultsConverter
     {
-        string OutputFormat { get; set;  } //TODO: not implemented
-
         private int columnStart = 0; //int.MaxValue; 
         //TODO: This won't be necessary when we inforce precise location
 
-        public FileStream RenderFile(ReadOnlyCollection<RecognizedSegment> ocrResults)
+        public Stream Convert(Stream input, ReadOnlyCollection<RecognizedSegment> results)
         {
-            Document doc = new Document();
+            var doc = new iTextSharp.text.Document();
             PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
             doc.Open();
             Paragraph paragraph = new Paragraph();
 
-            var sortedOutput = ocrResults.OrderBy(k => k.Bounds.Y).ToList();
+            var sortedOutput = results.OrderBy(k => k.Bounds.Y).ToList();
             int indiciesToAdjust = 0;
 
             for (int i = sortedOutput.Count - 1; i >= 0; i--)
@@ -114,5 +112,6 @@ namespace Prax.Recognition
             FileStream returnedFileAsStream = new FileStream("pdfOutput.pdf", FileMode.Open);
             return returnedFileAsStream;
         }
+        public ResultFormat OutputFormat { get { return ResultFormat.Pdf; } }
     }
 }

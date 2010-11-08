@@ -137,46 +137,48 @@ namespace Prax.Recognition
         {
             public NewFormForDisplay(Bitmap bitmapToRender)
             {
-                produceNewForm(bitmapToRender, null);
+                produceNewForm(bitmapToRender, null, null);
             }
 
             public NewFormForDisplay(int[][] doubleArray)
             {
                 DisplayUtility displayUtility = new DisplayUtility();
                 Bitmap bitmapToRender = displayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
-                produceNewForm(bitmapToRender, null);
+                produceNewForm(bitmapToRender, null, null);
             }
 
-            public NewFormForDisplay(int[][] doubleArray, string displayLabel)
+            public NewFormForDisplay(int[][] doubleArray, string displayLabel1, string displayLabel2)
             {
                 DisplayUtility displayUtility = new DisplayUtility();
                 Bitmap bitmapToRender = displayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
-                produceNewForm(bitmapToRender, displayLabel);
+                produceNewForm(bitmapToRender, displayLabel1, displayLabel2);
             }
 
-            private void produceNewForm(Bitmap bitmapToRender, string displayLabel)
+            private void produceNewForm(Bitmap bitmapToRender, string displayLabel1, string displayLabel2)
             {   
                 Form tempDisplay = new Form();
                 Label labelLabel = new Label();
-                Label certaintyLabel = new Label();
+                Label certaintyLabel1 = new Label();
                 Label displayLocation = new Label();
                 labelLabel.AutoSize = true;
-                certaintyLabel.AutoSize = true;
+                certaintyLabel1.AutoSize = true;
                 displayLocation.AutoSize = true;
                 int width = bitmapToRender.Width;
                 int height = bitmapToRender.Height;
 
-                if(displayLabel != null)
-                    labelLabel.Text = displayLabel;
+                if(displayLabel1 != null)
+                    labelLabel.Text = displayLabel1;
+                if (displayLabel2 != null)
+                    certaintyLabel1.Text = displayLabel2;
 
                 labelLabel.Location = new System.Drawing.Point(6, 7);
-                certaintyLabel.Location = new System.Drawing.Point(6, 66);
+                certaintyLabel1.Location = new System.Drawing.Point(6, 66);
                 displayLocation.Location = new System.Drawing.Point(50, 7);
 
 
 
                 tempDisplay.Controls.Add(labelLabel);
-                tempDisplay.Controls.Add(certaintyLabel);
+                tempDisplay.Controls.Add(certaintyLabel1);
                 tempDisplay.Controls.Add(displayLocation);
 
                 tempDisplay.SetBounds(10, 10, width, height);

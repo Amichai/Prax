@@ -321,7 +321,7 @@ namespace Prax.Recognition
             OCRSegment wordSegment = new OCRSegment();
             foreach (List<Point> discreteLoop in defineDiscreteLoops(internalLoopPoints.ToList()))
             {
-                //if (discreteLoop.Count > 5 && discreteLoop.Count < 700) //TODO: Factor out all sanity testing into one centralized place. 
+                if (discreteLoop.Count > 5 && discreteLoop.Count < 700) //TODO: Factor out all sanity testing into one centralized place. 
                 {                                                           //TODO: Make sanity test information available to the heuristic array
                     wordSegment = defineSegmentObjectToReturn(discreteLoop);
                     if (testSegmentForPlausibilty(wordSegment)) //Factor out all sanity testing into one centralized place. Problem. Eliminate this method.
@@ -399,19 +399,19 @@ namespace Prax.Recognition
                     {
                         for (int j = 0; j < height; j++)
                         {
-                            int xRenderIndex = i + breakPoints[startIdx] + borderOffset;
+                            int xRenderIndex = i + breakPoints[startIdx];
                             newSegmentToReturn[i][j] = wordSegment.InternalPoints[xRenderIndex][j];
                         }
                     }
                     newSegmentToReturn = addBorder(newSegmentToReturn);
                     subSegmentToReturn.InternalPoints = newSegmentToReturn;
                     
-                    subSegmentToReturn.SegmentLocation = new Rectangle(wordSegment.SegmentLocation.X + breakPoints[startIdx],
+                    subSegmentToReturn.SegmentLocation = new Rectangle(wordSegment.SegmentLocation.X - borderOffset + breakPoints[startIdx],
                                                                         wordSegment.SegmentLocation.Y,
-                                                                        breakPoints[endIndex] - breakPoints[startIdx],
+                                                                        breakPoints[endIndex] - breakPoints[startIdx] - 1,
                                                                         wordSegment.SegmentLocation.Height);
                     endIndex++;
-//                    DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(subSegmentToReturn.InternalPoints);
+                    //DisplayUtility.NewFormForDisplay test = new DisplayUtility.NewFormForDisplay(subSegmentToReturn.InternalPoints);
                     yield return subSegmentToReturn;
                 }
             }
@@ -438,7 +438,7 @@ namespace Prax.Recognition
             {
                 diffVerticalSums.Add(listOfVerticalSums[i - 1] - listOfVerticalSums[i]);
             }
-            int numberOfBreaks = width / 6;
+            int numberOfBreaks = (width - segBorder);
 
             var sortedVerticalSums = listOfVerticalSums.Select((x, i) => new KeyValuePair<int, int>(x, i))
                                             .OrderBy(x => x.Key).ToList();
