@@ -80,6 +80,17 @@ namespace Prax.OcrEngine {
 					yield return value;
 			}
 		}
+		///<summary>Adds zero or more items to a collection.</summary>
+		public static void AddRange<TItem, TElement>(this ICollection<TElement> collection, params TItem[] items) where TItem : TElement { collection.AddRange((IEnumerable<TItem>)items); }
+		///<summary>Adds zero or more items to a collection.</summary>
+		public static void AddRange<TItem, TElement>(this ICollection<TElement> collection, IEnumerable<TItem> items)
+			where TItem : TElement {
+			if (collection == null) throw new ArgumentNullException("collection");
+			if (items == null) throw new ArgumentNullException("items");
+
+			foreach (var item in items)
+				collection.Add(item);
+		}
 		#endregion
 
 		static readonly string[] sizes = { "bytes", "KB", "MB", "GB", "TB" };

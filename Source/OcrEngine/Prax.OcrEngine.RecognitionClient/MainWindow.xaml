@@ -1,0 +1,72 @@
+﻿<Window x:Class="Prax.OcrEngine.RecognitionClient.MainWindow" x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:Prax.OcrEngine.RecognitionClient"
+        Title="Prax OCR Client" Height="350" Width="721" Icon="Prax.ico">
+	<Window.Resources>
+		<DataTemplate x:Key="ProgressTemplate" DataType="{x:Type local:DocumentModel}">
+			<Grid>
+				<ProgressBar Name="progress" Value="{Binding Progress}" Maximum="100" Visibility="Collapsed" />
+				<TextBlock Name="queued" Text="Queued"	Visibility="Collapsed" HorizontalAlignment="Center" />
+				<TextBlock Name="done"	 Text="Done!"	Visibility="Collapsed" HorizontalAlignment="Center" />
+			</Grid>
+			<DataTemplate.Triggers>
+				<DataTrigger Binding="{Binding State}" Value="ScanQueued">
+					<Setter TargetName="queued" Property="Visibility" Value="Visible" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding State}" Value="Scanning">
+					<Setter TargetName="progress" Property="Visibility" Value="Visible" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding State}" Value="Scanned">
+					<Setter TargetName="done" Property="Visibility" Value="Visible" />
+				</DataTrigger>
+			</DataTemplate.Triggers>
+		</DataTemplate>
+	</Window.Resources>
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="5" />
+			<ColumnDefinition />
+		</Grid.ColumnDefinitions>
+		<ToolBar Grid.Row="0" Grid.ColumnSpan="3">
+			<Button Click="AddImage_Click" ToolTip="Open">
+				<Image Source="Images/Open16.png" Stretch="Uniform" Height="16px" Width="16px" />
+			</Button>
+			<Separator />
+			<Button Click="CancelAll_Click" ToolTip="Cancel all">
+				<Image Source="Images/ClearAll16.png" Stretch="Uniform" Height="16px" Width="16px" />
+			</Button>
+		</ToolBar>
+		<ListView Name="filesList" Grid.Row="1" SelectedIndex="1">
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+					<Setter Property="VerticalContentAlignment" Value="Stretch" />
+				</Style>
+			</ListView.ItemContainerStyle>
+			<ListView.ItemsSource>
+				<local:DummyDocumentList />
+			</ListView.ItemsSource>
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="Name" DisplayMemberBinding="{Binding FileName}" Width="150" />
+					<GridViewColumn Header="Size" Width="90">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate DataType="{x:Type local:DocumentModel}">
+								<TextBlock Text="{Binding SizeString}" HorizontalAlignment="Right" />
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+					<GridViewColumn Header="Progress" CellTemplate="{StaticResource ProgressTemplate}" Width="100"/>
+				</GridView>
+			</ListView.View>
+		</ListView>
+		<GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		<Image Stretch="Uniform" Grid.Row="1" Grid.Column="2"  Source="{Binding ElementName=filesList, Path=SelectedItem.FilePath}" />
+	</Grid>
+</Window>

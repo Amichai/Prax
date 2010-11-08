@@ -56,6 +56,7 @@ namespace Prax.OcrEngine.Services.Azure {
 					processor.CheckCanceled += (sender, e) => e.Cancel = reporter.CancellationPending;
 
 					//TODO: Cache document stream
+					//TODO: Shared ProcessorRunner that forwards events and takes a Document; perhaps also move ProgressReporter
 					processor.ProcessDocument(document.OpenRead());
 					reporter.StopReporter();
 
