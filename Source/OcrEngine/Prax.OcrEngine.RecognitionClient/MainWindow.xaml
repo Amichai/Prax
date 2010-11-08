@@ -33,13 +33,19 @@
 			<ColumnDefinition Width="5" />
 			<ColumnDefinition />
 		</Grid.ColumnDefinitions>
-		<ToolBar Grid.Row="0" Grid.ColumnSpan="3">
+		<ToolBar Grid.Row="0" Grid.ColumnSpan="1">
 			<Button Click="AddImage_Click" ToolTip="Open">
-				<Image Source="Images/Open16.png" Stretch="Uniform" Height="16px" Width="16px" />
+				<StackPanel Orientation="Horizontal">
+					<Image Source="Images/Open32.png" Stretch="Uniform" Height="32px" Width="32px" />
+					<Label>Open Image</Label>
+				</StackPanel>
 			</Button>
 			<Separator />
 			<Button Click="CancelAll_Click" ToolTip="Cancel all">
-				<Image Source="Images/ClearAll16.png" Stretch="Uniform" Height="16px" Width="16px" />
+				<StackPanel Orientation="Horizontal">
+					<Image Source="Images/ClearAll16.png" Stretch="Uniform" Height="16px" Width="16px" />
+					<Label>Cancel All</Label>
+				</StackPanel>
 			</Button>
 		</ToolBar>
 		<ListView Name="filesList" Grid.Row="1" SelectedIndex="1">
@@ -66,7 +72,11 @@
 				</GridView>
 			</ListView.View>
 		</ListView>
-		<GridSplitter Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-		<Image Stretch="Uniform" Grid.Row="1" Grid.Column="2"  Source="{Binding ElementName=filesList, Path=SelectedItem.FilePath}" />
+		<GridSplitter Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+		<Label Grid.Row="0" Grid.RowSpan="2" Grid.Column="2" 
+			   HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+			Select an image to see a preview
+		</Label>
+		<Image Stretch="Uniform" Grid.Row="0" Grid.RowSpan="2" Grid.Column="2"  Source="{Binding ElementName=filesList, Path=SelectedItem.FilePath}" />
 	</Grid>
 </Window>
