@@ -69,10 +69,10 @@
             this.train.UseVisualStyleBackColor = true;
             this.train.Click += new System.EventHandler(this.trainAlgorithm);
             // 
-            // test
+            // read
             // 
             this.read.Location = new System.Drawing.Point(256, 13);
-            this.read.Name = "test";
+            this.read.Name = "read";
             this.read.Size = new System.Drawing.Size(75, 23);
             this.read.TabIndex = 3;
             this.read.Text = "Test";
@@ -83,7 +83,7 @@
             // 
             this.pictureBox.Location = new System.Drawing.Point(13, 42);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(534, 373);
+            this.pictureBox.Size = new System.Drawing.Size(397, 341);
             this.pictureBox.TabIndex = 4;
             this.pictureBox.TabStop = false;
             // 
@@ -111,7 +111,7 @@
             this.PercentComplete.Size = new System.Drawing.Size(0, 13);
             this.PercentComplete.TabIndex = 7;
             // 
-            // UserInterface
+            // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -124,7 +124,7 @@
             this.Controls.Add(this.train);
             this.Controls.Add(this.clearData);
             this.Controls.Add(this.upload);
-            this.Name = "UserInterface";
+            this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).EndInit();
             this.ResumeLayout(false);

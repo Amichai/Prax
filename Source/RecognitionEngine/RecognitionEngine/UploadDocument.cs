@@ -18,7 +18,7 @@ namespace Prax.Recognition
         {
             pictureBox = picture;
             setDialogBoxSettings();
-            if (openFileDialog.ShowDialog() == DialogResult.OK && openFileDialog.OpenFile() != null)
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 documentToDoubleArray();
                 preprocessImage();
@@ -52,8 +52,7 @@ namespace Prax.Recognition
             #endregion
 
             //Display Bitmap
-            DisplayUtility display = new DisplayUtility();
-            display.DisplayBitmap(FileBitmap, pictureBox);
+            DisplayUtility.DisplayBitmap(FileBitmap, pictureBox);
 
             uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
         }

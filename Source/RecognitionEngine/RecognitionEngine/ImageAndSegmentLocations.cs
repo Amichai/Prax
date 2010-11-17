@@ -19,15 +19,18 @@ namespace Prax.Recognition
 
         enum RenderMethod { letterByLetter, wholeTextAtOnce };
 
+
+
         public ImageAndSegmentLocations()
         {
             RenderMethod renderMethod = RenderMethod.letterByLetter;
-            string dataFileName = @"C:\Users\Amichai\Documents\doc.txt";
+            string dataFileName = "doc.txt";
             string dataFontName = "Times New Roman";
             string dataSize = "16";
             string dataStyle = "".ToLower();
 
             FontStyle style = FontStyle.Regular;
+
             if (dataStyle.Contains("b"))
                 style |= FontStyle.Bold;
             if (dataStyle.Contains("i"))
@@ -36,16 +39,14 @@ namespace Prax.Recognition
             {
                 string text = string.Empty;
                 StringCollection lines = new StringCollection();
-                int maxCharacters = 0;
                 string textDocument = string.Empty;
+
                 using (StreamReader reader = new StreamReader(new FileStream(dataFileName, FileMode.Open, FileAccess.Read)))
                 {
                     while (reader.Peek() != -1)
                     {
                         string line = reader.ReadLine();
                         lines.Add(line);
-                        if (line.Length > maxCharacters)
-                            maxCharacters = line.Length;
                     }
                 }
                 lines = getAlteredLines(lines);
@@ -167,79 +168,6 @@ namespace Prax.Recognition
                         return coord;
                 }
                 return null;
-            }
-
-            public ReturnedSegment DetermineSegmentText(Rectangle bounds)
-            {
-                List<YCoordinate> bestYCoordinates = new List<YCoordinate>();
-                int bestYDiff = int.MaxValue;
-
-                foreach (YCoordinate yCoordinate in this.YCoordinates)
-                {
-                    if (Math.Abs(yCoordinate.Value - bounds.Y) == bestYDiff)
-                    {
-                        bestYCoordinates.Add(yCoordinate);
-                    }
-                    if (Math.Abs(yCoordinate.Value - bounds.Y) < bestYDiff)
-                    {
-                        bestYCoordinates = new List<YCoordinate>();
-                        bestYCoordinates.Add(yCoordinate);
-                        bestYDiff = Math.Abs(yCoordinate.Value - bounds.Y);
-                    }
-                }
-                if (bestYCoordinates == null)
-                    return null;
-                List<XCoordinate> bestXCoordinates = new List<XCoordinate>();
-                int bestXDiff = int.MaxValue;
-                int bestYCoordinate = 0;
-                foreach (YCoordinate yCoordinate in bestYCoordinates)
-                {
-                    foreach (XCoordinate xCoordinate in yCoordinate.XCoordinates)
-                    {
-                        if (Math.Abs(xCoordinate.Value - bounds.X) == bestXDiff)
-                        {
-                            bestXCoordinates.Add(xCoordinate);
-                        }
-                        if (Math.Abs(xCoordinate.Value - bounds.X) < bestXDiff)
-                        {
-                            bestXCoordinates = new List<XCoordinate>();
-                            bestXCoordinates.Add(xCoordinate);
-                            bestXDiff = Math.Abs(xCoordinate.Value - bounds.X);
-                            bestYCoordinate = yCoordinate.Value;
-                        }
-                    }
-                }
-                if (bestXCoordinates == null)
-                    return null;
-                string matchedWord = null;
-                double bestOverlapRatio = int.MinValue;
-                int bestXCoordinate = 0;
-                foreach (XCoordinate xCoordinate in bestXCoordinates)
-                {
-                    foreach (int i in xCoordinate.Texts.Keys)
-                    {
-                        double overlapRatio = 0;
-                        if (i <= bounds.Width)
-                            overlapRatio = (double)i / bounds.Width;
-                        if (i > bounds.Width)
-                            overlapRatio = (double)bounds.Width / i;
-                        if (overlapRatio > bestOverlapRatio)
-                        {
-                            bestOverlapRatio = overlapRatio;
-                            matchedWord = xCoordinate.Texts[i];
-                            bestXCoordinate = xCoordinate.Value;
-                        }
-                        /*
-                        Debug.Print("YDiff: " + bestYDiff.ToString());
-                        Debug.Print("XDiff: " + bestXDiff.ToString());
-                        Debug.Print("Overlap: " + bestOverlapRatio.ToString()); */
-                    }
-                }
-                ReturnedSegment determinedSegment = new ReturnedSegment(matchedWord, bestXDiff, bestYDiff, bestOverlapRatio);
-                if (bestOverlapRatio >= .8)
-                    return determinedSegment;
-                else
-                    return null;
             }
         }
 
@@ -372,26 +300,18 @@ namespace Prax.Recognition
 
         public Tuple<string, double> LabelAtThisSegmentLocation(Rectangle segmentLocation)
         {
-            var newRectangles = segmentData.AllItems.Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0).ToList();
-            
-            List<Tuple<string, double>> labelsAndOverlapRating = new List<Tuple<string, double>>();
-            for (int i = 0; i < newRectangles.Count(); i++)
-            {
-                Tuple<string, double> textAndRating = getTextAndRating(newRectangles[i], segmentLocation);
-                labelsAndOverlapRating.Add(textAndRating);
-            }
             double thresholdOverlap = .3;
 
-            var newRects = newRectangles
-                .Where(r => Rectangle.Intersect(r.Item2, segmentLocation).Width / (double)r.Item2.Width > thresholdOverlap);
-            if (newRects.Count() > 0)
+            var newRectangles = segmentData.AllItems
+                                    .Where(t => Rectangle.Intersect(segmentLocation, t.Item2).Width > 0 &&
+                                             Rectangle.Intersect(t.Item2, segmentLocation).Width / (double)t.Item2.Width > thresholdOverlap);
+            if (newRectangles.Count() > 0)
             {
-                newRects.OrderBy(r => r.Item2.X);
-                int width = newRects.Max(r => r.Item2.X + r.Item2.Width) - newRects.Min(r => r.Item2.X);
-                Rectangle newRect = new Rectangle(newRects.Min(r => r.Item2.X), newRects.Min(r => r.Item2.Y), 
+                int width = newRectangles.Max(r => r.Item2.X + r.Item2.Width) - newRectangles.Min(r => r.Item2.X);
+                Rectangle newRect = new Rectangle(newRectangles.Min(r => r.Item2.X), newRectangles.Min(r => r.Item2.Y), 
                                             width,
-                                            newRects.Max(r => r.Item2.Height));
-                string newString = string.Concat(newRects.Select(t => t.Item1));
+                                            newRectangles.Max(r => r.Item2.Height));
+                string newString = string.Concat(newRectangles.Select(t => t.Item1));
                 double overlapRating = getOverlapRating(newRect, segmentLocation);
                 if (overlapRating > thresholdOverlap && (double)segmentLocation.Width / newRect.Width > .8)
                 {
@@ -428,8 +348,7 @@ namespace Prax.Recognition
             return char.MinValue;
         }
 
-        static private int[] RF = new int[] { 1570, 1571, 1573, 1575, 1577, 1583, 1584, 1585, 1586, 1608, 1609 };
-        private HashSet<int> restrictedForms = new HashSet<int>(RF);
+        private HashSet<int> restrictedForms = new HashSet<int> { 1570, 1571, 1573, 1575, 1577, 1583, 1584, 1585, 1586, 1608, 1609 };
 
         private enum arabicLetterForms
         {
@@ -505,107 +424,42 @@ namespace Prax.Recognition
 
         int getContextualForm(int currentChar)
         {
-            int newCharVal = char.MinValue;
             switch (currentChar)
             {
-                case 1575: //0627
-                    newCharVal = 65165;
-                    break;
-                case 1576: //0628
-                    newCharVal = 65167;
-                    break;
-                case 1578: //062A
-                    newCharVal = 65173;
-                    break;
-                case 1579:
-                    newCharVal = 65177;
-                    break;
-                case 1580:
-                    newCharVal = 65181;
-                    break;
-                case 1581:
-                    newCharVal = 65185;
-                    break;
-                case 1582:
-                    newCharVal = 65189;
-                    break;
-                case 1583:
-                    newCharVal = 65193;
-                    break;
-                case 1584:
-                    newCharVal = 65195;
-                    break;
-                case 1585:
-                    newCharVal = 65197;
-                    break;
-                case 1586:
-                    newCharVal = 65199;
-                    break;
-                case 1587:
-                    newCharVal = 65201;
-                    break;
-                case 1588:
-                    newCharVal = 65205;
-                    break;
-                case 1589:
-                    newCharVal = 65209;
-                    break;
-                case 1590:
-                    newCharVal = 65213;
-                    break;
-                case 1591:
-                    newCharVal = 65217;
-                    break;
-                case 1592:
-                    newCharVal = 65221;
-                    break;
-                case 1593:
-                    newCharVal = 65225;
-                    break;
-                case 1594:
-                    newCharVal = 65229;
-                    break;
-                case 1601:
-                    newCharVal = 65233;
-                    break;
-                case 1602:
-                    newCharVal = 65237;
-                    break;
-                case 1603:
-                    newCharVal = 65241;
-                    break;
-                case 1604:
-                    newCharVal = 65245;
-                    break;
-                case 1605:
-                    newCharVal = 65249;
-                    break;
-                case 1606:
-                    newCharVal = 65253;
-                    break;
-                case 1607:
-                    newCharVal = 65257;
-                    break;
-                case 1608:
-                    newCharVal = 65261;
-                    break;
-                case 1610:
-                    newCharVal = 65265;
-                    break;
-                case 1570:
-                    newCharVal = 65153;
-                    break;
-                case 1571:
-                    newCharVal = 65155;
-                    break;
-                case 1577:
-                    newCharVal = 65171;
-                    break;
-                case 1609:
-                    newCharVal = 65263;
-                    break;
+                case 1575: return 65165;
+                case 1576: return 65167;
+                case 1578: return 65173;
+                case 1579: return 65177;
+                case 1580: return 65181;
+                case 1581: return 65185;
+                case 1582: return 65189;
+                case 1583: return 65193;
+                case 1584: return 65195;
+                case 1585: return 65197;
+                case 1586: return 65199;
+                case 1587: return 65201;
+                case 1588: return 65205;
+                case 1589: return 65209;
+                case 1590: return 65213;
+                case 1591: return 65217;
+                case 1592: return 65221;
+                case 1593: return 65225;
+                case 1594: return 65229;
+                case 1601: return 65233;
+                case 1602: return 65237;
+                case 1603: return 65241;
+                case 1604: return 65245;
+                case 1605: return 65249;
+                case 1606: return 65253;
+                case 1607: return 65257;
+                case 1608: return 65261;
+                case 1610: return 65265;
+                case 1570: return 65153;
+                case 1571: return 65155;
+                case 1577: return 65171;
+                case 1609: return 65263;
             }
-            return newCharVal;
+            return char.MinValue;
         }
         #endregion
     }

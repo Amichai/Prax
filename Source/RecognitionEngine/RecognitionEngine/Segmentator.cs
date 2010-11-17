@@ -100,8 +100,10 @@ namespace Prax.Recognition
             return lowerBound;
         }
         
-        public int[,] labeledPixels; //Defines pixels as edge (2), foreground (0), background (1)
+        public wordBoundary[,] labeledPixels; //Defines pixels as edge (2), foreground (0), background (1)
         private List<Point> wordOutlinePoints = new List<Point>(); //contains all the points resolved from all the word outlines
+
+        public enum wordBoundary { insideWord, wordEdge, outsideWord };
 
         private void identifyWordEdges()
         {
@@ -110,7 +112,7 @@ namespace Prax.Recognition
             int colorLowerBound = findLowerBoundForColor(colorThreshold);
             int complexityLowerBound = findLowerBoundForComplexity(complexityThreshold);
             int totalDifference;
-            labeledPixels = new int[width, height];
+            labeledPixels = new wordBoundary[width, height];
             DisplayUtility.DisplayMask display = new DisplayUtility.DisplayMask(uploadedDocument);
             for (int i = 1; i < width - 1; i++)
             {
@@ -120,25 +122,25 @@ namespace Prax.Recognition
                     if (uploadedDocument[i][j] >= colorLowerBound || totalDifference < complexityLowerBound)
                     {
                         display.PixelToDisplay(new Point(i, j), DisplayUtility.DisplayMarker1); //Blue
-                        labeledPixels[i, j] = 1;
-                        if (i != 1 && j != 1 && i != width - 1 && j != height - 1    //Not on an edge
-                            && ((labeledPixels[i - 1, j] != 1 && labeledPixels[i - 1, j] != 2)
-                            || (labeledPixels[i, j - 1] != 1 && labeledPixels[i, j - 1] != 2)))
+                        labeledPixels[i, j] = wordBoundary.outsideWord;
+                        if ((labeledPixels[i - 1, j] != wordBoundary.outsideWord && labeledPixels[i - 1, j] != wordBoundary.wordEdge)
+                            || (labeledPixels[i, j - 1] != wordBoundary.outsideWord && labeledPixels[i, j - 1] != wordBoundary.wordEdge))
                         {
                             wordOutlinePoints.Add(new Point(i, j));
                             display.PixelToDisplay(new Point(i, j), DisplayUtility.DisplayMarker2); //Green
-                            labeledPixels[i, j] = 2;
+                            labeledPixels[i, j] = wordBoundary.wordEdge;
                         }
                     }
-                    else if (labeledPixels[i - 1, j] == 1 || labeledPixels[i, j - 1] == 1)
+                    else if (labeledPixels[i - 1, j] == wordBoundary.outsideWord || labeledPixels[i, j - 1] == wordBoundary.outsideWord)
                     {
                         wordOutlinePoints.Add(new Point(i, j));
                         display.PixelToDisplay(new Point(i, j), DisplayUtility.DisplayMarker2); //Green
-                        labeledPixels[i, j] = 2;
+                        labeledPixels[i, j] = wordBoundary.wordEdge;
                     }
                 }
             }
-            display.DisplayToUI();
+            //display.RenderBitmap();
+            //display.DisplayToUI();
         }
         #endregion
         
@@ -155,7 +157,7 @@ namespace Prax.Recognition
                 {
                     for (int j = currentPoint.Y - 1; j <= currentPoint.Y + 1; j++)
                     {
-                        if (labeledPixels[i, j] == 0 && !internalLoopPoints.Contains(new Point(i, j)))
+                        if (labeledPixels[i, j] == wordBoundary.outsideWord && !internalLoopPoints.Contains(new Point(i, j)))
                         {
                             internalLoopPoints.Add(new Point(i, j));
                         }
@@ -243,6 +245,7 @@ namespace Prax.Recognition
                         associatedUnexaminedPoints.RemoveAt(index);
                     }
                     //tempDisplay.RenderBitmap();
+                    //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(tempDisplay.BitmapToRender);
 
                     CurrentProgress += resolvedLoop.Count + 1;
                     float currentPercentProgress = (((float)CurrentProgress / MaxProgress) * 100);
@@ -284,7 +287,7 @@ namespace Prax.Recognition
                 for (int j = topBound - 1; j <= bottomBound; j++)
                 {
                     bool inBounds = i < labeledPixels.GetLength(0) && j < labeledPixels.GetLength(1) && i > 0 && j > 0;
-                    if (inBounds && labeledPixels[i, j] != 1)
+                    if (inBounds && labeledPixels[i, j] != wordBoundary.outsideWord)
                     {
                         correctedX = i - (leftBound) + (segBorder / 2) + 1; //This insures a buffer of 5 white pixels on every border
                         correctedY = j - (topBound) + (segBorder / 2) + 1;

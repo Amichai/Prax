@@ -14,7 +14,7 @@ namespace Prax.Recognition
         public AlgorithmTrainer()
         {
             //Define how the segmentation should be displayed for testing:
-            DisplayOptions testDisplayOptions = DisplayOptions.none;
+            DisplayOptions testDisplayOptions = DisplayOptions.segmentsAndMatch;
 
             DisplayUtility.NewFormForDisplay temp;
             //Generate a document image:
@@ -36,7 +36,7 @@ namespace Prax.Recognition
                     {
                         temp = new DisplayUtility.NewFormForDisplay(segment.InternalPoints, labelToTrainWith.Item1, labelToTrainWith.Item2.ToString());
                     }
-                    ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
+                    //ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
                 }
             }
             ocrHandler.SaveTrainingData();

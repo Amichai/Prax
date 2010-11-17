@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using iTextSharp;
 
 namespace Prax.Recognition
-{
+{   
     static class GraphicsHelper
     {
         public static Bitmap MakeGrayscale(Bitmap original)
@@ -146,6 +146,5 @@ namespace Prax.Recognition
             }
             return uploadedDocument;
         }
-    
     }
 }

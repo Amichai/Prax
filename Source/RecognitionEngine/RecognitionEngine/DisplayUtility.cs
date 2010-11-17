@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Prax.Recognition
 {
-    class DisplayUtility
+    static class DisplayUtility
     {
         public const int DisplayMarker1 = 509; //Blue 
         public const int DisplayMarker2 = 700; //Green
@@ -16,24 +16,20 @@ namespace Prax.Recognition
 
         public static PictureBox DefaultPictureBox = null;
 
-        public void DisplayDoubleArray(int[][] uploadedDocument, PictureBox picture)
+        static public void DisplayDoubleArray(int[][] uploadedDocument, PictureBox picture)
         {
 
 
         }
 
-        public void DisplayBitmap(Bitmap bitmapToRender, PictureBox picture)
+        static public void DisplayBitmap(Bitmap bitmapToRender, PictureBox picture)
         {
             int width = bitmapToRender.Width;
             int height = bitmapToRender.Height;
-            Image DocumentInspector = new Bitmap(width, height);
-            Graphics GraphDraw = Graphics.FromImage(DocumentInspector);
-
-            GraphDraw.DrawImage(bitmapToRender, 0, 0);
-            picture.Image = DocumentInspector;
+            picture.Image = bitmapToRender; 
         }
 
-        public Bitmap ConvertDoubleArrayToBitmap(int[][] doubleArray, Color defaultColor)
+        static public Bitmap ConvertDoubleArrayToBitmap(int[][] doubleArray, Color defaultColor)
         {
             int width = doubleArray.GetLength(0);
             int height = doubleArray[0].GetLength(0);
@@ -121,7 +117,7 @@ namespace Prax.Recognition
             }
 
             public Bitmap BitmapToRender = null;
-
+            
             public void DisplayToUI()
             {
                 RenderBitmap();
@@ -142,15 +138,13 @@ namespace Prax.Recognition
 
             public NewFormForDisplay(int[][] doubleArray)
             {
-                DisplayUtility displayUtility = new DisplayUtility();
-                Bitmap bitmapToRender = displayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
+                Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
                 produceNewForm(bitmapToRender, null, null);
             }
 
             public NewFormForDisplay(int[][] doubleArray, string displayLabel1, string displayLabel2)
             {
-                DisplayUtility displayUtility = new DisplayUtility();
-                Bitmap bitmapToRender = displayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
+                Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
                 produceNewForm(bitmapToRender, displayLabel1, displayLabel2);
             }
 
