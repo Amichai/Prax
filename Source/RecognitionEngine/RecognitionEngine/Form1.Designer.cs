@@ -36,6 +36,7 @@
             this.algorithmOutput = new System.Windows.Forms.Label();
             this.TrainingDataInfo = new System.Windows.Forms.Label();
             this.PercentComplete = new System.Windows.Forms.Label();
+            this.segView = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,7 +84,7 @@
             // 
             this.pictureBox.Location = new System.Drawing.Point(13, 42);
             this.pictureBox.Name = "pictureBox";
-            this.pictureBox.Size = new System.Drawing.Size(397, 341);
+            this.pictureBox.Size = new System.Drawing.Size(318, 317);
             this.pictureBox.TabIndex = 4;
             this.pictureBox.TabStop = false;
             // 
@@ -111,11 +112,22 @@
             this.PercentComplete.Size = new System.Drawing.Size(0, 13);
             this.PercentComplete.TabIndex = 7;
             // 
+            // imageView
+            // 
+            this.segView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.segView.AutoScroll = true;
+            this.segView.Location = new System.Drawing.Point(342, 13);
+            this.segView.Name = "imageView";
+            this.segView.Size = new System.Drawing.Size(294, 346);
+            this.segView.TabIndex = 8;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(928, 429);
+            this.ClientSize = new System.Drawing.Size(648, 371);
+            this.Controls.Add(this.segView);
             this.Controls.Add(this.PercentComplete);
             this.Controls.Add(this.TrainingDataInfo);
             this.Controls.Add(this.algorithmOutput);
@@ -142,5 +154,6 @@
         private System.Windows.Forms.Label algorithmOutput;
         private System.Windows.Forms.Label TrainingDataInfo;
         private System.Windows.Forms.Label PercentComplete;
+        private System.Windows.Forms.Panel segView;
     }
 }

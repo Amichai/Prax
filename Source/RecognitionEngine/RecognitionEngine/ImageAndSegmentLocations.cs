@@ -16,11 +16,7 @@ namespace Prax.Recognition
     {
         private Tree segmentData = new Tree();
         public Bitmap TrainingImage = new Bitmap(1, 1);
-
         enum RenderMethod { letterByLetter, wholeTextAtOnce };
-
-
-
         public ImageAndSegmentLocations()
         {
             RenderMethod renderMethod = RenderMethod.letterByLetter;
@@ -93,9 +89,9 @@ namespace Prax.Recognition
                 for (int j = 0; j < segmentData.YCoordinates[i].XCoordinates.Count(); j++)
                 {
                     writer.Write("X val: " + segmentData.YCoordinates[i].XCoordinates[j].Value.ToString());
-                    foreach (KeyValuePair<int, string> l in segmentData.YCoordinates[i].XCoordinates[j].Texts)
+                    foreach (KeyValuePair<int, string> widthChar in segmentData.YCoordinates[i].XCoordinates[j].Texts)
                     {
-                        writer.Write(" Width: " + l.Key.ToString() + " Char: " + l.Value);
+                        writer.Write(" Width: " + widthChar.Key.ToString() + " Char: " + widthChar.Value);
                     }
 
                     writer.Write(Environment.NewLine);
