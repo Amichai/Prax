@@ -14,54 +14,44 @@ namespace Prax.Recognition {
 	class ImageAndSegmentLocations {
 		private Tree segmentData = new Tree();
 		public Bitmap TrainingImage = new Bitmap(1, 1);
-		enum RenderMethod { letterByLetter, wholeTextAtOnce };
+		enum RenderMethod { LetterByLetter, WholeTextAtOnce, MeasureRanges };
 		public ImageAndSegmentLocations() {
-			RenderMethod renderMethod = RenderMethod.letterByLetter;
+			RenderMethod renderMethod = RenderMethod.MeasureRanges;
 			string dataFileName = "doc.txt";
 			string dataFontName = "Times New Roman";
 			string dataSize = "16";
 			string dataStyle = "".ToLower();
 
 			FontStyle style = FontStyle.Regular;
-
 			if (dataStyle.Contains("b"))
 				style |= FontStyle.Bold;
 			if (dataStyle.Contains("i"))
 				style |= FontStyle.Italic;
-			using (var font = new Font(dataFontName, float.Parse(dataSize), style, GraphicsUnit.Pixel)) {
-				string text = string.Empty;
-				StringCollection lines = new StringCollection();
-				string textDocument = string.Empty;
 
-				using (StreamReader reader = new StreamReader(new FileStream(dataFileName, FileMode.Open, FileAccess.Read))) {
-					while (reader.Peek() != -1) {
-						string line = reader.ReadLine();
-						lines.Add(line);
-					}
-				}
-				lines = getAlteredLines(lines);
-				foreach (string s in lines) {
-					text += s + Environment.NewLine;
-				}
+			using (var font = new Font(dataFontName, float.Parse(dataSize), style, GraphicsUnit.Pixel)) {
+				var lines = WrapLines(File.ReadLines(dataFileName)).ToArray();
+				var text = String.Join(Environment.NewLine, lines);
 
 				var size = TextRenderer.MeasureText(text, font);
 				var image = new Bitmap(size.Width * 2, size.Height * 2);
 
 				using (var objGraphics = Graphics.FromImage(image)) {
-					string imageFileName = string.Empty;
 					objGraphics.Clear(Color.White);
 
-					if (renderMethod == RenderMethod.letterByLetter) {
-						drawTextLetterByLetter(objGraphics, font, Brushes.Black, lines);
-						imageFileName = "letterByLetter.bmp";
-					}
-					if (renderMethod == RenderMethod.wholeTextAtOnce) {
-						objGraphics.DrawString(text, font, Brushes.Black, new PointF(image.Width, 0), new StringFormat(StringFormatFlags.DirectionRightToLeft));
-						imageFileName = "wholeTextAtOnce.bmp";
+					switch (renderMethod) {
+						case RenderMethod.LetterByLetter:
+							drawTextLetterByLetter(objGraphics, font, Brushes.Black, lines);
+							break;
+						case RenderMethod.WholeTextAtOnce:
+							objGraphics.DrawString(text, font, Brushes.Black, new PointF(image.Width, 0), new StringFormat(StringFormatFlags.DirectionRightToLeft));
+							break;
+						case RenderMethod.MeasureRanges:
+							MeasureText(objGraphics, font, text);
+							break;
 					}
 
 					TrainingImage = image;
-					image.Save(imageFileName, ImageFormat.Bmp);
+					image.Save(renderMethod.ToString() + ".bmp", ImageFormat.Bmp);
 				}
 			}
 			printSegmentData();
@@ -86,33 +76,26 @@ namespace Prax.Recognition {
 			}
 		}
 
-		private StringCollection getAlteredLines(StringCollection document) {
-			StringCollection lines = new StringCollection();
-
-			foreach (string line in document) {
-				string[] words = line.Split(new char[] { ' ' });
-
-				string newline = string.Empty;
-				bool bShortLine = false;
-				foreach (string word in words) {
-					bShortLine = true;
-					if (newline.Length + word.Length <= 100) {
-						bShortLine = true;
-						newline += " ";
-						newline += word;
-					} else {
-						bShortLine = false;
-						lines.Add(newline);
-						newline = word;
+		static IEnumerable<string> WrapLines(IEnumerable<string> lines, int maxLength = 100) {
+			StringBuilder currentLine = new StringBuilder();
+			foreach (var line in lines) {
+				currentLine.Clear();
+				foreach (var word in line.Split(' ')) {
+					if (currentLine.Length + 1 + word.Length > maxLength            //Leave room for the space
+					 && !(currentLine.Length == 0 && word.Length >= maxLength)) {   //If the word alone won't fit, just use it.
+						yield return currentLine.ToString();
+						currentLine.Clear();
 					}
+
+					if (currentLine.Length > 0)
+						currentLine.Append(' ');
+					currentLine.Append(word);
 				}
-				if (bShortLine)
-					lines.Add(newline);
+
+				if (currentLine.Length > 0)
+					yield return currentLine.ToString();
 			}
-
-			return lines;
 		}
-
 		#region Tree Data Sturcture
 		class Tree {
 			public List<BoundedString> Words = new List<BoundedString>();
@@ -227,7 +210,7 @@ namespace Prax.Recognition {
 			}
 		}
 
-		private void drawTextLetterByLetter(Graphics objGraphics, Font font, Brush brush, StringCollection lines) {
+		private void drawTextLetterByLetter(Graphics objGraphics, Font font, Brush brush, IEnumerable<string> lines) {
 			int docWidth, docHeight;
 			docWidth = (int)objGraphics.VisibleClipBounds.Size.Width;
 			docHeight = (int)objGraphics.VisibleClipBounds.Size.Height;
