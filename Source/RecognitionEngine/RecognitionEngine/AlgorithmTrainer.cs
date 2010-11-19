@@ -48,10 +48,10 @@ namespace Prax.Recognition
                     DispaySegEvent(eventArgs);
                 }
 
-                Tuple<string, double> labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation);
+                Tuple<string, double> labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation, segment.ThisSegmentIsAWord);
                 if (labelToTrainWith != null)
                 {
-                    if ((segment.ThisSegmentIsAWord == true && testDisplayOptions == DisplayOptions.wordSegmentsAndMatch)
+                    if ((segment.ThisSegmentIsAWord  && testDisplayOptions == DisplayOptions.wordSegmentsAndMatch)
                                     || testDisplayOptions == DisplayOptions.segmentsAndMatch || testDisplayOptions == DisplayOptions.everySegment)
                     {
                         DisplayMatchResultArgs matchArgs = new DisplayMatchResultArgs(labelToTrainWith.Item1, segment.SegmentLocation, labelToTrainWith.Item2);

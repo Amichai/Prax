@@ -283,12 +283,13 @@ namespace Prax.Recognition {
 			return overlapRating;
 		}
 
-		public Tuple<string, double> LabelAtThisSegmentLocation(Rectangle segmentLocation) {
+		public Tuple<string, double> LabelAtThisSegmentLocation(Rectangle segmentLocation, bool isWord) {
 			double thresholdOverlap = .3;
 
-			var newRectangles = segmentData.Words.Concat(segmentData.Letters)	//TODO: Figure out what to search in
-									.Where(t => Rectangle.Intersect(segmentLocation, t.Bounds).Width > 0 &&
-											 Rectangle.Intersect(t.Bounds, segmentLocation).Width / (double)t.Bounds.Width > thresholdOverlap);
+			var allSegments = isWord ? segmentData.Words : segmentData.Letters;
+
+			var newRectangles = allSegments.Where(t => Rectangle.Intersect(segmentLocation, t.Bounds).Width > 0 &&
+													   Rectangle.Intersect(t.Bounds, segmentLocation).Width / (double)t.Bounds.Width > thresholdOverlap);
 			if (newRectangles.Count() > 0) {
 				int width = newRectangles.Max(r => r.Bounds.Right) - newRectangles.Min(r => r.Bounds.X);
 				Rectangle newRect = new Rectangle(newRectangles.Min(r => r.Bounds.X), newRectangles.Min(r => r.Bounds.Y),
