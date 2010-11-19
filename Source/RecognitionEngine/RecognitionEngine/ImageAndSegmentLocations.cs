@@ -190,26 +190,33 @@ namespace Prax.Recognition {
 				segmentData.AddWord(word);
 		}
 
-		static IEnumerable<BoundedString> MeasureRanges(Graphics g, Font font, string text, IEnumerable<CharacterRange> ranges) {
-			Region[] regions;
-			var allRanges = ranges.ToArray();
-			using (var format = new StringFormat()) {	//Dispose the StringFormat before returning results
-				format.SetMeasurableCharacterRanges(allRanges);
-				regions = g.MeasureCharacterRanges(text, font, g.VisibleClipBounds, format);
-			}
+		///<summary>The maximum number of ranges that we'll process at once.</summary>
+		///<remarks>I got an Overflow error from GDI+ when processing 800 ranges.</remarks>
+		const int maxRanges = 32;		//The maximum number of ranges that we'll process at once.
+		static IEnumerable<BoundedString> MeasureRanges(Graphics g, Font font, string text, List<CharacterRange> ranges) {
+			for (int r = 0; r < ranges.Count; r += maxRanges) {
+				//Process at most maxRanges at a time
+				var subRanges = new CharacterRange[Math.Min(ranges.Count - r, maxRanges)];
+				ranges.CopyTo(r, subRanges, 0, subRanges.Length);
 
-			for (int i = 0; i < allRanges.Length; i++) {
-				RectangleF bounds;
-				using (regions[i])
-					bounds = regions[i].GetBounds(g);
+				Region[] regions;
+				using (var format = new StringFormat()) {	//Dispose the StringFormat before returning results
+					format.SetMeasurableCharacterRanges(subRanges);
+					regions = g.MeasureCharacterRanges(text, font, g.VisibleClipBounds, format);
+				}
 
-				yield return new BoundedString(
-					text.Substring(allRanges[i].First, allRanges[i].Length),
-					Rectangle.Round(bounds)
-				);
+				for (int i = 0; i < subRanges.Length; i++) {
+					RectangleF bounds;
+					using (regions[i])
+						bounds = regions[i].GetBounds(g);
+
+					yield return new BoundedString(
+						text.Substring(subRanges[i].First, subRanges[i].Length),
+						Rectangle.Round(bounds)
+					);
+				}
 			}
 		}
-
 		private void drawTextLetterByLetter(Graphics objGraphics, Font font, Brush brush, IEnumerable<string> lines) {
 			int docWidth, docHeight;
 			docWidth = (int)objGraphics.VisibleClipBounds.Size.Width;
