@@ -31,16 +31,18 @@ namespace Prax.Recognition
             DisplayOptions testDisplayOptions = DisplayOptions.everySegment;
 
             //Generate a document image:
-            ImageAndSegmentLocations generateTrainingSeg = new ImageAndSegmentLocations();  
-            int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
+            //ImageAndSegmentLocations generateTrainingSeg = new ImageAndSegmentLocations();  
+            //int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
             
-            //Bitmap FileBitmap = Bitmap.FromFile("letterByLetter.bmp") as Bitmap;
-            //int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
+            Bitmap FileBitmap = Bitmap.FromFile("letterByLetter.bmp") as Bitmap;
+            int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
  
             Segmentator segmentation = new Segmentator(uploadedDocument);
             OCRHandler ocrHandler = new OCRHandler();
             foreach (OCRSegment segment in segmentation.DefineSegments())
             {
+
+                /*
                 if (testDisplayOptions == DisplayOptions.everySegment)
                 {
                     Bitmap bitmapSeg = DisplayUtility.ConvertDoubleArrayToBitmap(segment.InternalPoints, Color.White);
@@ -59,6 +61,7 @@ namespace Prax.Recognition
                     }                    
                     //ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
                 }
+                */
             }
             ocrHandler.SaveTrainingData();
         }

@@ -31,7 +31,8 @@ namespace Prax.Recognition
         {
             train.Enabled = false;
             DisplayUtility.DefaultPictureBox = pictureBox;
-            AlgorithmTrainer.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
+            //AlgorithmTrainer.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
+            Segmentator.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
             AlgorithmTrainer.DisplayResult += new DisplayResultHandler(ShowResult);
             AlgorithmTrainer trainHandler = new AlgorithmTrainer();
             train.Enabled = true;

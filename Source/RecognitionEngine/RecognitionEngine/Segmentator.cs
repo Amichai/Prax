@@ -140,7 +140,7 @@ namespace Prax.Recognition
                 }
             }
             //display.RenderBitmap();
-            //display.DisplayToUI();
+            //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(display.BitmapToRender);
         }
         #endregion
         
@@ -227,7 +227,7 @@ namespace Prax.Recognition
                 {
                     associatedUnexaminedPoints.Add(internalLoopPoints[k]);
                     List<Point> resolvedLoop = new List<Point>();
-                    //DisplayUtility.DisplayMask tempDisplay = new DisplayUtility.DisplayMask(uploadedDocument);
+                    DisplayUtility.DisplayMask tempDisplay = new DisplayUtility.DisplayMask(uploadedDocument);
                     discreteLoopRectangle = new Rectangle(int.MaxValue, int.MaxValue, 0, 0);
                     while (associatedUnexaminedPoints.Count > 0)
                     {
@@ -239,16 +239,17 @@ namespace Prax.Recognition
                                                                     listOfAllAssociatedPoints, associatedUnexaminedPoints))
                         {
                             resolvedLoop.Add(pointToAdd);
-                            //tempDisplay.PixelToDisplay(pointToAdd, 900);
+                            tempDisplay.PixelToDisplay(pointToAdd, 900);
                             reassessBounds(pointToAdd);
                         }
                         associatedUnexaminedPoints.RemoveAt(index);
                     }
-                    //tempDisplay.RenderBitmap();
+                    tempDisplay.RenderBitmap();
                     //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(tempDisplay.BitmapToRender);
 
                     CurrentProgress += resolvedLoop.Count + 1;
                     float currentPercentProgress = (((float)CurrentProgress / MaxProgress) * 100);
+                    Debug.Print(currentPercentProgress.ToString());
                     yield return resolvedLoop;
                 }
             }
@@ -324,8 +325,8 @@ namespace Prax.Recognition
             OCRSegment wordSegment = new OCRSegment();
             foreach (List<Point> discreteLoop in defineDiscreteLoops(internalLoopPoints.ToList()))
             {
-                if (discreteLoop.Count > 5 && discreteLoop.Count < 700) //TODO: Factor out all sanity testing into one centralized place. 
-                {                                                           //TODO: Make sanity test information available to the heuristic array
+                if (discreteLoop.Count > 5)
+                {
                     wordSegment = defineSegmentObjectToReturn(discreteLoop);
                     if (testSegmentForPlausibilty(wordSegment)) //Factor out all sanity testing into one centralized place. Problem. Eliminate this method.
                     {
@@ -338,11 +339,24 @@ namespace Prax.Recognition
                             yield return subSegment;
                         }
                         //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(wordSegment.InternalPoints, wordSegment.SegmentLocation.ToString());
+
+                        Bitmap bitmapSeg = DisplayUtility.ConvertDoubleArrayToBitmap(wordSegment.InternalPoints, Color.White);
+                        DisplaySegEventArgs eventArgs = new DisplaySegEventArgs(bitmapSeg, wordSegment.SegmentLocation);
+                        DispaySegEvent(eventArgs);
+
+
                         yield return wordSegment;
                     }
                 }
             }
         }
+
+        public void DispaySegEvent(DisplaySegEventArgs e)
+        {
+            DisplaySeg(new object(), e);
+        }
+        public static event DisplaySubSegmentHandler DisplaySeg;
+
         #endregion
 
         #region Resolve All Letter SubSegments
