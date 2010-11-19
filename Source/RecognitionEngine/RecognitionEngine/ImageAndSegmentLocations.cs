@@ -17,7 +17,7 @@ namespace Prax.Recognition {
 		enum RenderMethod { LetterByLetter, WholeTextAtOnce, MeasureRanges };
 		public ImageAndSegmentLocations() {
 			RenderMethod renderMethod = RenderMethod.MeasureRanges;
-			string dataFileName = "doc.txt";
+			string dataFileName = "Arabic Source.txt";
 			string dataFontName = "Times New Roman";
 			string dataSize = "16";
 			string dataStyle = "".ToLower();
