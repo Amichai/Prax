@@ -76,6 +76,7 @@
     <Compile Include="ResolvedSegment.cs" />
     <Compile Include="SegmentAnalysis.cs" />
     <Compile Include="Segmentator.cs" />
+    <Compile Include="SegmentatorV2.cs" />
     <Compile Include="TrainingData.cs" />
     <Compile Include="UploadDocument.cs" />
   </ItemGroup>

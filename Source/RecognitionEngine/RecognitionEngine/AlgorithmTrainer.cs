@@ -18,31 +18,37 @@ namespace Prax.Recognition
 
         public void DispaySegEvent(DisplaySegEventArgs e)
         {
-            DisplaySeg(new object(), e);
+            if(DisplaySeg != null)
+                DisplaySeg(new object(), e);
         }
         public void DisplayMatchEvent(DisplayMatchResultArgs e)
         {
-            DisplayResult(new object(), e);
+            if(DisplayResult != null)
+                DisplayResult(new object(), e);
         }
 
         public AlgorithmTrainer()
         {
             //Define how the segmentation should be displayed for testing:
             DisplayOptions testDisplayOptions = DisplayOptions.everySegment;
+            bool testSegmentation = true;
 
-            //Generate a document image:
-            //ImageAndSegmentLocations generateTrainingSeg = new ImageAndSegmentLocations();  
-            //int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
-            
-            Bitmap FileBitmap = Bitmap.FromFile("letterByLetter.bmp") as Bitmap;
-            int[][] uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
- 
-            Segmentator segmentation = new Segmentator(uploadedDocument);
+            int[][] uploadedDocument = null;
+            if (testSegmentation == true) {
+                Bitmap FileBitmap = Bitmap.FromFile("letterByLetter.bmp") as Bitmap;
+                uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
+            }
+
+            ImageAndSegmentLocations generateTrainingSeg = null;
+            if (testSegmentation == false) {
+                generateTrainingSeg = new ImageAndSegmentLocations();
+                uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
+            }
+
+            SegmentatorV2 segmentation = new SegmentatorV2(uploadedDocument);
             OCRHandler ocrHandler = new OCRHandler();
             foreach (OCRSegment segment in segmentation.DefineSegments())
             {
-
-                /*
                 if (testDisplayOptions == DisplayOptions.everySegment)
                 {
                     Bitmap bitmapSeg = DisplayUtility.ConvertDoubleArrayToBitmap(segment.InternalPoints, Color.White);
@@ -50,18 +56,20 @@ namespace Prax.Recognition
                     DispaySegEvent(eventArgs);
                 }
 
-                Tuple<string, double> labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation, segment.ThisSegmentIsAWord);
-                if (labelToTrainWith != null)
+                if (testSegmentation == false)
                 {
-                    if ((segment.ThisSegmentIsAWord  && testDisplayOptions == DisplayOptions.wordSegmentsAndMatch)
-                                    || testDisplayOptions == DisplayOptions.segmentsAndMatch || testDisplayOptions == DisplayOptions.everySegment)
+                    Tuple<string, double> labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation, segment.IsAWord);
+                    if (labelToTrainWith != null)
                     {
-                        DisplayMatchResultArgs matchArgs = new DisplayMatchResultArgs(labelToTrainWith.Item1, segment.SegmentLocation, labelToTrainWith.Item2);
-                        DisplayMatchEvent(matchArgs);
-                    }                    
-                    //ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
+                        if ((segment.IsAWord && testDisplayOptions == DisplayOptions.wordSegmentsAndMatch)
+                                        || testDisplayOptions == DisplayOptions.segmentsAndMatch || testDisplayOptions == DisplayOptions.everySegment)
+                        {
+                            DisplayMatchResultArgs matchArgs = new DisplayMatchResultArgs(labelToTrainWith.Item1, segment.SegmentLocation, labelToTrainWith.Item2);
+                            DisplayMatchEvent(matchArgs);
+                        }
+                        //ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
+                    }
                 }
-                */
             }
             ocrHandler.SaveTrainingData();
         }

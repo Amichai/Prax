@@ -297,7 +297,7 @@ namespace Prax.Recognition {
 
 			var newRectangles = allSegments.Where(t => Rectangle.Intersect(segmentLocation, t.Bounds).Width > 0 &&
 													   Rectangle.Intersect(t.Bounds, segmentLocation).Width / (double)t.Bounds.Width > thresholdOverlap);
-			if (newRectangles.Count() > 0) {
+			if (newRectangles.Any()) {
 				int width = newRectangles.Max(r => r.Bounds.Right) - newRectangles.Min(r => r.Bounds.X);
 				Rectangle newRect = new Rectangle(newRectangles.Min(r => r.Bounds.X), newRectangles.Min(r => r.Bounds.Y),
 											width,
@@ -378,7 +378,7 @@ namespace Prax.Recognition {
 			}
 
 			if (currentPosition == letterPosition.isolated) //stand alone letter
-            {
+			{
 				newCharVal = newCharVal + 0; //isolated glyph
 			}
 

@@ -16,12 +16,6 @@ namespace Prax.Recognition
 
         public static PictureBox DefaultPictureBox = null;
 
-        static public void DisplayDoubleArray(int[][] uploadedDocument, PictureBox picture)
-        {
-
-
-        }
-
         static public void DisplayBitmap(Bitmap bitmapToRender, PictureBox picture)
         {
             int width = bitmapToRender.Width;
@@ -121,69 +115,70 @@ namespace Prax.Recognition
             public void DisplayToUI()
             {
                 RenderBitmap();
-                Image DocumentInspector = new Bitmap(width, height);
-                Graphics GraphDraw = Graphics.FromImage(DocumentInspector);
-
-                GraphDraw.DrawImage(BitmapToRender, 0, 0);
-                DefaultPictureBox.Image = DocumentInspector;
+                DefaultPictureBox.Image = BitmapToRender;
             }
         }
 
-        public class NewFormForDisplay
+        #region New Form Methods
+        static public void NewFormForDisplay(List<Point> pointsToShow, int[][] doubleArray) {
+            foreach (Point p in pointsToShow) {
+                doubleArray[p.X][p.Y] = DisplayMarker2;
+            }
+            Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
+            produceNewForm(bitmapToRender, null, null);
+        }
+
+        static public void NewFormForDisplay(Bitmap bitmapToRender)
         {
-            public NewFormForDisplay(Bitmap bitmapToRender)
-            {
-                produceNewForm(bitmapToRender, null, null);
-            }
-
-            public NewFormForDisplay(int[][] doubleArray)
-            {
-                Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
-                produceNewForm(bitmapToRender, null, null);
-            }
-
-            public NewFormForDisplay(int[][] doubleArray, string displayLabel1, string displayLabel2)
-            {
-                Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
-                produceNewForm(bitmapToRender, displayLabel1, displayLabel2);
-            }
-
-            private void produceNewForm(Bitmap bitmapToRender, string displayLabel1, string displayLabel2)
-            {   
-                Form tempDisplay = new Form();
-                Label labelLabel = new Label();
-                Label certaintyLabel1 = new Label();
-                Label displayLocation = new Label();
-                labelLabel.AutoSize = true;
-                certaintyLabel1.AutoSize = true;
-                displayLocation.AutoSize = true;
-                int width = bitmapToRender.Width;
-                int height = bitmapToRender.Height;
-
-                if(displayLabel1 != null)
-                    labelLabel.Text = displayLabel1;
-                if (displayLabel2 != null)
-                    certaintyLabel1.Text = displayLabel2;
-
-                labelLabel.Location = new System.Drawing.Point(6, 7);
-                certaintyLabel1.Location = new System.Drawing.Point(6, 66);
-                displayLocation.Location = new System.Drawing.Point(50, 7);
-
-
-
-                tempDisplay.Controls.Add(labelLabel);
-                tempDisplay.Controls.Add(certaintyLabel1);
-                tempDisplay.Controls.Add(displayLocation);
-
-                tempDisplay.SetBounds(10, 10, width, height);
-                tempDisplay.ClientSize = new System.Drawing.Size(150, 88);
-                tempDisplay.BackgroundImage = bitmapToRender;
-                tempDisplay.BackgroundImageLayout = ImageLayout.Center;
-                tempDisplay.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-
-                tempDisplay.Location = new System.Drawing.Point(100, 100);
-                tempDisplay.ShowDialog();
-            }
+            produceNewForm(bitmapToRender, null, null);
         }
+
+        static public void NewFormForDisplay(int[][] doubleArray)
+        {
+            Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
+            produceNewForm(bitmapToRender, null, null);
+        }
+
+        static public void NewFormForDisplay(int[][] doubleArray, string displayLabel1, string displayLabel2)
+        {
+            Bitmap bitmapToRender = DisplayUtility.ConvertDoubleArrayToBitmap(doubleArray, Color.White);
+            produceNewForm(bitmapToRender, displayLabel1, displayLabel2);
+        }
+
+        static private void produceNewForm(Bitmap bitmapToRender, string displayLabel1, string displayLabel2)
+        {   
+            Form tempDisplay = new Form();
+            Label labelLabel = new Label();
+            Label certaintyLabel1 = new Label();
+            Label displayLocation = new Label();
+            labelLabel.AutoSize = true;
+            certaintyLabel1.AutoSize = true;
+            displayLocation.AutoSize = true;
+            int width = bitmapToRender.Width;
+            int height = bitmapToRender.Height;
+
+            if(displayLabel1 != null)
+                labelLabel.Text = displayLabel1;
+            if (displayLabel2 != null)
+                certaintyLabel1.Text = displayLabel2;
+
+            labelLabel.Location = new System.Drawing.Point(6, 7);
+            certaintyLabel1.Location = new System.Drawing.Point(6, 66);
+            displayLocation.Location = new System.Drawing.Point(50, 7);
+
+            tempDisplay.Controls.Add(labelLabel);
+            tempDisplay.Controls.Add(certaintyLabel1);
+            tempDisplay.Controls.Add(displayLocation);
+
+            tempDisplay.SetBounds(10, 10, width, height);
+            tempDisplay.ClientSize = new System.Drawing.Size(150, 88);
+            tempDisplay.BackgroundImage = bitmapToRender;
+            tempDisplay.BackgroundImageLayout = ImageLayout.Center;
+            tempDisplay.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+
+            tempDisplay.Location = new System.Drawing.Point(100, 100);
+            tempDisplay.ShowDialog();
+        }
+        #endregion
     }
 }

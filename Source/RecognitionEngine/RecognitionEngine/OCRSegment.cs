@@ -9,7 +9,7 @@ namespace Prax.Recognition
     class OCRSegment
     {
         public Rectangle SegmentLocation;
-        public bool ThisSegmentIsAWord;
+        public bool IsAWord;
         public int[][] InternalPoints;
     }
 }

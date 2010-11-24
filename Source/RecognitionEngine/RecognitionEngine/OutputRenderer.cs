@@ -12,7 +12,7 @@ namespace Prax.Recognition
     class OutputRenderer:IResultsConverter
     {
         private int columnStart = 0; //int.MaxValue; 
-        //TODO: This won't be necessary when we inforce precise location
+        //TODO: This won't be necessary when we enforce precise location
 
         public Stream Convert(Stream input, ReadOnlyCollection<RecognizedSegment> results)
         {
@@ -21,7 +21,7 @@ namespace Prax.Recognition
             
             doc.Open();
             //Paragraph paragraph = new Paragraph();
-            string fontpath = Environment.GetEnvironmentVariable("SystemRoot") + "\\fonts\\arabtype.ttf";
+            string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arabtype.ttf");
             BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
 

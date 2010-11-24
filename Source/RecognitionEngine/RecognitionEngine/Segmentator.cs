@@ -11,7 +11,7 @@ namespace Prax.Recognition
         private int[][] uploadedDocument; 
         private int width, height;
         //variables for marking segmentation progress
-        public int MaxProgress, CurrentProgress;
+        public int MaxProgress, CurrentProgress; //TODO: Implement progress variables
 
         public Segmentator(int[][] uploaded)
         {
@@ -145,115 +145,7 @@ namespace Prax.Recognition
         #endregion
         
         #region Resolve All Word segments
-
-        private HashSet<Point> findInternalLoopToProcess()
-        {
-            HashSet<Point> internalLoopPoints = new HashSet<Point>();
-            Point currentPoint;
-            for (int k = 0; k < wordOutlinePoints.Count; k++)
-            {
-                currentPoint = new Point(wordOutlinePoints[k].X, wordOutlinePoints[k].Y);
-                for (int i = currentPoint.X - 1; i <= currentPoint.X + 1; i++)
-                {
-                    for (int j = currentPoint.Y - 1; j <= currentPoint.Y + 1; j++)
-                    {
-                        if (labeledPixels[i, j] == wordBoundary.outsideWord && !internalLoopPoints.Contains(new Point(i, j)))
-                        {
-                            internalLoopPoints.Add(new Point(i, j));
-                        }
-                    }
-                }
-            }
-            return internalLoopPoints;
-        }
-
-        private IEnumerable<Point> assessSurroundingPoint(Point point, List<Point> internalLoopPoints,
-            HashSet<Point> listOfAllAssociatedPoints, List<Point> associatedUnexaminedPoints)
-        {
-            Point currentPoint;
-            for (int i = point.X - 1; i <= point.X + 1; i++)
-            {
-                for (int j = point.Y - 1; j <= point.Y + 1; j++)
-                {
-                    currentPoint = new Point(i, j);
-                    if (internalLoopPoints.Contains(currentPoint) && !listOfAllAssociatedPoints.Contains(currentPoint))
-                    {
-                        listOfAllAssociatedPoints.Add(currentPoint);
-                        associatedUnexaminedPoints.Add(currentPoint);
-                        yield return currentPoint;
-                    }
-                }
-            }
-        }
-
         private Rectangle discreteLoopRectangle;
-
-        private void reassessBounds(Point pointToAdd)
-        {
-            int rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width,
-                bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
-
-            if (pointToAdd.X < discreteLoopRectangle.X)
-                discreteLoopRectangle.X = pointToAdd.X;
-            if (pointToAdd.Y < discreteLoopRectangle.Y)
-                discreteLoopRectangle.Y = pointToAdd.Y;
-            if (pointToAdd.X > rightBound)
-            {
-                discreteLoopRectangle.Width = pointToAdd.X - discreteLoopRectangle.X;
-                rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width;
-            }
-            if (pointToAdd.Y > bottomBound)
-            { 
-                discreteLoopRectangle.Height = pointToAdd.Y - discreteLoopRectangle.Y;
-                bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
-            }
-            if (bottomBound < int.MaxValue)
-
-                discreteLoopRectangle.Height = bottomBound - discreteLoopRectangle.Y;
-            if (rightBound < int.MaxValue)
-                discreteLoopRectangle.Width = rightBound - discreteLoopRectangle.X;
-        }
-
-        private IEnumerable<List<Point>> defineDiscreteLoops(List<Point> internalLoopPoints)
-        {
-            HashSet<Point> listOfAllAssociatedPoints = new HashSet<Point>();
-            List<Point> associatedUnexaminedPoints = new List<Point>();
-            List<Point> pointUnexamiendOnce = new List<Point>();
-            int xVal, yVal;
-            int index;
-            for (int k = 0; k < internalLoopPoints.Count; k++)
-            {
-                if (!listOfAllAssociatedPoints.Contains(internalLoopPoints[k]))
-                {
-                    associatedUnexaminedPoints.Add(internalLoopPoints[k]);
-                    List<Point> resolvedLoop = new List<Point>();
-                    DisplayUtility.DisplayMask tempDisplay = new DisplayUtility.DisplayMask(uploadedDocument);
-                    discreteLoopRectangle = new Rectangle(int.MaxValue, int.MaxValue, 0, 0);
-                    while (associatedUnexaminedPoints.Count > 0)
-                    {
-                        index = 0;
-                        listOfAllAssociatedPoints.Add(associatedUnexaminedPoints[index]);
-                        xVal = associatedUnexaminedPoints[index].X;
-                        yVal = associatedUnexaminedPoints[index].Y;
-                        foreach (Point pointToAdd in assessSurroundingPoint(new Point(xVal, yVal), internalLoopPoints,
-                                                                    listOfAllAssociatedPoints, associatedUnexaminedPoints))
-                        {
-                            resolvedLoop.Add(pointToAdd);
-                            tempDisplay.PixelToDisplay(pointToAdd, 900);
-                            reassessBounds(pointToAdd);
-                        }
-                        associatedUnexaminedPoints.RemoveAt(index);
-                    }
-                    tempDisplay.RenderBitmap();
-                    //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(tempDisplay.BitmapToRender);
-
-                    CurrentProgress += resolvedLoop.Count + 1;
-                    float currentPercentProgress = (((float)CurrentProgress / MaxProgress) * 100);
-                    Debug.Print(currentPercentProgress.ToString());
-                    yield return resolvedLoop;
-                }
-            }
-        }
 
         private const int segBorder = 10;
         private OCRSegment defineSegmentObjectToReturn(List<Point> loopOfPoints)
@@ -290,7 +182,7 @@ namespace Prax.Recognition
                     bool inBounds = i < labeledPixels.GetLength(0) && j < labeledPixels.GetLength(1) && i > 0 && j > 0;
                     if (inBounds && labeledPixels[i, j] != wordBoundary.outsideWord)
                     {
-                        correctedX = i - (leftBound) + (segBorder / 2) + 1; //This insures a buffer of 5 white pixels on every border
+                        correctedX = i - (leftBound) + (segBorder / 2) + 1; //This ensures a buffer of 5 white pixels on every border
                         correctedY = j - (topBound) + (segBorder / 2) + 1;
                         segment.InternalPoints[correctedX][correctedY] = uploadedDocument[i][j];
                         if (i < lowestXVal) lowestXVal = i;
@@ -309,52 +201,159 @@ namespace Prax.Recognition
         private bool testSegmentForPlausibilty(OCRSegment returnedSegment) //Refactor this functionality
         {
             //test the center pixels for complexity/information
-            if (returnedSegment.InternalPoints.Length > 14 && returnedSegment.InternalPoints[0].Length > 14)
+            if (returnedSegment.InternalPoints.Length > 14 && returnedSegment.InternalPoints[0].Length > 14 && returnedSegment.InternalPoints[0].Length < 200)
                 return true;
             else
                 return false;
         }
 
+        class AllBorderPoints {
+            private HashSet<Point> setOfBorderPoints = new HashSet<Point>();
+            public List<Point> listOfPoints = new List<Point>();
+            private wordBoundary[,] labeledPixels;
+            private int maxProgress, currentProgress = 0;
+            private int[][] uploadedDocument;
+            
 
-        public IEnumerable<OCRSegment> DefineSegments()
-        {
-            HashSet<Point> internalLoopPoints = new HashSet<Point>();
-            internalLoopPoints = findInternalLoopToProcess();
-            MaxProgress = internalLoopPoints.Count;
-            CurrentProgress = 0;
-            OCRSegment wordSegment = new OCRSegment();
-            foreach (List<Point> discreteLoop in defineDiscreteLoops(internalLoopPoints.ToList()))
-            {
-                if (discreteLoop.Count > 5)
-                {
-                    wordSegment = defineSegmentObjectToReturn(discreteLoop);
-                    if (testSegmentForPlausibilty(wordSegment)) //Factor out all sanity testing into one centralized place. Problem. Eliminate this method.
-                    {
-                        //wordSegment.SegmentLocation = discreteLoopRectangle;
-                        wordSegment.ThisSegmentIsAWord = true;
-                        foreach (OCRSegment subSegment in defineSubSegments(wordSegment))
-                        {
-                            subSegment.ThisSegmentIsAWord = false;
-                            //DisplayUtility.NewFormForDisplay temp2 = new DisplayUtility.NewFormForDisplay(subSegment.InternalPoints, subSegment.SegmentLocation.ToString());
-                            yield return subSegment;
+            public AllBorderPoints(wordBoundary[,] LabeledPixels, List<Point> outlnePoints, int[][] UploadedDocument) {
+                labeledPixels = LabeledPixels;
+                listOfPoints = outlnePoints;
+                setOfBorderPoints = ReturnInternalPoints(listOfPoints);
+                maxProgress = setOfBorderPoints.Count();
+                listOfPoints = setOfBorderPoints.ToList();
+                uploadedDocument = UploadedDocument;
+            }
+
+            private HashSet<Point> ReturnInternalPoints(List<Point> currentPoints) {
+                HashSet<Point> internalLoopPoints = new HashSet<Point>();
+                Point currentPoint;
+                for (int k = 0; k < currentPoints.Count; k++) {
+                    currentPoint = new Point(currentPoints[k].X, currentPoints[k].Y);
+                    for (int i = currentPoint.X - 1; i <= currentPoint.X + 1; i++) {
+                        for (int j = currentPoint.Y - 1; j <= currentPoint.Y + 1; j++) {
+                            if (labeledPixels[i, j] == wordBoundary.outsideWord && !internalLoopPoints.Contains(new Point(i, j))) {
+                                internalLoopPoints.Add(new Point(i, j));
+                            }
                         }
-                        //DisplayUtility.NewFormForDisplay temp = new DisplayUtility.NewFormForDisplay(wordSegment.InternalPoints, wordSegment.SegmentLocation.ToString());
+                    }
+                }
+                return internalLoopPoints;
+            }
 
-                        Bitmap bitmapSeg = DisplayUtility.ConvertDoubleArrayToBitmap(wordSegment.InternalPoints, Color.White);
-                        DisplaySegEventArgs eventArgs = new DisplaySegEventArgs(bitmapSeg, wordSegment.SegmentLocation);
-                        DispaySegEvent(eventArgs);
+            private IEnumerable<Point> assessSurroundingPoint(Point point, List<Point> internalLoopPoints,
+                HashSet<Point> listOfAllAssociatedPoints, List<Point> associatedUnexaminedPoints){
+                Point currentPoint;
+                for (int i = point.X - 1; i <= point.X + 1; i++){
+                    for (int j = point.Y - 1; j <= point.Y + 1; j++){
+                        currentPoint = new Point(i, j);
+                        if (internalLoopPoints.Contains(currentPoint) && !listOfAllAssociatedPoints.Contains(currentPoint)){
+                            listOfAllAssociatedPoints.Add(currentPoint);
+                            associatedUnexaminedPoints.Add(currentPoint);
+                            yield return currentPoint;
+                        }
+                    }
+                }
+            }
+            
+            private Rectangle discreteLoopRectangle;
 
+            private void reassessBounds(Point pointToAdd) {
+                int rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width,
+                    bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
 
-                        yield return wordSegment;
+                if (pointToAdd.X < discreteLoopRectangle.X)
+                    discreteLoopRectangle.X = pointToAdd.X;
+                if (pointToAdd.Y < discreteLoopRectangle.Y)
+                    discreteLoopRectangle.Y = pointToAdd.Y;
+                if (pointToAdd.X > rightBound) {
+                    discreteLoopRectangle.Width = pointToAdd.X - discreteLoopRectangle.X;
+                    rightBound = discreteLoopRectangle.X + discreteLoopRectangle.Width;
+                }
+                if (pointToAdd.Y > bottomBound) {
+                    discreteLoopRectangle.Height = pointToAdd.Y - discreteLoopRectangle.Y;
+                    bottomBound = discreteLoopRectangle.Y + discreteLoopRectangle.Height;
+                }
+                if (bottomBound < int.MaxValue)
+
+                    discreteLoopRectangle.Height = bottomBound - discreteLoopRectangle.Y;
+                if (rightBound < int.MaxValue)
+                    discreteLoopRectangle.Width = rightBound - discreteLoopRectangle.X;
+            }
+
+            public IEnumerable<List<Point>> ReturnWordLoops() {
+                HashSet<Point> listOfAllAssociatedPoints = new HashSet<Point>();
+                List<Point> associatedUnexaminedPoints = new List<Point>();
+                List<Point> pointUnexamiendOnce = new List<Point>();
+                int xVal, yVal;
+                int index;
+                for (int k = 0; k < listOfPoints.Count; k++) {
+                    if (!listOfAllAssociatedPoints.Contains(listOfPoints[k])) {
+                        associatedUnexaminedPoints.Add(listOfPoints[k]);
+                        List<Point> resolvedLoop = new List<Point>();
+                        discreteLoopRectangle = new Rectangle(int.MaxValue, int.MaxValue, 0, 0);
+                        while (associatedUnexaminedPoints.Count > 0) {
+                            index = 0;
+                            listOfAllAssociatedPoints.Add(associatedUnexaminedPoints[index]);
+                            xVal = associatedUnexaminedPoints[index].X;
+                            yVal = associatedUnexaminedPoints[index].Y;
+                            foreach (Point pointToAdd in assessSurroundingPoint(new Point(xVal, yVal), listOfPoints,
+                                                                        listOfAllAssociatedPoints, associatedUnexaminedPoints)) {
+                                resolvedLoop.Add(pointToAdd);
+                                reassessBounds(pointToAdd);
+                            }
+                            associatedUnexaminedPoints.RemoveAt(index);
+                        }
+                        DisplayUtility.NewFormForDisplay(listOfPoints, uploadedDocument);
+                        DisplayUtility.NewFormForDisplay(resolvedLoop, uploadedDocument);
+                        currentProgress += resolvedLoop.Count + 1;
+                        float currentPercentProgress = (((float)currentProgress / maxProgress) * 100);
+                        Debug.Print(currentPercentProgress.ToString());
+                        yield return resolvedLoop;
                     }
                 }
             }
         }
 
-        public void DispaySegEvent(DisplaySegEventArgs e)
-        {
+        private void SendSegmentToUI(int[][] content, Rectangle location) {
+            Bitmap bitmap = DisplayUtility.ConvertDoubleArrayToBitmap(content, Color.White);
+            DisplaySegEventArgs eventArgs = new DisplaySegEventArgs(bitmap,location);
+            DispaySegEvent(eventArgs);
+        }
+
+        private IEnumerable<OCRSegment> handleSegmentsSizes(AllBorderPoints borderPoints) {
+            //DisplayUtility.NewFormForDisplay(borderPoints.listOfPoints, uploadedDocument);
+            OCRSegment wordSegment = new OCRSegment();
+            foreach (List<Point> wordPointLoop in borderPoints.ReturnWordLoops()) {
+                //DisplayUtility.NewFormForDisplay(wordPointLoop, uploadedDocument);
+                if (wordPointLoop.Count > 5 && wordPointLoop.Count < 400) { //Test the amount of points in the loop
+                    wordSegment = defineSegmentObjectToReturn(wordPointLoop);
+                    if (testSegmentForPlausibilty(wordSegment)) {  //Test the dimensions of the points
+                        wordSegment.IsAWord = true;
+                        foreach (OCRSegment subSegment in defineSubSegments(wordSegment)) {
+                            subSegment.IsAWord = false;
+                            SendSegmentToUI(subSegment.InternalPoints, new Rectangle(0, 0, 0, 0)); //TODO: Derive the actual location of the subsegment
+                            yield return subSegment;
+                        }
+                        SendSegmentToUI(wordSegment.InternalPoints, wordSegment.SegmentLocation);
+                        yield return wordSegment;
+                    } else {
+                        AllBorderPoints next = new AllBorderPoints(labeledPixels, wordPointLoop, uploadedDocument);
+                        handleSegmentsSizes(next);
+                    }
+                } 
+            }
+        }
+
+        public IEnumerable<OCRSegment> DefineSegments(){
+            AllBorderPoints borderPoints = new AllBorderPoints(labeledPixels, wordOutlinePoints, uploadedDocument);
+            foreach(OCRSegment segmentToReturn in handleSegmentsSizes(borderPoints))
+                yield return segmentToReturn;
+        }
+
+        public void DispaySegEvent(DisplaySegEventArgs e){
             DisplaySeg(new object(), e);
         }
+        
         public static event DisplaySubSegmentHandler DisplaySeg;
 
         #endregion
