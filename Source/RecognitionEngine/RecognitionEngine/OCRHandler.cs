@@ -14,9 +14,9 @@ namespace Prax.Recognition
         public List<List<int>> listOfIndicies { get; private set; }
         public List<string> listOfIndexLabels { get; private set; }
 
-        public OCRHandler()
+        public OCRHandler(TrainingDataOptions openOptions)
         {
-            TrainingData TDLibrary = new TrainingData();
+            TrainingData TDLibrary = new TrainingData(openOptions);
             trainingLibrary = TDLibrary.trainingLibrary;
             listOfIndicies = TDLibrary.listOfIndicies;
             listOfIndexLabels = TDLibrary.listOfIndexLabels;
@@ -551,27 +551,6 @@ namespace Prax.Recognition
                 return null;
             }
         }
-
-        public HashSet<int> IndiciesToCheck = new HashSet<int>();
-
-        IEnumerable<int> getInspectionLabelIdicies()
-        {
-            foreach (int i in IndiciesToCheck)
-            {
-                yield return i;
-            }
-        }
-        /*
-        IEnumerable<int> getInspectionLabelIdicies()
-        {
-            for (int i = 0; i < numberOfUniqueLabels; i++)
-            {
-                if (IndiciesToCheck.Contains(listOfIndexLabels[i]))
-                { 
-                }    
-            }
-        } */
-
         #endregion
     }
 }

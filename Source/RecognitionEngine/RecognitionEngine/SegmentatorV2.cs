@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Prax.Recognition {
     class SegmentatorV2 {
@@ -102,7 +103,7 @@ namespace Prax.Recognition {
                 for (int startIdx = 0; startIdx < breakIndicies.Count - 1; startIdx++) {
                     int endIndex = startIdx + 1;
                     subSegmentWidth = breakIndicies[endIndex] - breakIndicies[startIdx];
-                    while (endIndex < breakIndicies.Count && subSegmentWidth <= MaxSegWidth && subSegmentWidth > 2) {
+                    while (endIndex < breakIndicies.Count && subSegmentWidth <= MaxSegWidth && subSegmentWidth > 1) {
                         subSegmentWidth = breakIndicies[endIndex] - breakIndicies[startIdx];
                         newSegmentToReturn = new int[subSegmentWidth][];
                         for (int i = 0; i < subSegmentWidth; i++)
@@ -183,9 +184,9 @@ namespace Prax.Recognition {
             seg.InternalPoints = doubleArrayToReturn;
             return seg;
         }
-
+        int counter = 0;
         public IEnumerable<OCRSegment> DefineSegments() {
-            int charWidth = 4; //Assumed, average char width 
+            int charWidth = 3; //Assumed, average char width 
             List<int> breakIndicies = new List<int>();
             calculateRowAndColumnSums();
             defineLineBreaks();
@@ -193,10 +194,11 @@ namespace Prax.Recognition {
                 allTextLines[i].LinearScan(uploadedDocument);
                 int numOfBreaks = allTextLines[i].ScanSum.Count / charWidth;
                 allTextLines[i].DefineSegmentBreaks(numOfBreaks);
-                int maxSegWidth = 10;
+                int maxSegWidth = 14;
                 foreach (OCRSegment seg in allTextLines[i].BuildSegments(maxSegWidth, uploadedDocument)) {
                     addBorder(seg);
-                    sendSegmentToUI(seg.InternalPoints, seg.SegmentLocation);
+                    //sendSegmentToUI(seg.InternalPoints, seg.SegmentLocation);
+                    Debug.Print((counter++).ToString());
                     yield return seg;
                 }
             }

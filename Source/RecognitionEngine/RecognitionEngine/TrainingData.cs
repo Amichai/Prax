@@ -15,15 +15,13 @@ namespace Prax.Recognition
         public List<string> listOfIndexLabels { get; private set; }
         //TODO: make these DS private and expose the data as functions (as few as possible)
 
-        public TrainingData() 
-        {
+        public TrainingData(TrainingDataOptions openOptions) {
             int piecesOfTrainingData = 0;
             string fileName = string.Empty;
                 
             fileName = "TrainingData.dat";
 
-            if (File.Exists(fileName))
-            {
+            if (File.Exists(fileName) && openOptions != TrainingDataOptions.reset){
                 FileStream openTrainingData = new FileStream(fileName, FileMode.Open);
                 BinaryFormatter formatter = new BinaryFormatter();
 
@@ -34,8 +32,10 @@ namespace Prax.Recognition
                 openTrainingData.Close();
                 piecesOfTrainingData = trainingLibrary.Count;
             }
-            else
-            {
+            if (openOptions == TrainingDataOptions.reset) {
+                File.Delete(fileName);
+            }
+            if(!File.Exists(fileName)){
                 trainingLibrary = new List<Tuple<string, List<int>>>();
                 listOfIndicies = new List<List<int>>();
                 listOfIndexLabels = new List<string>();

@@ -22,17 +22,20 @@ namespace Prax.Recognition
         private void uploadFile(object sender, EventArgs e)
         {
             upload.Enabled = false;
-            DisplayUtility.DefaultPictureBox = pictureBox;
-            uploadDocument = new UploadDocument(pictureBox);
+            uploadDocument = new UploadDocument();
             upload.Enabled = true;
         }
 
+        private enum segmentsToDisplay {segmentation, trainingSegments}
+
         private void trainAlgorithm(object sender, EventArgs e)
         {
+            segmentsToDisplay displayOptions = segmentsToDisplay.trainingSegments;
             train.Enabled = false;
-            DisplayUtility.DefaultPictureBox = pictureBox;
-            //AlgorithmTrainer.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
-            SegmentatorV2.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
+            if(displayOptions == segmentsToDisplay.trainingSegments)
+                AlgorithmTrainer.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
+            if(displayOptions == segmentsToDisplay.segmentation)
+                SegmentatorV2.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
             AlgorithmTrainer.DisplayResult += new DisplayResultHandler(ShowResult);
             AlgorithmTrainer trainHandler = new AlgorithmTrainer();
             train.Enabled = true;
@@ -41,6 +44,7 @@ namespace Prax.Recognition
         private void readDocument(object sender, EventArgs e)
         {
             read.Enabled = false;
+            SegmentatorV2.DisplaySeg += new DisplaySubSegmentHandler(ShowSeg);
             DocumentReader readHandler = new DocumentReader(uploadDocument.uploadedDocument);
             read.Enabled = true;
         }
@@ -51,6 +55,26 @@ namespace Prax.Recognition
         }
 
         private int yValueIndex = 0;
+
+        Bitmap segmentsToSave = new Bitmap(1,1);
+        int counter = 1;
+        private void SaveSegmentsToFile(Bitmap seg) {
+            Size imageSize; 
+            string filename = "allImages" + counter.ToString() + "matches"+ ".bmp";
+            if(seg.Width > segmentsToSave.Width)
+                imageSize = new Size(seg.Width, segmentsToSave.Height + seg.Height);
+            else
+                imageSize = new Size(segmentsToSave.Width, segmentsToSave.Height + seg.Height);
+            Bitmap newBitmap = new Bitmap(imageSize.Width, imageSize.Height);
+            Graphics g;
+            g = Graphics.FromImage(newBitmap);
+            g.DrawImage(segmentsToSave, new Point(0, 0));
+            g.DrawImage(seg, new Point(0,segmentsToSave.Height));
+            segmentsToSave = newBitmap;
+            segmentsToSave.Save(filename);
+            double fileSize = new FileInfo(filename).Length;
+            Debug.Print(fileSize.ToString());
+        }
 
         private void ShowSeg(object o, DisplaySegEventArgs e)
         {
@@ -68,6 +92,7 @@ namespace Prax.Recognition
             yValueIndex += lbl.Size.Height;
             segView.Controls.Add(lbl);
             yValueIndex -= 10;
+            //SaveSegmentsToFile(e.BitmapToDisplay);
         }
 
         private void ShowResult(object o, DisplayMatchResultArgs e)

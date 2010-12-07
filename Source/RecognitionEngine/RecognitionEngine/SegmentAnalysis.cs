@@ -6,32 +6,26 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text.RegularExpressions;
 using Prax.OcrEngine.Services;
+using System.Drawing;
+using System.Diagnostics;
 
 namespace Prax.Recognition {
     class SegmentAnalysis {
-        List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();
-        OCRHandler wordOCR = new OCRHandler();
+        public List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();
+        OCRHandler wordOCR = new OCRHandler(TrainingDataOptions.open);
         List<RecognizedSegment> lettersResolvedFromWord = new List<RecognizedSegment>();
 
-        private const int thresholdCertainty = 6000;
-
+        private const int thresholdCertainty = 500;
+        int didntReachCertaintyThreshold = 0;
         public void ProcessAndReadSegment(OCRSegment segment) {
-            if (segment.IsAWord == true) {
-                assessTheLettersResolvedFromWord();  //Handle border ambiguities between resolved letters
-                RecognizedSegment recognizedWord = new RecognizedSegment();
-                recognizedWord = readSegment(segment);
-                if (recognizedWord.Certainty > thresholdCertainty) {
-                    resolvedSegmentsList.Add(recognizedWord);
-                }
-            } else {
-                RecognizedSegment recognizedLetter = new RecognizedSegment();
-                recognizedLetter = readSegment(segment);
-                if (recognizedLetter.Certainty > thresholdCertainty) {
-                    //if (lettersResolvedFromWord.Count > 0 && recognizedLetter.Bounds.X - lettersResolvedFromWord[lettersResolvedFromWord.Count - 1].Bounds.X > thresholdDistance)
-                    //  lettersResolvedFromWord.Add(new RecognizedSegment());
+            RecognizedSegment recognizedWord = new RecognizedSegment();
+            recognizedWord = readSegment(segment);
 
-                    lettersResolvedFromWord.Add(recognizedLetter);
-                }
+            if (recognizedWord.Certainty > thresholdCertainty) {
+                resolvedSegmentsList.Add(recognizedWord);
+            } else {
+                Debug.Print((didntReachCertaintyThreshold++).ToString() + " didn't reach certainty threshold");
+                Debug.Print(recognizedWord.Certainty.ToString());
             }
         }
 
@@ -44,7 +38,7 @@ namespace Prax.Recognition {
                     if (seg.Bounds.X < currentIndex)
                         overlap.Add(new Tuple<int, int>(counter, currentIndex - seg.Bounds.X));
                     counter++;
-                    currentIndex = seg.Bounds.X + seg.Bounds.Width;
+                    currentIndex = seg.Bounds.Right;
                 }
             }
             for (int i = 0; i < overlap.Count(); i++) {
@@ -78,16 +72,9 @@ namespace Prax.Recognition {
             );
         }
 
-        private HashSet<int> indiciesOfLettersOnly = new HashSet<int>();
-
         private RecognizedSegment readSegment(OCRSegment segment) {
             Tuple<string, double> labelAndCertainty;
             labelAndCertainty = wordOCR.ReadDoubleArray(segment.InternalPoints);
-
-            if (!segment.IsAWord)
-                wordOCR.IndiciesToCheck = indiciesOfLettersOnly;
-            else
-                wordOCR.IndiciesToCheck = determineIndiciesToSearchFor();
 
             if (labelAndCertainty != null)
                 return new RecognizedSegment(segment.SegmentLocation,
@@ -100,7 +87,26 @@ namespace Prax.Recognition {
             ReadOnlyCollection<RecognizedSegment> readOnlyResults = resolvedSegmentsList.AsReadOnly();
             OutputRenderer outputRenderer = new OutputRenderer();
             FileStream outputFile = (FileStream)outputRenderer.Convert(null, readOnlyResults);
-            outputFile.Close();
+            if(outputFile != null)
+                outputFile.Close();
         }
+    }
+
+    [Serializable]
+    public struct RecognizedSegment {
+        public RecognizedSegment(Rectangle bounds, string text, double certainty)
+            : this() {
+            Bounds = bounds;
+            Text = text;
+            Certainty = certainty;
+        }
+
+        ///<summary>Gets the area in the image that contains the string.</summary>
+        public Rectangle Bounds { get; private set; }
+        ///<summary>Gets the recognized text.</summary>
+        public string Text { get; private set; }
+        ///<summary>Gets the certainty of the recognition, between 0 and 1.</summary>
+        public double Certainty { get; private set; }
+
     }
 }

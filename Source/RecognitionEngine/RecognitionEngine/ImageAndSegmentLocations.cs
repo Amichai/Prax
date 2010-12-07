@@ -9,14 +9,14 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Collections;
 using System.Windows.Forms;
-
+	
 namespace Prax.Recognition {
 	class ImageAndSegmentLocations {
 		private Tree segmentData = new Tree();
 		public Bitmap TrainingImage = new Bitmap(1, 1);
 		enum RenderMethod { LetterByLetter, WholeTextAtOnce, MeasureRanges };
 		public ImageAndSegmentLocations() {
-			RenderMethod renderMethod = RenderMethod.MeasureRanges;
+			RenderMethod renderMethod = RenderMethod.LetterByLetter;
 			string dataFileName = "Arabic Source.txt";
 			string dataFontName = "Times New Roman";
 			string dataSize = "16";
@@ -242,7 +242,6 @@ namespace Prax.Recognition {
 						objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
 						segmentData.AddLetter(new BoundedString(c.ToString(), new Rectangle((int)Math.Round(xIndex) + 2, (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height))));
 
-
 						wordWidth += width;
 					}
 					objGraphics.DrawString(" ", font, brush, xIndex, yIndex);
@@ -291,12 +290,16 @@ namespace Prax.Recognition {
 		}
 
 		public Tuple<string, double> LabelAtThisSegmentLocation(Rectangle segmentLocation, bool isWord) {
+			
 			double thresholdOverlap = .3;
+			int topBottomThreshold = 4;
 
 			var allSegments = isWord ? segmentData.Words : segmentData.Letters;
 
+
 			var newRectangles = allSegments.Where(t => Rectangle.Intersect(segmentLocation, t.Bounds).Width > 0 &&
-													   Rectangle.Intersect(t.Bounds, segmentLocation).Width / (double)t.Bounds.Width > thresholdOverlap);
+													   Rectangle.Intersect(t.Bounds, segmentLocation).Width / (double)t.Bounds.Width > thresholdOverlap
+													   && segmentLocation.Y - t.Bounds.Y < topBottomThreshold);
 			if (newRectangles.Any()) {
 				int width = newRectangles.Max(r => r.Bounds.Right) - newRectangles.Min(r => r.Bounds.X);
 				Rectangle newRect = new Rectangle(newRectangles.Min(r => r.Bounds.X), newRectangles.Min(r => r.Bounds.Y),
@@ -304,13 +307,16 @@ namespace Prax.Recognition {
 											newRectangles.Max(r => r.Bounds.Height));
 				string newString = string.Concat(newRectangles.Select(t => t.Text));
 				double overlapRating = getOverlapRating(newRect, segmentLocation);
-				if (overlapRating > thresholdOverlap && (double)segmentLocation.Width / newRect.Width > .8) {
+				if (overlapRating > thresholdOverlap && (double)segmentLocation.Width / newRect.Width > .7) {
 					return new Tuple<string, double>(newString, overlapRating);
+				} else {
+					Debug.Print("No match: " + noMatchCounter++.ToString() + " " + segmentLocation.ToString() + " " + newRect.ToString() + " certainty: " + overlapRating.ToString());
 				}
+
 			}
 			return null;
 		}
-
+		int noMatchCounter = 0;
 		#region letter conversion
 		private enum letterPosition {
 			start, middle, end, isolated

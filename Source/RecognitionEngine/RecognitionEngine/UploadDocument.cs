@@ -14,9 +14,8 @@ namespace Prax.Recognition
         private OpenFileDialog openFileDialog = new OpenFileDialog();
         private PictureBox pictureBox;
 
-        public UploadDocument(PictureBox picture)
+        public UploadDocument()
         {
-            pictureBox = picture;
             setDialogBoxSettings();
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
@@ -50,10 +49,6 @@ namespace Prax.Recognition
             }
             //FileBitmap = GraphicsHelper.MakeGrayscale(FileBitmap);
             #endregion
-
-            //Display Bitmap
-            DisplayUtility.DisplayBitmap(FileBitmap, pictureBox);
-
             uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
         }
 
