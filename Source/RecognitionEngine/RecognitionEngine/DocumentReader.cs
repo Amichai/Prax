@@ -21,6 +21,7 @@ namespace Prax.Recognition
 
                 foreach (OCRSegment segment in segmentation.DefineSegments()) {
                     segmentAnalysis.ProcessAndReadSegment(segment);
+                    //DisplayUtility.NewFormForDisplay(segment.InternalPoints);
                 }
             } if(readerOptions == ReaderOptions.readSavedOutput) {
                 segmentAnalysis.resolvedSegmentsList = SaveAndOpenUtility.OpenRecognizedSegments().ToList();

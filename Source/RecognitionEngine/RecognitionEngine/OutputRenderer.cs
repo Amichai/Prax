@@ -45,7 +45,7 @@ namespace Prax.Recognition
         {
             var doc = new iTextSharp.text.Document();
             PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
-            string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arabtype.ttf");
+            string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
             BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
             Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
 
@@ -56,7 +56,7 @@ namespace Prax.Recognition
 
             List<RecognizedSegment> sortedOutput = orderAllResults(results);
             
-            const int overlapThreshold = 3;
+            const int overlapThreshold = 1;
             const int spaceWidth = 2; //The amount of pixels in a space
             const int newLineYDiscrepancy = 3;
             string outputString = string.Empty;
@@ -94,15 +94,19 @@ namespace Prax.Recognition
                                     segToRender += segToResolve[j];
                                 }
                             }
-                        } else
-                            segToRender = segToResolve; 
+                            lastSegRendered += segToRender;
+                        } else {
+                            segToRender = segToResolve;
+                            lastSegRendered = segToResolve;
+                        }
                         //Print
-                        paragraph.Add(new string(segToRender.Reverse().ToArray()));
-                        lastSegRendered = segToResolve;
+                        paragraph.Add(segToRender);
+                        outputString += new string(segToRender.Reverse().ToArray());
                         xIndex = sortedOutput[i].Bounds.Right;
                     } else { //render without checking for spaces
                         lastSegRendered = sortedOutput[i].Text;
                         paragraph.Add(new string(sortedOutput[i].Text.Reverse().ToArray()));
+                        outputString += sortedOutput[i].Text;
                         xIndex = sortedOutput[i].Bounds.Right;
                         yIndex = sortedOutput[i].Bounds.Y;
                         position = writerPosition.sameLine;
@@ -112,6 +116,8 @@ namespace Prax.Recognition
             if (!paragraph.IsEmpty()) {
                 doc.Add(paragraph);
                 doc.Close();
+                outputString = new string(outputString.Reverse().ToArray());
+                File.WriteAllText("TxtToRender.txt", outputString);
                 FileStream returnedFileAsStream = new FileStream("pdfOutput.pdf", FileMode.Open);
                 return returnedFileAsStream;
             }
