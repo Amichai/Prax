@@ -100,7 +100,7 @@ namespace Prax.Recognition
                             lastSegRendered = segToResolve;
                         }
                         //Print
-                        paragraph.Add(segToRender);
+                        paragraph.Add(new string(segToRender.Reverse().ToArray()));
                         outputString += new string(segToRender.Reverse().ToArray());
                         xIndex = sortedOutput[i].Bounds.Right;
                     } else { //render without checking for spaces
