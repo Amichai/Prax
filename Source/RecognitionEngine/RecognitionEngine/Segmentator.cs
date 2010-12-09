@@ -316,8 +316,7 @@ namespace Prax.Recognition
 
         private void SendSegmentToUI(int[][] content, Rectangle location) {
             Bitmap bitmap = DisplayUtility.ConvertDoubleArrayToBitmap(content, Color.White);
-            DisplaySegEventArgs eventArgs = new DisplaySegEventArgs(bitmap,location);
-            DispaySegEvent(eventArgs);
+            OnDisplaySegment(new DisplaySegEventArgs(bitmap,location));
         }
 
         private IEnumerable<OCRSegment> handleSegmentsSizes(AllBorderPoints borderPoints) {
@@ -350,12 +349,11 @@ namespace Prax.Recognition
                 yield return segmentToReturn;
         }
 
-        public void DispaySegEvent(DisplaySegEventArgs e){
-            DisplaySeg(new object(), e);
-        }
-        
-        public static event DisplaySubSegmentHandler DisplaySeg;
-
+		public static event EventHandler<DisplaySegEventArgs> DisplaySegment;
+		void OnDisplaySegment(DisplaySegEventArgs e) {
+			var copy = DisplaySegment;
+			if (copy != null) copy(this, e);
+		}
         #endregion
 
         #region Resolve All Letter SubSegments
