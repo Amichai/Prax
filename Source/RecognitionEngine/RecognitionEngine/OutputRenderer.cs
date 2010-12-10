@@ -35,94 +35,158 @@ namespace Prax.Recognition
                 }
             }
 
-            sortedOutput = sortedOutput.OrderBy(k => k.Bounds.Width).OrderBy(k => k.Bounds.X).OrderBy(k => k.Bounds.Y).ToList();
+            sortedOutput = sortedOutput.OrderByDescending(k => k.Bounds.Width)
+                                        .OrderBy(k => k.Bounds.X)
+                                        .OrderBy(k => k.Bounds.Y).ToList();
             return sortedOutput;
         }
 
         private enum writerPosition { firstSeg, newLine, sameLine };
 
-        public Stream Convert(Stream input, ReadOnlyCollection<RecognizedSegment> results)
-        {
-            var doc = new iTextSharp.text.Document();
-            PdfWriter writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
-            string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
-            BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
+        private class lastSegmentRendered {
+            public lastSegmentRendered() {
+                startingXValue = int.MinValue;
+                endingXValue = int.MinValue;
+                YValue = 0;
+            }
+            public void ResetListOfPreviousRenderings() {
+                renderingsAndEndIdx = new List<Tuple<string, int>>();
+            }
 
-            Paragraph paragraph = new Paragraph(string.Empty, arabicFont);
-            paragraph.Alignment = Element.ALIGN_RIGHT;
+            public void RemoveOldRenderedString(RecognizedSegment seg) {
+                for (int k = 0; k < renderingsAndEndIdx.Count; k++) {
+                    if (renderingsAndEndIdx[k].Item2 <= seg.Bounds.X)
+                        renderingsAndEndIdx.RemoveAt(k);
+                    else
+                        k = renderingsAndEndIdx.Count;
+                }
+            }
+
+            public List<Tuple<string, int>> renderingsAndEndIdx = new List<Tuple<string, int>>();
             
-            doc.Open();
+            public int startingXValue, endingXValue, YValue;
 
+            public bool TestForNewLine(RecognizedSegment seg, writerPosition position) {
+                return Math.Abs(YValue - seg.Bounds.Y) > newLineYDiscrepancy && position != writerPosition.firstSeg;
+            }
+
+            public void AdjustLastSegValues(RecognizedSegment seg) {
+                endingXValue = seg.Bounds.Right;
+                startingXValue = seg.Bounds.X;
+                YValue = seg.Bounds.Y;
+            }
+        }
+
+        private class outputObject {
+            string outputString = string.Empty;
+            Paragraph paragraph;
+            iTextSharp.text.Document doc = new iTextSharp.text.Document();
+            PdfWriter writer;
+            public outputObject() {
+                writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
+                string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
+                BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
+                paragraph = new Paragraph(string.Empty, arabicFont);
+                paragraph.Alignment = Element.ALIGN_RIGHT;
+                doc.Open();
+            }
+
+            public void AddOutput(string outputToAdd) {
+                paragraph.Add(new string(outputToAdd.Reverse().ToArray()));
+                outputString += new string(outputToAdd.Reverse().ToArray());
+            }
+
+            public void PrintStoredOutput() {
+                if (!paragraph.IsEmpty()) {
+                    doc.Add(paragraph);
+                    doc.Close();
+                    outputString = new string(outputString.Reverse().ToArray());
+                    writer.Close();
+                    File.WriteAllText("TxtToRender.txt", outputString);
+                }
+            }
+        }
+        
+        const int newLineYDiscrepancy = 3;
+        
+        public void Convert(Stream input, ReadOnlyCollection<RecognizedSegment> results)
+        {
+            outputObject resultsRenderer = new outputObject();
             List<RecognizedSegment> sortedOutput = orderAllResults(results);
             
             const int overlapThreshold = 1;
-            const int spaceWidth = 2; //The amount of pixels in a space
-            const int newLineYDiscrepancy = 3;
-            string outputString = string.Empty;
-            int xIndex = columnStart;
-               //xIndex is the right bound of the last piece rendered
-            int yIndex = 0;
-            string lastSegRendered = string.Empty;
+            const int spaceWidth = 3; //The amount of pixels in a space
+            
+            lastSegmentRendered lastSeg = new lastSegmentRendered();
+            lastSeg.endingXValue = columnStart;
+            lastSeg.startingXValue = columnStart;
+
             writerPosition position = writerPosition.firstSeg;
 
             for (int i = 0; i < sortedOutput.Count; i++) {
                 //Test for new line
-                if (Math.Abs(yIndex - sortedOutput[i].Bounds.Y) > newLineYDiscrepancy && position != writerPosition.firstSeg) {
-                    paragraph.Add("\n");  //ylocation descrepancy greater than newLineYDiscrepancy
-                    outputString += Environment.NewLine;
+                if (lastSeg.TestForNewLine(sortedOutput[i], position)) {
+                    //New line determined
+                    resultsRenderer.AddOutput(Environment.NewLine);
+                    lastSeg.AdjustLastSegValues(sortedOutput[i]);
                     position = writerPosition.newLine;
-                    xIndex = columnStart;
-                    yIndex = sortedOutput[i].Bounds.Y;
                 } 
                 else {
-                    if (position == writerPosition.sameLine) {
+                    //Not a new line
+                    if (position == writerPosition.sameLine &&
+                        //check that the segment isn't wholly subsumed in the last
+                        !(sortedOutput[i].Bounds.X >= lastSeg.startingXValue
+                                && sortedOutput[i].Bounds.Right <= lastSeg.endingXValue)
+                        ) {
                         //Add spaces
-                        int numberOfSpaces = (sortedOutput[i].Bounds.X - xIndex) / spaceWidth; 
+                        int numberOfSpaces = (sortedOutput[i].Bounds.X - lastSeg.endingXValue) / spaceWidth; 
                         for (int j = 0; j < numberOfSpaces; j++) {
-                            paragraph.Add(" ");
-                            outputString += " ";
+                            resultsRenderer.AddOutput(" ");
                         }
-                        //check segment colision
                         string segToResolve = sortedOutput[i].Text;
-                        //Adjust the string to print in case of conflict
                         string segToRender = string.Empty;
-                        if (xIndex - sortedOutput[i].Bounds.X > overlapThreshold) {
+                        //Remove segments from the previous renderings list
+                        lastSeg.RemoveOldRenderedString(sortedOutput[i]);
+                        //Check for some degree of overlap
+                        if (lastSeg.endingXValue - sortedOutput[i].Bounds.X > overlapThreshold) {
+                            //Check if some characters can be removed from segToResolve
+                            string allPrevRenderings = string.Empty;
+                            foreach (string s in lastSeg.renderingsAndEndIdx.Select(k => k.Item1)) {
+                                allPrevRenderings += s;
+                            }
                             for (int j = 0; j < segToResolve.ToCharArray().Count(); j++) {
-                                char removeMe = segToResolve[j];
-                                if (!lastSegRendered.Contains(removeMe)) {
+                                if (!allPrevRenderings.Contains(segToResolve[j])) {
                                     segToRender += segToResolve[j];
+                                } else {
+                                    int idx = allPrevRenderings.IndexOf(segToResolve[j]);
+                                    allPrevRenderings = allPrevRenderings.Remove(idx, 1);
                                 }
                             }
-                            lastSegRendered += segToRender;
-                        } else {
-                            segToRender = segToResolve;
-                            lastSegRendered = segToResolve;
+                            lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(segToRender, sortedOutput[i].Bounds.Right));
+                            resultsRenderer.AddOutput(segToRender);
+                            lastSeg.AdjustLastSegValues(sortedOutput[i]);
+                        } else { 
+                            //No overlap. Clear list of previous rendrings
+                            lastSeg.ResetListOfPreviousRenderings();
+                            lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(sortedOutput[i].Text, sortedOutput[i].Bounds.Right));
+                            resultsRenderer.AddOutput(sortedOutput[i].Text);
+                            lastSeg.AdjustLastSegValues(sortedOutput[i]);
                         }
-                        //Print
-                        paragraph.Add(new string(segToRender.Reverse().ToArray()));
-                        outputString += new string(segToRender.Reverse().ToArray());
-                        xIndex = sortedOutput[i].Bounds.Right;
-                    } else { //render without checking for spaces
-                        lastSegRendered = sortedOutput[i].Text;
-                        paragraph.Add(new string(sortedOutput[i].Text.Reverse().ToArray()));
-                        outputString += sortedOutput[i].Text;
-                        xIndex = sortedOutput[i].Bounds.Right;
-                        yIndex = sortedOutput[i].Bounds.Y;
+                    }
+                    if (position == writerPosition.firstSeg) {
+                        //New line. Render without checking for spaces
+                        lastSeg.ResetListOfPreviousRenderings();
+                        lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(sortedOutput[i].Text, sortedOutput[i].Bounds.Right));
+                        resultsRenderer.AddOutput(sortedOutput[i].Text);
+                        lastSeg.AdjustLastSegValues(sortedOutput[i]);
                         position = writerPosition.sameLine;
                     }
                 }
             }
-            if (!paragraph.IsEmpty()) {
-                doc.Add(paragraph);
-                doc.Close();
-                outputString = new string(outputString.Reverse().ToArray());
-                File.WriteAllText("TxtToRender.txt", outputString);
-                FileStream returnedFileAsStream = new FileStream("pdfOutput.pdf", FileMode.Open);
-                return returnedFileAsStream;
-            }
-            return null;
+            resultsRenderer.PrintStoredOutput();
         }
+        
         public ResultFormat OutputFormat { get { return ResultFormat.Pdf; } }
     }
 }

@@ -86,9 +86,7 @@ namespace Prax.Recognition {
         public void PrintOutput() {
             ReadOnlyCollection<RecognizedSegment> readOnlyResults = resolvedSegmentsList.AsReadOnly();
             OutputRenderer outputRenderer = new OutputRenderer();
-            FileStream outputFile = (FileStream)outputRenderer.Convert(null, readOnlyResults);
-            if(outputFile != null)
-                outputFile.Close();
+            outputRenderer.Convert(null, readOnlyResults);
         }
     }
 
