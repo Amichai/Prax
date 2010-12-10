@@ -151,16 +151,16 @@ namespace Prax.Recognition
                         //Check for some degree of overlap
                         if (lastSeg.endingXValue - sortedOutput[i].Bounds.X > overlapThreshold) {
                             //Check if some characters can be removed from segToResolve
-                            string allPrevRenderings = string.Empty;
+                            string storedPrevRenderings = string.Empty;
                             foreach (string s in lastSeg.renderingsAndEndIdx.Select(k => k.Item1)) {
-                                allPrevRenderings += s;
+                                storedPrevRenderings += s;
                             }
                             for (int j = 0; j < segToResolve.ToCharArray().Count(); j++) {
-                                if (!allPrevRenderings.Contains(segToResolve[j])) {
+                                if (!storedPrevRenderings.Contains(segToResolve[j])) {
                                     segToRender += segToResolve[j];
                                 } else {
-                                    int idx = allPrevRenderings.IndexOf(segToResolve[j]);
-                                    allPrevRenderings = allPrevRenderings.Remove(idx, 1);
+                                    int idx = storedPrevRenderings.IndexOf(segToResolve[j]);
+                                    storedPrevRenderings = storedPrevRenderings.Remove(idx, 1);
                                 }
                             }
                             lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(segToRender, sortedOutput[i].Bounds.Right));

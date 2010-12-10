@@ -72,15 +72,20 @@ namespace Prax.Recognition {
 				int lineHeight = bottomBound - topBound;
 				int lineWidth = uploadedDocument.Length;
 				int yIndex;
+                List<Tuple<int, int>> TempScanSum = new List<Tuple<int, int>>();
 				for (int i = 0; i < lineWidth; i++) {
 					int tempSum = 0;
 					for (int j = 0; j < lineHeight; j++) {
 						yIndex = topBound + j;
 						tempSum += MyColor.Offest(uploadedDocument[i][yIndex]);
 					}
-					if (tempSum > 0)
-						ScanSum.Add(new Tuple<int, int>(tempSum, i));
+                    TempScanSum.Add(new Tuple<int, int>(tempSum, i));
 				}
+                for (int i = 1; i < TempScanSum.Count - 1; i++) {
+                    if(TempScanSum[i].Item1 > 0 || TempScanSum[i - 1].Item1 > 0 || TempScanSum[i + 1].Item1 > 0){
+                        ScanSum.Add(TempScanSum[i]);
+                    }
+                }
 			}
 
 			List<int> breakIndicies = new List<int>();
@@ -197,13 +202,10 @@ namespace Prax.Recognition {
 				int maxSegWidth = 14;
 				foreach (OCRSegment seg in allTextLines[i].BuildSegments(maxSegWidth, uploadedDocument)) {
 					addBorder(seg);
-					//sendSegmentToUI(seg.InternalPoints, seg.SegmentLocation);
-					Debug.Print((counter++).ToString());
 					yield return seg;
 				}
 			}
 		}
-
 		#region UI event
 		private void sendSegmentToUI(int[][] content, Rectangle location) {
 			Bitmap bitmap = DisplayUtility.ConvertDoubleArrayToBitmap(content, Color.White);
