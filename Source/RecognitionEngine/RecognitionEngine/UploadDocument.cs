@@ -10,7 +10,7 @@ namespace Prax.Recognition
 {
     class UploadDocument
     {
-        public int[][] uploadedDocument;
+        public int[][] uploadedDocument = null;
         private OpenFileDialog openFileDialog = new OpenFileDialog();
         private PictureBox pictureBox;
 

@@ -12,7 +12,7 @@ namespace Prax.Recognition
 {
     class OutputRenderer
     {
-        private int columnStart = 442; //int.MaxValue; 
+        private int columnStart = 0; //int.MaxValue; 
         //TODO: This won't be necessary when we enforce precise location
 
         private List<RecognizedSegment> orderAllResults(ReadOnlyCollection<RecognizedSegment> results) {
@@ -116,7 +116,7 @@ namespace Prax.Recognition
             List<RecognizedSegment> sortedOutput = orderAllResults(results);
             
             const int overlapThreshold = 1;
-            const int spaceWidth = 3; //The amount of pixels in a space
+            const int spaceWidth = 7; //The amount of pixels in a space
             
             lastSegmentRendered lastSeg = new lastSegmentRendered();
             lastSeg.endingXValue = columnStart;
@@ -174,7 +174,7 @@ namespace Prax.Recognition
                             lastSeg.AdjustLastSegValues(sortedOutput[i]);
                         }
                     }
-                    if (position == writerPosition.firstSeg) {
+                    if (position == writerPosition.firstSeg || position == writerPosition.newLine) {
                         //New line. Render without checking for spaces
                         lastSeg.ResetListOfPreviousRenderings();
                         lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(sortedOutput[i].Text, sortedOutput[i].Bounds.Right));

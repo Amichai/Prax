@@ -8,10 +8,11 @@ using System.Drawing;
 using System.IO;
 
 namespace Prax.Recognition {
-	public enum TrainingDataOptions { open, reset };
+	public enum TrainingDataOptions { openAndAddTo, reset };
 
 	class AlgorithmTrainer {
 		private enum DisplayOptions { none, everySegment, segmentsAndMatch, wordSegmentsAndMatch };
+		private enum TrainFunction { trainToo, justRenderImage }
 
 		public static event EventHandler<DisplaySegEventArgs> DisplaySegment;
 		public static event EventHandler<DisplayMatchResultArgs> DisplayResult;
@@ -28,6 +29,7 @@ namespace Prax.Recognition {
 		public AlgorithmTrainer() {
 			DisplayOptions testDisplayOptions = DisplayOptions.segmentsAndMatch;
 			TrainingDataOptions openOptions = TrainingDataOptions.reset;
+			TrainFunction trainFunction = TrainFunction.trainToo;
 
 			int[][] uploadedDocument = null;
 
@@ -43,8 +45,12 @@ namespace Prax.Recognition {
 					OnDisplaySegment(new DisplaySegEventArgs(bitmapSeg, segment.SegmentLocation));
 				}
 
-				Tuple<string, double> labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation, segment.IsAWord);
-				if (labelToTrainWith != null) {
+				Tuple<string, double> labelToTrainWith = null;
+				if(trainFunction == TrainFunction.trainToo)
+					labelToTrainWith = generateTrainingSeg.LabelAtThisSegmentLocation(segment.SegmentLocation, segment.IsAWord);
+				if (labelToTrainWith != null ) {
+					Debug.Print(labelToTrainWith.Item1 + " " + labelToTrainWith.Item2.ToString());
+					//DisplayUtility.NewFormForDisplay(segment.InternalPoints);
 					if (testDisplayOptions != DisplayOptions.none && (segment.IsAWord || testDisplayOptions != DisplayOptions.wordSegmentsAndMatch)) {
 						OnDisplayMatch(new DisplayMatchResultArgs(labelToTrainWith.Item1, segment.SegmentLocation, labelToTrainWith.Item2));
 
@@ -52,8 +58,6 @@ namespace Prax.Recognition {
 						OnDisplaySegment(new DisplaySegEventArgs(bitmapSeg, segment.SegmentLocation));
 					}
 					ocrHandler.TrainDoubleArray(segment.InternalPoints, labelToTrainWith.Item1);
-				} else {
-					//DisplayUtility.NewFormForDisplay(segment.InternalPoints);
 				}
 			}
 			ocrHandler.SaveTrainingData();

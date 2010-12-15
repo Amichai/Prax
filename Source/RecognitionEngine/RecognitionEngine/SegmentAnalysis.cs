@@ -12,7 +12,7 @@ using System.Diagnostics;
 namespace Prax.Recognition {
     class SegmentAnalysis {
         public List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();
-        OCRHandler wordOCR = new OCRHandler(TrainingDataOptions.open);
+        OCRHandler wordOCR = new OCRHandler(TrainingDataOptions.openAndAddTo);
         List<RecognizedSegment> lettersResolvedFromWord = new List<RecognizedSegment>();
 
         private const int thresholdCertainty = 500;
@@ -23,6 +23,7 @@ namespace Prax.Recognition {
 
             if (recognizedWord.Certainty > thresholdCertainty) {
                 resolvedSegmentsList.Add(recognizedWord);
+                Debug.Print(recognizedWord.Text);
             } else {
                 Debug.Print((didntReachCertaintyThreshold++).ToString() + " didn't reach certainty threshold");
                 Debug.Print(recognizedWord.Certainty.ToString());

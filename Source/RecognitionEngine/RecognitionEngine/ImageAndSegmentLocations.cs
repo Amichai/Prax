@@ -17,9 +17,9 @@ namespace Prax.Recognition {
 		enum RenderMethod { LetterByLetter, WholeTextAtOnce, MeasureRanges };
 		public ImageAndSegmentLocations() {
 			RenderMethod renderMethod = RenderMethod.LetterByLetter;
-			string dataFileName = "Arabic Source Short.txt";
+			string dataFileName = "doc2.txt";
 			string dataFontName = "Times New Roman";
-			string dataSize = "16";
+			string dataSize = "28";
 			string dataStyle = "".ToLower();
 
 			FontStyle style = FontStyle.Regular;
@@ -226,7 +226,8 @@ namespace Prax.Recognition {
 
 			float yIndex = docHeight / 4;
 			float tempWidth = docWidth - docWidth / 4;
-			SizeF spaceSize = objGraphics.MeasureStringSize(" ", font);
+			//SizeF spaceSize = objGraphics.MeasureStringSize(" ", font);
+            SizeF spaceSize = new SizeF(9, 0);
 			foreach (string line in lines) {
 				float xIndex = tempWidth;
 				foreach (string word in line.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)) {
@@ -240,7 +241,7 @@ namespace Prax.Recognition {
 
 						xIndex -= width;
 						objGraphics.DrawString(c.ToString(), font, brush, new PointF(xIndex, yIndex));
-						segmentData.AddLetter(new BoundedString(c.ToString(), new Rectangle((int)Math.Round(xIndex) + 2, (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height))));
+						segmentData.AddLetter(new BoundedString(c.ToString(), new Rectangle((int)Math.Round(xIndex) + 5, (int)Math.Round(yIndex), (int)Math.Round(width), (int)Math.Round(size.Height))));
 
 						wordWidth += width;
 					}
@@ -291,7 +292,7 @@ namespace Prax.Recognition {
 
 		public Tuple<string, double> LabelAtThisSegmentLocation(Rectangle segmentLocation, bool isWord) {
 			
-			double thresholdOverlap = .3;
+			double thresholdOverlap = .5;
 			int topBottomThreshold = 4;
 
 			var allSegments = isWord ? segmentData.Words : segmentData.Letters;
@@ -300,20 +301,40 @@ namespace Prax.Recognition {
 			var newRectangles = allSegments.Where(t => Rectangle.Intersect(segmentLocation, t.Bounds).Width > 0 &&
 													   Rectangle.Intersect(t.Bounds, segmentLocation).Width / (double)t.Bounds.Width > thresholdOverlap
 													   && segmentLocation.Y - t.Bounds.Y < topBottomThreshold);
-			if (newRectangles.Any()) {
-				int width = newRectangles.Max(r => r.Bounds.Right) - newRectangles.Min(r => r.Bounds.X);
-				Rectangle newRect = new Rectangle(newRectangles.Min(r => r.Bounds.X), newRectangles.Min(r => r.Bounds.Y),
-											width,
-											newRectangles.Max(r => r.Bounds.Height));
-				string newString = string.Concat(newRectangles.Select(t => t.Text));
-				double overlapRating = getOverlapRating(newRect, segmentLocation);
-				if (overlapRating > thresholdOverlap && (double)segmentLocation.Width / newRect.Width > .7) {
-					return new Tuple<string, double>(newString, overlapRating);
-				} else {
-					Debug.Print("No match: " + noMatchCounter++.ToString() + " " + segmentLocation.ToString() + " " + newRect.ToString() + " certainty: " + overlapRating.ToString());
-				}
+            if (newRectangles.Any()) {
+                foreach(BoundedString boundedString in newRectangles){
+                    int width = boundedString.Bounds.Right - boundedString.Bounds.X;
+                    double overlapRating = getOverlapRating(boundedString.Bounds, segmentLocation);
+                    double widthOverlap = (double)segmentLocation.Width / boundedString.Bounds.Width;
+                    if (overlapRating > thresholdOverlap && widthOverlap > .8 && 1/widthOverlap > .8) {
+                        Debug.Print("Match Found: " + segmentLocation.ToString() + " " + boundedString.Bounds.ToString());
+                        Debug.Print("OverlapRating: " + overlapRating.ToString() + " widthOverlap: " + widthOverlap.ToString());
+                        return new Tuple<string, double>(boundedString.Text, overlapRating);
+                    } else {
+                        Debug.Print("No Match: " + segmentLocation.ToString() + " " + boundedString.Bounds.ToString());
+                        Debug.Print("OverlapRating: " + overlapRating.ToString() + " widthOverlap: " + widthOverlap.ToString());
+                    }
+                }
+            }
 
-			}
+
+            //if (newRectangles.Any()) {
+            //    int width = newRectangles.Max(r => r.Bounds.Right) - newRectangles.Min(r => r.Bounds.X);
+            //    Rectangle newRect = new Rectangle(newRectangles.Min(r => r.Bounds.X), newRectangles.Min(r => r.Bounds.Y),
+            //                                width,
+            //                                newRectangles.Max(r => r.Bounds.Height));
+            //    string newString = string.Concat(newRectangles.Select(t => t.Text));
+            //    double overlapRating = getOverlapRating(newRect, segmentLocation);
+            //    double widthOverlap = (double)segmentLocation.Width / newRect.Width;
+            //    if (overlapRating > thresholdOverlap &&  widthOverlap > .8 && newString.Count() == 1) {
+            //        Debug.Print("OverlapRating: " + overlapRating.ToString() + " width ovelap: " + widthOverlap.ToString());
+            //        return new Tuple<string, double>(newString, overlapRating);
+            //    } else {
+            //        Debug.Print("No match: " + noMatchCounter++.ToString() + " " + segmentLocation.ToString() + " " + newRect.ToString() + " certainty: " + overlapRating.ToString());
+            //        Debug.Print("OverlapRating: " + overlapRating.ToString() + " width ovelap: " + widthOverlap.ToString());
+            //    }
+
+            //}
 			return null;
 		}
 		int noMatchCounter = 0;
@@ -338,7 +359,7 @@ namespace Prax.Recognition {
 			return char.MinValue;
 		}
 
-		private HashSet<int> restrictedForms = new HashSet<int> { 1570, 1571, 1573, 1575, 1577, 1583, 1584, 1585, 1586, 1608, 1609 };
+		private HashSet<int> restrictedForms = new HashSet<int> { 1570, 1571, 1573, 1575, 1577, 1583, 1584, 1585, 1586, 1608, 1609};
 
 		private enum arabicLetterForms {
 			restricted, unrestricted
@@ -356,6 +377,13 @@ namespace Prax.Recognition {
 
 			letterPosition currentPosition = letterPosition.middle;
 
+            //Check for symbols with no contextual forms
+            if (word[idx] == 1569)
+                return (char)65152;
+            if (word[idx] == 1572)
+                return (char)1572;
+
+                 
 			if (idx == word.Count() - 1)
 				currentPosition = letterPosition.end;
 			if (idx == 0) {
@@ -364,7 +392,7 @@ namespace Prax.Recognition {
 			}
 			if (word.Count() == 1)
 				currentPosition = letterPosition.isolated;
-
+            
 			int newCharVal = getContextualForm(currentChar);
 			if (newCharVal == char.MinValue)
 				return char.MinValue;
@@ -376,6 +404,21 @@ namespace Prax.Recognition {
 			if (idx < word.Count() - 1)
 				nextChar = word[idx + 1];
 
+            //Special case, broken glyph. Specific to rendering in WORD
+            if (newCharVal == 65263) {
+                if (currentPosition == letterPosition.isolated) //stand alone letter
+                    return (char)newCharVal;
+                if (currentPosition == letterPosition.start) {   //No right bind
+                    return (char)65267;
+                }
+                if (currentPosition == letterPosition.end) {  //Right bind only
+                    return (char)65264;
+                }
+                if (currentPosition == letterPosition.middle) { //Right and left bind
+                    return (char)65267;
+                }
+            }
+
 			int ligature = testForLigatures(currentChar, nextChar);
 			if (ligature != char.MinValue) {
 				newCharVal = ligature;
@@ -383,23 +426,24 @@ namespace Prax.Recognition {
 				idx++;
 			}
 
-			if (currentPosition == letterPosition.isolated) //stand alone letter
+            if (currentPosition == letterPosition.isolated) //stand alone letter
 			{
-				newCharVal = newCharVal + 0; //isolated glyph
-			}
+                newCharVal = newCharVal + 0; //isolated glyph
+            } else {
+                if (currentPosition == letterPosition.start || previousForm == arabicLetterForms.restricted) {   //No right bind
+                    if (currentForm == arabicLetterForms.restricted)
+                        newCharVal = newCharVal + 0; //isolated glyph
+                    if (currentForm == arabicLetterForms.unrestricted && currentPosition != letterPosition.end)
+                        newCharVal = newCharVal + 2; //starting glyph
+                }
 
-			if (currentPosition == letterPosition.start || previousForm == arabicLetterForms.restricted) {   //No right bind
-				if (currentForm == arabicLetterForms.restricted)
-					newCharVal = newCharVal + 0; //isolated glyph
-				if (currentForm == arabicLetterForms.unrestricted && currentPosition != letterPosition.end)
-					newCharVal = newCharVal + 2; //starting glyph
-			}
-			if ((currentPosition == letterPosition.end || currentForm == arabicLetterForms.restricted) && previousForm == arabicLetterForms.unrestricted) {  //Right bind only
-				newCharVal = newCharVal + 1;
-			}
-			if (currentPosition != letterPosition.end && currentForm == arabicLetterForms.unrestricted && previousForm == arabicLetterForms.unrestricted) { //Right and left bind
-				newCharVal = newCharVal + 3;
-			}
+                if ((currentPosition == letterPosition.end || currentForm == arabicLetterForms.restricted) && previousForm == arabicLetterForms.unrestricted) {  //Right bind only
+                    newCharVal = newCharVal + 1;
+                }
+                if (currentPosition != letterPosition.end && currentForm == arabicLetterForms.unrestricted && previousForm == arabicLetterForms.unrestricted) { //Right and left bind
+                    newCharVal = newCharVal + 3;
+                }
+            }
 
 			previousForm = currentForm;
 			return (char)newCharVal;
@@ -407,6 +451,7 @@ namespace Prax.Recognition {
 
 		int getContextualForm(int currentChar) {
 			switch (currentChar) {
+                case 1574: return 65161;
 				case 1575: return 65165;
 				case 1576: return 65167;
 				case 1578: return 65173;

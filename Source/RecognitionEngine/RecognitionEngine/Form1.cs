@@ -40,6 +40,7 @@ namespace Prax.Recognition {
 			read.Enabled = false;
 			SegmentatorV2.DisplaySegment += ShowSeg;
 			DocumentReader readHandler = new DocumentReader(uploadDocument.uploadedDocument);
+			//DocumentReader readHandler = new DocumentReader();
 			read.Enabled = true;
 		}
 
