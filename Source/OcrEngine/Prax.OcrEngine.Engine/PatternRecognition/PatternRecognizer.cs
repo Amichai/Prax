@@ -21,7 +21,9 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 			public int count;
 			double mean, M2;
 
-			public double calcOnlineVar(double x) {
+			///<summary>Adds a number to the variated set.</summary>
+			///<returns>The new variance.</returns>
+			public double AddSample(double x) {
 				count++;
 				double delta = x - mean;
 				mean = mean + delta / count;
@@ -34,17 +36,15 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 
 		///<summary>Matches a set of data to the closest match in a set of reference data.</summary>
 		public RecognizedPattern Recognize(IReferenceSet set, int[] data) {
-			double[][] probabilityFromEachHeuristic = new double[set.Labels.Count][];
-			double[][] lblComparisonResults = new double[set.Labels.Count][];
-			double[] labelProbability;
+			double[][] labelScores = new double[set.Labels.Count][];
 
 			double[] totalComparison_test = new double[set.Labels.Count];	//TODO: Delete this? Its values are never used!
 
+			//TODO: Why did this use to be static?
 			RollingVariance[][] variances = new RollingVariance[set.Labels.Count][];
 
 			for (int i = 0; i < set.Labels.Count; i++) {
-				probabilityFromEachHeuristic[i] = new double[set.HeuristicCount];
-				lblComparisonResults[i] = new double[set.HeuristicCount];
+				labelScores[i] = new double[set.HeuristicCount];
 				variances[i] = new RollingVariance[set.HeuristicCount];
 			}
 
@@ -56,13 +56,13 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 				var labelSamples = labelData[label];
 
 				for (int h = 0; h < set.HeuristicCount; h++) {
-					if (data[h] == -1)
-						continue;		//TODO:  || data[h] == 0) //RESOLVE THE NECESSITY OF != 0 IN THIS STATEMENT
+					if (data[h] == -1)	//TODO:  || data[h] == 0) //RESOLVE THE NECESSITY OF != 0 IN THIS STATEMENT
+						continue;		
 
 					var score = labelSamples.Count(r => r.Data[h] == data[h]);
 
 					totalComparison_test[label] += score;
-					lblComparisonResults[label][h] = (double)score / labelSamples.Count;
+					labelScores[label][h] = (double)score / labelSamples.Count;
 				}
 			}
 
@@ -71,50 +71,56 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 
 			//We are working to produce two DSs: lblComparisonResults[][], totalComparison_test[]
 
-			double heuristicProbabilisticIndication;
-			double multiplicativeOffset;
-			labelProbability = new double[set.Labels.Count];
-			double maxProb = 0;
-			int maxProbIndex = 0;
+			var labelProbabilities = new double[set.Labels.Count];
+
+			double bestProb = 0;
+			int bestLabel = 0;
+
 			double aprioriProb = 1.0 / (double)set.Labels.Count;
 			double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
 
-			for (int inspectionLbl = 0; inspectionLbl < set.Labels.Count; inspectionLbl++) {
-				labelProbability[inspectionLbl] = 1.0 / (double)set.Labels.Count;
-				for (int heurIdx = 0; heurIdx < set.HeuristicCount; heurIdx++) {
-					double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
-					double comparisonToOtherLabels = 0;
-					for (int comparisonLbl = 0; comparisonLbl < set.Labels.Count; comparisonLbl++) {
-						if (inspectionLbl != comparisonLbl)
-							comparisonToOtherLabels += lblComparisonResults[comparisonLbl][heurIdx];
-					}
+			for (int label = 0; label < set.Labels.Count; label++) {
+				labelProbabilities[label] = aprioriProb;
 
-					if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
-						heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
-						buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, inspectionLbl, heurIdx);
-						multiplicativeOffset = variances[inspectionLbl][heurIdx].calcOnlineVar(heuristicProbabilisticIndication);
+				for (int h = 0; h < set.HeuristicCount; h++) {
+					double comparisonToThisLabel = labelScores[label][h];
 
-						multiplicativeOffset += aprioriProb / (double)variances[inspectionLbl][heurIdx].count;
+					//Get the total score against other labels in this heuristic
+					double comparisonToOtherLabels = labelScores
+						.Where((a, i) => i != label)
+						.Sum(a => a[h]);
 
-						if (multiplicativeOffset < double.MaxValue)
-							labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+					//TODO: Since label scores cannot be negative, I assume that these two lines are equivalent
+					//if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
+					if (comparisonToThisLabel == 0 && comparisonToOtherLabels == 0)
+						continue;
 
-						if (double.IsInfinity(labelProbability[inspectionLbl]) || labelProbability[inspectionLbl] == 0)
-							heurIdx = set.HeuristicCount;
-					}
+					var heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
+					buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, label, h);
+
+					var multiplicativeOffset = variances[label][h].AddSample(heuristicProbabilisticIndication);
+					multiplicativeOffset += aprioriProb / (double)variances[label][h].count;
+
+					if (multiplicativeOffset < double.MaxValue)
+						labelProbabilities[label] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) 
+												 / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+
+					if (double.IsInfinity(labelProbabilities[label]) || labelProbabilities[label] == 0)
+						h = set.HeuristicCount;	//TODO: Huh? What on earth? Do you mean break;?
 				}
 
-				if (labelProbability[inspectionLbl] > maxProb && labelData[maxProbIndex].Count > 0) {
-					maxProb = labelProbability[inspectionLbl];
-					maxProbIndex = inspectionLbl;
+				if (labelProbabilities[label] > bestProb && labelData[bestLabel].Count > 0) {
+					bestProb = labelProbabilities[label];
+					bestLabel = label;
 				}
 			}
-			if (maxProb > 0)
-				return new RecognizedPattern(set.Labels[maxProbIndex], maxProb);
+			if (bestProb > 0)
+				return new RecognizedPattern(set.Labels[bestLabel], bestProb);
 			return null;
 		}
 
 		//From HeuristicsControlPanel
+		//TODO: Why did this use to be static?
 		private int[] probabilityHistorgram = new int[21];
 		public void buildHeuristicProbabilityHistorgram(double probability, int labelUnderInspection, int heuristicUnderInspection) {
 			if (probability == 1)
