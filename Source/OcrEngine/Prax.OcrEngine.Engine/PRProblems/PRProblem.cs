@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 
-namespace Prax.OcrEngine.Engine.PRProblems {
+namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 	///<summary>Converts data arrays into PR heuristics.</summary>
-	public abstract class PRProblem {
-		protected PRProblem(int[][] data) { OriginalBoard = new ProblemBoard(data); }
+	public abstract class HeuristicGenerator {
+		protected HeuristicGenerator(int[][] data) { OriginalBoard = new DataMatrix(data); }
 
 		///<summary>Gets the original data that will be converted.</summary>
-		public ProblemBoard OriginalBoard { get; private set; }
+		public DataMatrix OriginalBoard { get; private set; }
 		///<summary>Gets the converted data as of the current iteration.</summary>
 		///<remarks>This is set by the BuildData method.</remarks>
-		public ProblemBoard IteratedBoard { get; protected set; }
+		public DataMatrix IteratedBoard { get; protected set; }
 
 		public virtual int ConsolidationConstant { get { return 3; } }
 
@@ -27,7 +27,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
 			List<int> heuristics = new List<int>(OriginalBoard.Area * iterationCount);
 
 			for (int i = 0; i < iterationCount; i++) {
-				IteratedBoard = new ProblemBoard(this.IterateBoard());
+				IteratedBoard = new DataMatrix(this.IterateBoard());
 
 				//A new set of heuristics is added after each iteration
 				heuristics.AddRange(IteratedBoard.ToList());
@@ -38,7 +38,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
 		//TODO: Visualization methods
 	}
 
-	class WordRecognition : PRProblem {
+	class WordRecognition : HeuristicGenerator {
 		public WordRecognition(int[][] data)
 			: base(data) {
 			this.IteratedBoard = this.OriginalBoard;
@@ -48,7 +48,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
 		}
 	}
 
-	class LetterRecognition : PRProblem {
+	class LetterRecognition : HeuristicGenerator {
 		public LetterRecognition(int[][] data)
 			: base(data) {
 			this.IteratedBoard = this.OriginalBoard;
@@ -69,13 +69,13 @@ namespace Prax.OcrEngine.Engine.PRProblems {
 
 			for (int i = 1; i < width - 1; i++) {
 				for (int j = 1; j < height - 1; j++) {
-					surroundingPxls[0] = IteratedBoard.Board[i - 1][j];
-					surroundingPxls[1] = IteratedBoard.Board[i][j - 1];
-					surroundingPxls[2] = IteratedBoard.Board[i + 1][j];
-					surroundingPxls[3] = IteratedBoard.Board[i][j + 1];
+					surroundingPxls[0] = IteratedBoard.Data[i - 1][j];
+					surroundingPxls[1] = IteratedBoard.Data[i][j - 1];
+					surroundingPxls[2] = IteratedBoard.Data[i + 1][j];
+					surroundingPxls[3] = IteratedBoard.Data[i][j + 1];
 
 					for (int k = 0; k < 4; k++)
-						surroundingDiscrepancyPxls[k] = Math.Abs(IteratedBoard.Board[i][j] - surroundingPxls[k]);
+						surroundingDiscrepancyPxls[k] = Math.Abs(IteratedBoard.Data[i][j] - surroundingPxls[k]);
 
 					averageSurroundingDiscrepPxls = (int)surroundingDiscrepancyPxls.Average();	//TODO: Are you sure you want to truncate?
 					rangeOfSurroundingDiscrepPxls = surroundingDiscrepancyPxls.Max() - surroundingDiscrepancyPxls.Min();
@@ -88,7 +88,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
 		}
 	}
 
-	class WhitespaceRecognition : PRProblem {
+	class WhitespaceRecognition : HeuristicGenerator {
 		public WhitespaceRecognition(int[][] data)
 			: base(data) {
 			this.IteratedBoard = this.OriginalBoard;
