@@ -7,11 +7,12 @@ using System.ComponentModel;
 
 namespace Prax.OcrEngine.Engine.ReferenceData {
 	///<summary>Stores a single labeled item from reference data.</summary>
+	///<remarks>These objects are very large (especially in aggregate) and should be avoided wherever possible.</remarks>
 	[ImmutableObject(true)]
 	public sealed class ReferenceItem {
 		///<summary>The label describing this item.</summary>
 		public string Label { get; private set; }
 		///<summary>Data corresponding to the item.</summary>
 		public ReadOnlyCollection<int> Data { get; private set; }
-    }
+	}
 }
