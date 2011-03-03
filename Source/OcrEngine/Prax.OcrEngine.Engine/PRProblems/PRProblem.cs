@@ -2,24 +2,47 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Engine.PRProblems {
     public abstract class PRProblem {
-        public ProblemBoard OrigionalBoard;
-        public ProblemBoard IteratedBoard;
-        public const int consolidationConstant = 3;
-        public virtual int[][] IterateBoard();
+        protected PRProblem(int[][] data) { OriginalBoard = new ProblemBoard(data); }
+        public ProblemBoard OriginalBoard { get; private set; }
+        public ProblemBoard IteratedBoard { get; protected set; }
+        public virtual int ConsolidationConstant { get { return 3; } }
+        public abstract int[][] IterateBoard();
+
+        private int numberOfIterations = 50;
+        public ReadOnlyCollection<int> BuildData() {
+            List<int> heuristics = new List<int>(OriginalBoard.Area);
+            for (int i = 0; i < numberOfIterations; i++) {
+                this.IterateBoard();
+                //A new set of heuristics is added after each iteration
+                heuristics.AddRange(this.IteratedBoard.BoardToList());
+            }
+            return new ReadOnlyCollection<int>(heuristics);
+        }
+
         //Visualization methods
     }
 
-    class WordRecognition : PRProblem { }
+    class WordRecognition : PRProblem {
+        public WordRecognition(int[][] data)
+            : base(data) {
+            this.IteratedBoard = this.OriginalBoard;
+        }
+        public override int[][] IterateBoard() {
+            throw new NotImplementedException();
+        }
+    }
 
     class LetterRecognition : PRProblem {
-        public LetterRecognition(int[][] board) {
-            this.OrigionalBoard = new ProblemBoard(board);
-            this.IteratedBoard = this.OrigionalBoard;
-        }
-        public int[][] IterateBoard() {
+        public LetterRecognition(int[][] data)
+            : base(data) {
+            this.IteratedBoard = this.OriginalBoard;
+        }     
+
+        public override int[][] IterateBoard() {
             int width = IteratedBoard.Width;
             int height = IteratedBoard.Height;
             int averageSurroundingDiscrepPxls;
@@ -28,7 +51,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
             int[] surroundingDiscrepancyPxls = new int[4];
 
             int[][] newBoard = new int[width][];
-            for(int i=0;i < width; i++){
+            for (int i = 0; i < width; i++) {
                 newBoard[i] = new int[height];
             }
 
@@ -48,7 +71,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
                     rangeOfSurroundingPxls = Math.Max(Math.Max(surroundingPxls[0], surroundingPxls[1]), Math.Max(surroundingPxls[2], surroundingPxls[3]))
                                             - Math.Min(Math.Min(surroundingPxls[0], surroundingPxls[1]), Math.Min(surroundingPxls[2], surroundingPxls[3]));
 
-                    newBoard[i][j] = ((averageSurroundingDiscrepPxls * rangeOfSurroundingPxls) / ((rangeOfSurroundingDiscrepPxls / 4) + 1)) / consolidationConstant;
+                    newBoard[i][j] = ((averageSurroundingDiscrepPxls * rangeOfSurroundingPxls) / ((rangeOfSurroundingDiscrepPxls / 4) + 1)) / ConsolidationConstant;
                 }
             }
             IteratedBoard = new ProblemBoard(newBoard);
@@ -56,5 +79,13 @@ namespace Prax.OcrEngine.Engine.PRProblems {
         }
     }
 
-    class WhitespaceRecognition : PRProblem { }
+    class WhitespaceRecognition : PRProblem {
+        public WhitespaceRecognition(int[][] data)
+            : base(data) {
+            this.IteratedBoard = this.OriginalBoard;
+        }
+        public override int[][] IterateBoard() {
+            throw new NotImplementedException();
+        }
+    }
 }
