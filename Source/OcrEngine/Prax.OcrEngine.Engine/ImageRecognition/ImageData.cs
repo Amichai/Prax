@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Drawing;
 
 namespace Prax.OcrEngine.Engine.ImageRecognition {
 	///<summary>Stores image data and recognized information.</summary>
@@ -17,6 +18,8 @@ namespace Prax.OcrEngine.Engine.ImageRecognition {
 	/// and final output from OCR.
 	///</remarks>
 	class ImageData {
+		Bitmap UploadedImage;
+		int[][] ImageMatrix;
 		//TODO: Color or B&W?
 	}
 }
