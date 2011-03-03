@@ -76,7 +76,6 @@ namespace Prax.Recognition
             submitLabel(label);
         }
 
-
         public Tuple<string, double> ReadDoubleArray(int[][] doubleArray)
         {
             Tuple<string, double> resolvedSegment;

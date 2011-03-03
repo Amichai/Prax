@@ -41,7 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HeuristicArray\HeuristicArray.cs" />
     <Compile Include="ImageRecognition\ImageData.cs" />
     <Compile Include="ImageRecognition\ImageWorkflow.cs" />
     <Compile Include="PatternRecognition\PatternRecognizer.cs" />
