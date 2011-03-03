@@ -5,87 +5,96 @@ using System.Text;
 using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Engine.PRProblems {
-    public abstract class PRProblem {
-        protected PRProblem(int[][] data) { OriginalBoard = new ProblemBoard(data); }
-        public ProblemBoard OriginalBoard { get; private set; }
-        public ProblemBoard IteratedBoard { get; protected set; }
-        public virtual int ConsolidationConstant { get { return 3; } }
-        public abstract int[][] IterateBoard();
+	///<summary>Converts data arrays into PR heuristics.</summary>
+	public abstract class PRProblem {
+		protected PRProblem(int[][] data) { OriginalBoard = new ProblemBoard(data); }
 
-        private int numberOfIterations = 50;
-        public ReadOnlyCollection<int> BuildData() {
-            List<int> heuristics = new List<int>(OriginalBoard.Area);
-            for (int i = 0; i < numberOfIterations; i++) {
-                this.IterateBoard();
-                //A new set of heuristics is added after each iteration
-                heuristics.AddRange(this.IteratedBoard.BoardToList());
-            }
-            return new ReadOnlyCollection<int>(heuristics);
-        }
+		///<summary>Gets the original data that will be converted.</summary>
+		public ProblemBoard OriginalBoard { get; private set; }
+		///<summary>Gets the converted data as of the current iteration.</summary>
+		///<remarks>This is set by the BuildData method.</remarks>
+		public ProblemBoard IteratedBoard { get; protected set; }
 
-        //Visualization methods
-    }
+		public virtual int ConsolidationConstant { get { return 3; } }
 
-    class WordRecognition : PRProblem {
-        public WordRecognition(int[][] data)
-            : base(data) {
-            this.IteratedBoard = this.OriginalBoard;
-        }
-        public override int[][] IterateBoard() {
-            throw new NotImplementedException();
-        }
-    }
+		///<summary>Processes the data.</summary>
+		///<returns>The new data after the current iteration.</returns>
+		public abstract int[][] IterateBoard();
 
-    class LetterRecognition : PRProblem {
-        public LetterRecognition(int[][] data)
-            : base(data) {
-            this.IteratedBoard = this.OriginalBoard;
-        }     
+		private const int iterationCount = 50;
 
-        public override int[][] IterateBoard() {
-            int width = IteratedBoard.Width;
-            int height = IteratedBoard.Height;
-            int averageSurroundingDiscrepPxls;
-            int rangeOfSurroundingPxls, rangeOfSurroundingDiscrepPxls;
-            int[] surroundingPxls = new int[4];
-            int[] surroundingDiscrepancyPxls = new int[4];
+		public ReadOnlyCollection<int> BuildData() {
+			List<int> heuristics = new List<int>(OriginalBoard.Area * iterationCount);
 
-            int[][] newBoard = new int[width][];
-            for (int i = 0; i < width; i++) {
-                newBoard[i] = new int[height];
-            }
+			for (int i = 0; i < iterationCount; i++) {
+				IteratedBoard = new ProblemBoard(this.IterateBoard());
 
-            for (int i = 1; i < width - 1; i++) {
-                for (int j = 1; j < height - 1; j++) {
-                    surroundingPxls[0] = IteratedBoard.Board[i - 1][j];
-                    surroundingPxls[1] = IteratedBoard.Board[i][j - 1];
-                    surroundingPxls[2] = IteratedBoard.Board[i + 1][j];
-                    surroundingPxls[3] = IteratedBoard.Board[i][j + 1];
+				//A new set of heuristics is added after each iteration
+				heuristics.AddRange(IteratedBoard.ToList());
+			}
+			return new ReadOnlyCollection<int>(heuristics);
+		}
 
-                    for (int k = 0; k < 4; k++)
-                        surroundingDiscrepancyPxls[k] = Math.Abs(IteratedBoard.Board[i][j] - surroundingPxls[k]);
-                    averageSurroundingDiscrepPxls = (surroundingDiscrepancyPxls[0] + surroundingDiscrepancyPxls[1]
-                                            + surroundingDiscrepancyPxls[2] + surroundingDiscrepancyPxls[3]) / 4;
-                    rangeOfSurroundingDiscrepPxls = Math.Max(Math.Max(surroundingDiscrepancyPxls[0], surroundingDiscrepancyPxls[1]), Math.Max(surroundingDiscrepancyPxls[2], surroundingDiscrepancyPxls[3]))
-                                            - Math.Min(Math.Min(surroundingDiscrepancyPxls[0], surroundingDiscrepancyPxls[1]), Math.Min(surroundingDiscrepancyPxls[2], surroundingDiscrepancyPxls[3]));
-                    rangeOfSurroundingPxls = Math.Max(Math.Max(surroundingPxls[0], surroundingPxls[1]), Math.Max(surroundingPxls[2], surroundingPxls[3]))
-                                            - Math.Min(Math.Min(surroundingPxls[0], surroundingPxls[1]), Math.Min(surroundingPxls[2], surroundingPxls[3]));
+		//TODO: Visualization methods
+	}
 
-                    newBoard[i][j] = ((averageSurroundingDiscrepPxls * rangeOfSurroundingPxls) / ((rangeOfSurroundingDiscrepPxls / 4) + 1)) / ConsolidationConstant;
-                }
-            }
-            IteratedBoard = new ProblemBoard(newBoard);
-            return newBoard;
-        }
-    }
+	class WordRecognition : PRProblem {
+		public WordRecognition(int[][] data)
+			: base(data) {
+			this.IteratedBoard = this.OriginalBoard;
+		}
+		public override int[][] IterateBoard() {
+			throw new NotImplementedException();
+		}
+	}
 
-    class WhitespaceRecognition : PRProblem {
-        public WhitespaceRecognition(int[][] data)
-            : base(data) {
-            this.IteratedBoard = this.OriginalBoard;
-        }
-        public override int[][] IterateBoard() {
-            throw new NotImplementedException();
-        }
-    }
+	class LetterRecognition : PRProblem {
+		public LetterRecognition(int[][] data)
+			: base(data) {
+			this.IteratedBoard = this.OriginalBoard;
+		}
+
+		public override int[][] IterateBoard() {
+			int width = IteratedBoard.Width;
+			int height = IteratedBoard.Height;
+			int averageSurroundingDiscrepPxls;
+			int rangeOfSurroundingPxls, rangeOfSurroundingDiscrepPxls;
+			int[] surroundingPxls = new int[4];
+			int[] surroundingDiscrepancyPxls = new int[4];
+
+			int[][] newBoard = new int[width][];
+			for (int i = 0; i < width; i++) {
+				newBoard[i] = new int[height];
+			}
+
+			for (int i = 1; i < width - 1; i++) {
+				for (int j = 1; j < height - 1; j++) {
+					surroundingPxls[0] = IteratedBoard.Board[i - 1][j];
+					surroundingPxls[1] = IteratedBoard.Board[i][j - 1];
+					surroundingPxls[2] = IteratedBoard.Board[i + 1][j];
+					surroundingPxls[3] = IteratedBoard.Board[i][j + 1];
+
+					for (int k = 0; k < 4; k++)
+						surroundingDiscrepancyPxls[k] = Math.Abs(IteratedBoard.Board[i][j] - surroundingPxls[k]);
+
+					averageSurroundingDiscrepPxls = (int)surroundingDiscrepancyPxls.Average();	//TODO: Are you sure you want to truncate?
+					rangeOfSurroundingDiscrepPxls = surroundingDiscrepancyPxls.Max() - surroundingDiscrepancyPxls.Min();
+					rangeOfSurroundingPxls = surroundingPxls.Max() - surroundingPxls.Min();
+
+					newBoard[i][j] = ((averageSurroundingDiscrepPxls * rangeOfSurroundingPxls) / ((rangeOfSurroundingDiscrepPxls / 4) + 1)) / ConsolidationConstant;
+				}
+			}
+			return newBoard;
+		}
+	}
+
+	class WhitespaceRecognition : PRProblem {
+		public WhitespaceRecognition(int[][] data)
+			: base(data) {
+			this.IteratedBoard = this.OriginalBoard;
+		}
+		public override int[][] IterateBoard() {
+			throw new NotImplementedException();
+		}
+	}
 }

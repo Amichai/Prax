@@ -18,7 +18,7 @@ namespace Prax.OcrEngine.Engine.PRProblems {
             this.Area = this.Width * this.Height;
         }
 
-        public List<int> BoardToList() {
+        public List<int> ToList() {
             List<int> listToReturn = new List<int>(Area);
             listToReturn.AddRange(Board.SelectMany(a => a));
             return listToReturn;
