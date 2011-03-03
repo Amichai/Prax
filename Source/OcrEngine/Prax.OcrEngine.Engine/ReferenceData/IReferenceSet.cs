@@ -20,9 +20,9 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		///SQL queries.  It will primarily be used to filter word sets by known letters.</remarks>
 		IReferenceSet Subset(Expression<Func<string, bool>> query);
 
-		///<summary>Gets all of the items in this set.  Avoid this property where possible.</summary>
-		///<remarks>It is better to perform a query than to loop through this.</remarks>
-		IEnumerable<ReferenceItem> Items { get; }
+		/////<summary>Gets all of the items in this set.  Avoid this property where possible.</summary>
+		/////<remarks>It is better to perform a query than to loop through this.</remarks>
+		//IEnumerable<ReferenceItem> Items { get; }
 
 		///<summary>Gets the number of heuristic elements in the items in this set (the size of the int[]s).</summary>
 		int HeuristicCount { get; }
@@ -31,9 +31,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		///<remarks>This property must be fast; it will be called a large number of times.</remarks>
 		ReadOnlyCollection<string> Labels { get; }
 
-		///<summary>Gets all of the items that correspond to a given label.</summary>
-		///<returns>A sequence of labels, possibly streamed directly from SQL Server.</returns>
-		///<remarks>This method is expected to be slow.</remarks>
-		IEnumerable<ReferenceItem> GetItems(string label);
+		///<summary>Gets a grouped forward-only view of complete contents of the set.</summary>
+		IEnumerable<IGrouping<string, ReferenceItem>> GetAllItems();
 	}
 }

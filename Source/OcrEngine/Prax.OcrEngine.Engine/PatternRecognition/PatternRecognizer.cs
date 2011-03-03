@@ -43,27 +43,33 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 			//TODO: Why did this use to be static?
 			RollingVariance[][] variances = new RollingVariance[set.Labels.Count][];
 
-			for (int i = 0; i < set.Labels.Count; i++) {
-				labelScores[i] = new double[set.HeuristicCount];
-				variances[i] = new RollingVariance[set.HeuristicCount];
-			}
-
-			//TODO: Move this to IReferenceSet?
-			var labelData = set.Labels.Select(s => set.GetItems(s).ToList()).ToList();
 
 			//Get the probability that the input matches each unique label
-			for (int label = 0; label < labelData.Count; label++) {
-				var labelSamples = labelData[label];
+			int labelIndex = 0;
+			foreach (var label in set.GetAllItems()) {
+				variances[labelIndex] = new RollingVariance[set.HeuristicCount];
+
+				var scores = labelScores[labelIndex] = new double[set.HeuristicCount];
+				int sampleCount = 0;	//We're using a forward-only iterator; don't call Count()
+
+				//Count total samples and the matches for each heuristic
+				//in the same loop (because we must not iterate over the
+				//label twice)
+				foreach (var sample in label) {
+					sampleCount++;
+					for (int h = 0; h < set.HeuristicCount; h++) {
+						if (data[h] == -1)	//TODO:  || data[h] == 0) //RESOLVE THE NECESSITY OF != 0 IN THIS STATEMENT
+							continue;
+						if (data[h] == sample.Data[h])
+							scores[h]++;
+					}
+				}
 
 				for (int h = 0; h < set.HeuristicCount; h++) {
-					if (data[h] == -1)	//TODO:  || data[h] == 0) //RESOLVE THE NECESSITY OF != 0 IN THIS STATEMENT
-						continue;		
-
-					var score = labelSamples.Count(r => r.Data[h] == data[h]);
-
-					totalComparison_test[label] += score;
-					labelScores[label][h] = (double)score / labelSamples.Count;
+					totalComparison_test[labelIndex] += scores[h];
+					labelScores[labelIndex][h] = (double)scores[h] / sampleCount;
 				}
+				labelIndex++;
 			}
 
 			//This data structure represents:
@@ -102,14 +108,14 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 					multiplicativeOffset += aprioriProb / (double)variances[label][h].count;
 
 					if (multiplicativeOffset < double.MaxValue)
-						labelProbabilities[label] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) 
+						labelProbabilities[label] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset)
 												 / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 
 					if (double.IsInfinity(labelProbabilities[label]) || labelProbabilities[label] == 0)
-						h = set.HeuristicCount;	//TODO: Huh? What on earth? Do you mean break;?
+						break;		//Once we hit 0 or inf, we can never recover - all we do is multiply
 				}
 
-				if (labelProbabilities[label] > bestProb && labelData[bestLabel].Count > 0) {
+				if (labelProbabilities[label] > bestProb) {
 					bestProb = labelProbabilities[label];
 					bestLabel = label;
 				}
