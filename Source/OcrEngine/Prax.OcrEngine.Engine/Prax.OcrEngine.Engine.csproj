@@ -48,6 +48,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PRProblems\ProblemBoard.cs" />
     <Compile Include="PRProblems\PRProblem.cs" />
+    <Compile Include="ReferenceData\InMemoryReferenceSet.cs" />
     <Compile Include="ReferenceData\IReferenceSet.cs" />
     <Compile Include="ReferenceData\ReferenceItem.cs" />
     <Compile Include="ReferenceData\IReferenceLibrary.cs" />
