@@ -59,7 +59,7 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 					if (data[h] == -1)	//TODO:  || data[h] == 0) //RESOLVE THE NECESSITY OF != 0 IN THIS STATEMENT
 						continue;		
 
-					var score = labelSamples.Count(r => r.Data.heuristics[h] == data[h]);
+					var score = labelSamples.Count(r => r.Data[h] == data[h]);
 
 					totalComparison_test[label] += score;
 					labelScores[label][h] = (double)score / labelSamples.Count;

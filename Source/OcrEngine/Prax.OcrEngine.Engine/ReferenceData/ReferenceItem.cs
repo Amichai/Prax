@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using Prax.OcrEngine.Engine.HeuristicArray;
 
 namespace Prax.OcrEngine.Engine.ReferenceData {
 	///<summary>Stores a single labeled item from reference data.</summary>
@@ -13,7 +12,6 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		///<summary>The label describing this item.</summary>
 		public string Label { get; private set; }
 		///<summary>Data corresponding to the item.</summary>
-		public HeuristicArray.HeuristicArray Data; // { get; private set; }
-		
-	}
+		public ReadOnlyCollection<int> Data { get; private set; }
+    }
 }
