@@ -15,10 +15,10 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 	/// (which inherits this) is mutable.
 	///</remarks>
 	public interface IReferenceSet {
-		///<summary>Creates a subset of this set matching the given criteria.</summary>
-		///<remarks>This method is designed to allow subsets to be created using
-		///SQL queries.  It will primarily be used to filter word sets by known letters.</remarks>
-		IReferenceSet Subset(Expression<Func<string, bool>> query);
+		/////<summary>Creates a subset of this set matching the given criteria.</summary>
+		/////<remarks>This method is designed to allow subsets to be created using
+		/////SQL queries.  It will primarily be used to filter word sets by known letters.</remarks>
+		//IReferenceSet Subset(Expression<Func<string, bool>> query);
 
 		/////<summary>Gets all of the items in this set.  Avoid this property where possible.</summary>
 		/////<remarks>It is better to perform a query than to loop through this.</remarks>
