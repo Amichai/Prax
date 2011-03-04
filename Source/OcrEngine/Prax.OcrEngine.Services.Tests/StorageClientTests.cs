@@ -41,6 +41,7 @@ namespace Prax.OcrEngine.Services.Tests {
 		public void InMemoryStorageTest() {
 			TestClient(new Stubs.InMemoryStorage());
 		}
+		[Ignore]	//This test can only run if the Azure service is running
 		[TestMethod]
 		public void AzureStorageTest() {
 			TestClient(new Azure.AzureStorageClient(CloudStorageAccount.DevelopmentStorageAccount));
