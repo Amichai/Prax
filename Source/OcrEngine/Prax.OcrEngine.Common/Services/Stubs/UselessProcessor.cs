@@ -18,11 +18,11 @@ namespace Prax.OcrEngine.Services.Stubs {
 			if (rand == null)
 				rand = new Random(Thread.CurrentThread.ManagedThreadId ^ Environment.TickCount);
 
-			MaximumProgress = rand.Next(5, 15);
+			MaximumProgress = rand.Next(5, 9);
 			for (int i = 0; i < MaximumProgress; i++) {
 				if (CheckCancel()) break;
 
-				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(5, 35)));
+				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(2, 11)));
 				CurrentProgress = i + 1;
 				OnProgressChanged();
 			}
