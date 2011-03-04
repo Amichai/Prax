@@ -46,8 +46,8 @@
     <Compile Include="PatternRecognition\PatternRecognizer.cs" />
     <Compile Include="PatternRecognition\RecognizedPattern.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PRProblems\ProblemBoard.cs" />
-    <Compile Include="PRProblems\PRProblem.cs" />
+    <Compile Include="HeuristicGeneration\DataMatrix.cs" />
+    <Compile Include="HeuristicGeneration\HeuristicGenerator.cs" />
     <Compile Include="ReferenceData\InMemoryReferenceSet.cs" />
     <Compile Include="ReferenceData\IReferenceSet.cs" />
     <Compile Include="ReferenceData\ReferenceItem.cs" />

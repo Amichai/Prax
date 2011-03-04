@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
-    
     public class DataMatrix {
         public int[][] Data { get; private set; }
         public int Width  { get; private set; }
