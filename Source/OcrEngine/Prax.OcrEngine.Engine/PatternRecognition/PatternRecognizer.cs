@@ -128,7 +128,7 @@ namespace Prax.OcrEngine.Engine.PatternRecognition {
 		//From HeuristicsControlPanel
 		//TODO: Why did this use to be static?
 		private int[] probabilityHistorgram = new int[21];
-		public void buildHeuristicProbabilityHistorgram(double probability, int labelUnderInspection, int heuristicUnderInspection) {
+		void buildHeuristicProbabilityHistorgram(double probability, int labelUnderInspection, int heuristicUnderInspection) {
 			if (probability == 1)
 				probabilityHistorgram[20]++;
 			else
