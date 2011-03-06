@@ -6,8 +6,8 @@ using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 	///<summary>Converts data arrays into PR heuristics.</summary>
-	public abstract class HeuristicGenerator {
-		protected HeuristicGenerator(int[][] data) { OriginalBoard = new DataMatrix(data); }
+	public class HeuristicGenerator {
+		public HeuristicGenerator(int[][] data) { OriginalBoard = new DataMatrix(data); }
 
 		///<summary>Gets the original data that will be converted.</summary>
 		public DataMatrix OriginalBoard { get; private set; }
@@ -17,44 +17,26 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 
 		public virtual int ConsolidationConstant { get { return 3; } }
 
-		///<summary>Processes the data.</summary>
-		///<returns>The new data after the current iteration.</returns>
-		public abstract int[][] IterateBoard();
+		private const int iterationCount = 8;	//TODO: Was 50; must be 8 to match old code
 
-		private const int iterationCount = 50;
-
+		private List<int> iterationResults;
 		public ReadOnlyCollection<int> BuildData() {
-			List<int> heuristics = new List<int>(OriginalBoard.Area * iterationCount);
+			iterationResults = new List<int>(OriginalBoard.Area * iterationCount);
 
+			IteratedBoard = OriginalBoard;
 			for (int i = 0; i < iterationCount; i++) {
 				IteratedBoard = new DataMatrix(this.IterateBoard());
 
-				//A new set of heuristics is added after each iteration
-				heuristics.AddRange(IteratedBoard.ToList());
+				//A new set of data is added after each iteration
+				iterationResults.AddRange(IteratedBoard.ToList());
 			}
-			return new ReadOnlyCollection<int>(heuristics);
-		}
 
-		//TODO: Visualization methods
-	}
-
-	class WordRecognition : HeuristicGenerator {
-		public WordRecognition(int[][] data)
-			: base(data) {
-			this.IteratedBoard = this.OriginalBoard;
+			return new ReadOnlyCollection<int>(CalculateHeuristics());
 		}
-		public override int[][] IterateBoard() {
-			throw new NotImplementedException();
-		}
-	}
-
-	class LetterRecognition : HeuristicGenerator {
-		public LetterRecognition(int[][] data)
-			: base(data) {
-			this.IteratedBoard = this.OriginalBoard;
-		}
-
-		public override int[][] IterateBoard() {
+		#region Base Logic
+		///<summary>Processes the data.</summary>
+		///<returns>The new data after the current iteration.</returns>
+		protected virtual int[][] IterateBoard() {
 			int width = IteratedBoard.Width;
 			int height = IteratedBoard.Height;
 			int averageSurroundingDiscrepPxls;
@@ -86,15 +68,216 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			}
 			return newBoard;
 		}
+
+		private int GetIteratedCell(int iterationIndex, int x, int y) {
+			return iterationResults[IteratedBoard.Area * iterationIndex
+								  + IteratedBoard.Height * x
+								  + y];
+		}
+		private IEnumerable<int> CalcQuadrantSums() {
+			//Sum up the value of all the quadrants, add them and divide them into each-other
+			for (int boardIdx = 0; boardIdx < iterationCount; boardIdx++) {
+				int[] quadrantSum = new int[4];
+				for (int x = 0; x < IteratedBoard.Width / 2; x++)
+					for (int y = 0; y < IteratedBoard.Height / 2; y++)
+						quadrantSum[0] += GetIteratedCell(boardIdx, x, y);
+
+				for (int x = IteratedBoard.Width / 2; x < IteratedBoard.Width; x++)
+					for (int y = 0; y < IteratedBoard.Height / 2; y++)
+						quadrantSum[1] += GetIteratedCell(boardIdx, x, y);
+
+				for (int x = 0; x < IteratedBoard.Width; x++)
+					for (int y = IteratedBoard.Height / 2; y < IteratedBoard.Height; y++)
+						quadrantSum[2] += GetIteratedCell(boardIdx, x, y);
+
+				for (int x = IteratedBoard.Width / 2; x < IteratedBoard.Width; x++)
+					for (int y = IteratedBoard.Height / 2; y < IteratedBoard.Height; y++)
+						quadrantSum[3] += GetIteratedCell(boardIdx, x, y);
+
+				for (int i = 0; i < 4; i++) {
+					if (quadrantSum[i] == 0)
+						quadrantSum[i] = 1;
+
+					yield return quadrantSum[i];
+				}
+
+				for (int i = 0; i < 4; i++) {
+					for (int j = 0; j < 4; j++) {
+						if (i != j)
+							yield return quadrantSum[i] * 4 / quadrantSum[j];
+					}
+				}
+
+				yield return (quadrantSum[3] + quadrantSum[2] + quadrantSum[1]) / quadrantSum[0];
+				yield return (quadrantSum[3] + quadrantSum[2] + quadrantSum[0]) / quadrantSum[1];
+				yield return (quadrantSum[3] + quadrantSum[0] + quadrantSum[1]) / quadrantSum[2];
+				yield return (quadrantSum[0] + quadrantSum[2] + quadrantSum[1]) / quadrantSum[3];
+
+				yield return 4 * (quadrantSum[0] + quadrantSum[2]) / (quadrantSum[1] + quadrantSum[3]);
+				yield return 4 * (quadrantSum[0] + quadrantSum[1]) / (quadrantSum[2] + quadrantSum[3]);
+				yield return 4 * (quadrantSum[0] + quadrantSum[3]) / (quadrantSum[1] + quadrantSum[2]);
+				yield return 4 * (quadrantSum[1] + quadrantSum[2]) / (quadrantSum[0] + quadrantSum[3]);
+				yield return 4 * (quadrantSum[3] + quadrantSum[1]) / (quadrantSum[2] + quadrantSum[0]);
+				yield return 4 * (quadrantSum[2] + quadrantSum[3]) / (quadrantSum[1] + quadrantSum[0]);
+
+				//Add many many more here
+			}
+		}
+		private IEnumerable<int> CalcCenterPixels() {
+			//CENTER PIXELS HEURISTICS
+			for (int boardIdx = 0; boardIdx < iterationCount; boardIdx++) {
+				int sumOfCenterPixels = 0, productOfCenterPixels = 1;
+				for (int y = 0; y < IteratedBoard.Height; y++) {
+					sumOfCenterPixels += GetIteratedCell(boardIdx, IteratedBoard.Width / 2 - 1, y);
+					sumOfCenterPixels += GetIteratedCell(boardIdx, IteratedBoard.Width / 2 + 0, y);
+					sumOfCenterPixels += GetIteratedCell(boardIdx, IteratedBoard.Width / 2 + 1, y);
+
+					var center = GetIteratedCell(boardIdx, IteratedBoard.Width / 2, y);
+					if (center != 0)
+						productOfCenterPixels *= center;
+				}
+
+				yield return sumOfCenterPixels;
+				yield return productOfCenterPixels;
+				yield return sumOfCenterPixels / IteratedBoard.Height;
+				yield return productOfCenterPixels / IteratedBoard.Height;
+
+				if (sumOfCenterPixels != 0)
+					yield return productOfCenterPixels / sumOfCenterPixels;
+				else
+					yield return 0;
+			}
+		}
+
+		private IEnumerable<int> CalcPixelSumVariations() {
+			//VARIATION TEMPLATE MEASURED WITH RESPECT TO SIDE PIXELS AND ANGLE PIXELS
+
+			int[] eightSurroundingPixels = new int[4];
+
+			const int baseThreeOffset = 1 * 2 + 3 * 2 + 9 * 2 + 27 * 2;
+
+			for (int boardIdx = 0; boardIdx < iterationCount; boardIdx++) {
+				var pixelSums = new int[baseThreeOffset];
+
+				for (int x = 1; x < IteratedBoard.Width - 1; x++) {
+					for (int y = 1; y < IteratedBoard.Height - 1; y++) {
+						eightSurroundingPixels[0] = GetIteratedCell(boardIdx, x - 1, y + 1);
+						eightSurroundingPixels[1] = GetIteratedCell(boardIdx, x + 1, y + 1);
+						eightSurroundingPixels[2] = GetIteratedCell(boardIdx, x - 1, y - 1);
+						eightSurroundingPixels[3] = GetIteratedCell(boardIdx, x + 1, y - 1);
+
+						int currentPixel = GetIteratedCell(boardIdx, x, y);
+						int pixelTemplateSum = 0;
+
+						for (int k = 0; k < 4; k++) {
+							if (eightSurroundingPixels[k] == currentPixel)
+								pixelTemplateSum += (int)(Math.Pow(k, 3) * 0.0);
+							if (eightSurroundingPixels[k] > currentPixel)
+								pixelTemplateSum += (int)(Math.Pow(k, 3) * 1.0);
+							if (eightSurroundingPixels[k] < currentPixel)
+								pixelTemplateSum += (int)(Math.Pow(k, 3) * 2);
+						}
+						pixelSums[pixelTemplateSum]++;
+					}
+				}
+
+				for (int i = 0; i < baseThreeOffset; i++)
+					yield return pixelSums[i];
+
+				pixelSums = new int[baseThreeOffset];
+				for (int x = 1; x < IteratedBoard.Width - 1; x++) {
+					for (int y = 1; y < IteratedBoard.Height - 1; y++) {
+						eightSurroundingPixels[0] = GetIteratedCell(boardIdx, x, y + 1);
+						eightSurroundingPixels[1] = GetIteratedCell(boardIdx, x + 1, y);
+						eightSurroundingPixels[2] = GetIteratedCell(boardIdx, x, y - 1);
+						eightSurroundingPixels[3] = GetIteratedCell(boardIdx, x - 1, y);
+
+						int currentPixel = GetIteratedCell(boardIdx, x, y);
+						int pixelTemplateSum = 0;
+						for (int k = 0; k < 4; k++) {
+							if (eightSurroundingPixels[k] == currentPixel)
+								pixelTemplateSum += (int)(Math.Pow(k, 3) * 0.0);
+							if (eightSurroundingPixels[k] > currentPixel)
+								pixelTemplateSum += (int)(Math.Pow(k, 3) * 1.0);
+							if (eightSurroundingPixels[k] < currentPixel)
+								pixelTemplateSum += (int)(Math.Pow(k, 3) * 2);
+						}
+						pixelSums[pixelTemplateSum]++;
+					}
+				}
+
+				for (int i = 0; i < baseThreeOffset; i++)
+					yield return pixelSums[i];
+			}
+		}
+
+		private IEnumerable<int> CalcBoardSums() {
+			yield return OriginalBoard.Data.Sum(a => a.Sum());
+
+			//Sum up the value of every board across all iterated boards
+			for (int i = 0; i < iterationCount; i++) {
+				var sum = 0;
+
+				for (int x = 0; x < IteratedBoard.Width; x++)
+					for (int y = 0; y < IteratedBoard.Height; y++)
+						sum += GetIteratedCell(i, x, y);
+
+				yield return sum;
+			}
+		}
+		private IEnumerable<int> CalcAspectRatio() {
+			double widthHeightRatio = (double)IteratedBoard.Width / (double)IteratedBoard.Height;
+
+			for (int i = 0; i < 10; i++) {
+				yield return (int)(widthHeightRatio);
+				widthHeightRatio *= 10;
+			}
+		}
+
+		private IList<int> CalculateHeuristics() {
+			var heuristics = new List<int>(1550);
+
+			heuristics.AddRange(CalcQuadrantSums());
+			//currentIndex = 208
+			heuristics.AddRange(CalcCenterPixels());
+
+			//CATEGORIZE EVERY PIXEL ACCORDING TO ITS COMPLEXITY AND COLOR RANKING (HISTOGRAM)
+			//TODO: What's that comment?
+
+			//currentIndex = 248
+			heuristics.AddRange(CalcPixelSumVariations());
+
+			//currentIndex = 1528
+			heuristics.AddRange(CalcBoardSums());
+
+			heuristics.AddRange(CalcAspectRatio());
+
+			//-GLOBAL- HEURISTIC PROPERTIES
+			heuristics.Add(IteratedBoard.Height + IteratedBoard.Width);
+
+			//TODO:int sumOfAllHeuristics = heuristics.Sum();	//This overflows
+			int sumOfAllHeuristics = 0;
+			for (int i = 0; i < heuristics.Count; i++)
+				sumOfAllHeuristics += heuristics[i];
+
+			heuristics.Add(sumOfAllHeuristics);
+			heuristics.Add(sumOfAllHeuristics / (heuristics.Count + 1));	//TODO: Use .Count - 1?
+
+			return heuristics;
+			//global properties for each one of the iterated boards
+			//each heuristic represents an orientation of relative pixel colors, the number of each heuristic is the amount of the those templates
+			//Sum up all the heuristics for each board, take the average, all the boards together
+		}
+		#endregion
+
+		//TODO: Visualization methods
 	}
 
-	class WhitespaceRecognition : HeuristicGenerator {
-		public WhitespaceRecognition(int[][] data)
-			: base(data) {
-			this.IteratedBoard = this.OriginalBoard;
-		}
-		public override int[][] IterateBoard() {
-			throw new NotImplementedException();
-		}
-	}
+
+	//class LetterRecognition : HeuristicGenerator {
+	//    public LetterRecognition(int[][] data)
+	//        : base(data) {
+	//        this.IteratedBoard = this.OriginalBoard;
+	//    }
+	//}
 }
