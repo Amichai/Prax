@@ -6,8 +6,8 @@ using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 	///<summary>Converts data arrays into PR heuristics.</summary>
-	public abstract class HeuristicGenerator {
-		protected HeuristicGenerator(int[][] data) { OriginalBoard = new DataMatrix(data); }
+	public class HeuristicGenerator {
+		public HeuristicGenerator(int[][] data) { OriginalBoard = new DataMatrix(data); }
 
 		///<summary>Gets the original data that will be converted.</summary>
 		public DataMatrix OriginalBoard { get; private set; }
