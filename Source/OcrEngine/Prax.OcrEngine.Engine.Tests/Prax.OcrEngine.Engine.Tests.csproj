@@ -51,6 +51,9 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PatternRecognition\LegacyDataLibrary.cs" />
+    <Compile Include="PatternRecognition\LegacyRecognizer.cs" />
+    <Compile Include="PatternRecognition\LegacyTester.cs" />
     <Compile Include="ReferenceData\InMemoryReferenceSetTest.cs" />
     <Compile Include="ReferenceData\IReferenceSetTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,6 +67,9 @@
       <Project>{0507F74F-3DB1-4FBE-A804-664D2FE52CA5}</Project>
       <Name>Prax.OcrEngine.Engine</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PatternRecognition\LegacyTrainingData.dat" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
