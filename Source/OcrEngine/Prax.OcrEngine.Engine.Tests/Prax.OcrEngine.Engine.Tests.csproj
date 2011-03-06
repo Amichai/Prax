@@ -51,6 +51,8 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HeuristicGeneration\LegacyHeuristicsTest.cs" />
+    <Compile Include="HeuristicGeneration\LegacyHeuristics.cs" />
     <Compile Include="PatternRecognition\LegacyDataLibrary.cs" />
     <Compile Include="PatternRecognition\LegacyRecognizer.cs" />
     <Compile Include="PatternRecognition\LegacyTester.cs" />
