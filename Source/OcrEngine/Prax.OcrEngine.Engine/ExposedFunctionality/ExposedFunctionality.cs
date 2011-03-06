@@ -18,25 +18,25 @@ namespace Prax.OcrEngine.Engine.ExposedFunctionality {
 			//fileQueue.Add(imageData);
 		}
 
-		public void OpenTrainingData{
+		public void OpenTrainingData(){
 			//Open file dialog
 			//trainingDataLibrary = new ReferenceLibrary();
 		}
 
-		public void EditTrainingData{
+		public void EditTrainingData(){
 			//if(trainingDataLibrary != null)
 				//trainingDataLibrary.ContentEditor();
 		}
 
-		public void OpenOCRResults{
+		public void OpenOCRResults(){
 			//results.Display();
 		}
 
-		public void TestAlgorithm{
+		public void TestAlgorithm(){
 			//fileQueue.ProcessFiles();
 		}
 
-		public void TrainAlgorithm{
+		public void TrainAlgorithm(){
 			//AlgorithmTrainer trainer = new AlgorithmTrainer();
 		}
 	}
