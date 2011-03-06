@@ -26,11 +26,11 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			for (int i = 0; i < iterationCount; i++) {
 				IteratedBoard = new DataMatrix(this.IterateBoard());
 
-				//A new set of heuristics is added after each iteration
+				//A new set of data is added after each iteration
 				iterationResults.AddRange(IteratedBoard.ToList());
 			}
 
-			return new ReadOnlyCollection<int>(iterationResults);
+			return new ReadOnlyCollection<int>(CalculateHeuristics());
 		}
 		#region Base Logic
 		///<summary>Processes the data.</summary>
@@ -73,7 +73,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 								  + IteratedBoard.Height * x
 								  + y];
 		}
-		private IEnumerable<int> SumQuadrants() {
+		private IEnumerable<int> CalcQuadrantSums() {
 			//Sum up the value of all the quadrants, add them and divide them into each-other
 			for (int boardIdx = 0; boardIdx < iterationCount; boardIdx++) {
 				int[] quadrantSum = new int[4];
@@ -148,7 +148,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			}
 		}
 
-		private IEnumerable<int> PixelSumVariations() {
+		private IEnumerable<int> CalcPixelSumVariations() {
 			//VARIATION TEMPLATE MEASURED WITH RESPECT TO SIDE PIXELS AND ANGLE PIXELS
 
 			int[] eightSurroundingPixels = new int[4];
@@ -210,7 +210,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			}
 		}
 
-		private IEnumerable<int> BoardSums() {
+		private IEnumerable<int> CalcBoardSums() {
 			yield return OriginalBoard.Data.Sum(a => a.Sum());
 			for (int x = 0; x < IteratedBoard.Width; x++) {
 				for (int y = 0; y < IteratedBoard.Height; y++) {
@@ -229,7 +229,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 				yield return sum;
 			}
 		}
-		private IEnumerable<int> AspectRatio() {
+		private IEnumerable<int> CalcAspectRatio() {
 			double widthHeightRatio = (double)IteratedBoard.Width / (double)IteratedBoard.Height;
 
 			int power = 1;
@@ -239,21 +239,22 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			}
 		}
 
-		private void generateHeuristics() {
+		private IList<int> CalculateHeuristics() {
 			int sizeOfHeuristicArray = 1550;
 			var heuristics = new List<int>(sizeOfHeuristicArray);
 
-			heuristics.AddRange(SumQuadrants());
+			heuristics.AddRange(CalcQuadrantSums());
 
 			heuristics.AddRange(CalcCenterPixels());
 
 			//CATEGORIZE EVERY PIXEL ACCORDING TO ITS COMPLEXITY AND COLOR RANKING (HISTOGRAM)
+			//TODO: What's that comment?
 
-			heuristics.AddRange(PixelSumVariations());
+			heuristics.AddRange(CalcPixelSumVariations());
 
-			heuristics.AddRange(BoardSums());
+			heuristics.AddRange(CalcBoardSums());
 
-			heuristics.AddRange(AspectRatio());
+			heuristics.AddRange(CalcAspectRatio());
 
 			//-GLOBAL- HEURISTIC PROPERTIES
 			heuristics.Add(IteratedBoard.Height + IteratedBoard.Width);
@@ -263,7 +264,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			heuristics.Add(sumOfAllHeuristics);
 			heuristics.Add(sumOfAllHeuristics / sizeOfHeuristicArray);	//TODO: Use .Count - 2?
 
-
+			return heuristics;
 			//global properties for each one of the iterated boards
 			//each heuristic represents an orientation of relative pixel colors, the number of each heuristic is the amount of the those templates
 			//Sum up all the heurisitics for each board, take the average, all the boards together
