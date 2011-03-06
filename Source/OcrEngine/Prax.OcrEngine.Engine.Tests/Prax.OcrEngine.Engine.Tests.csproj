@@ -55,7 +55,7 @@
     <Compile Include="HeuristicGeneration\LegacyHeuristics.cs" />
     <Compile Include="PatternRecognition\LegacyDataLibrary.cs" />
     <Compile Include="PatternRecognition\LegacyRecognizer.cs" />
-    <Compile Include="PatternRecognition\LegacyTester.cs" />
+    <Compile Include="PatternRecognition\LegacyRecognitionTest.cs" />
     <Compile Include="ReferenceData\InMemoryReferenceSetTest.cs" />
     <Compile Include="ReferenceData\IReferenceSetTestBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

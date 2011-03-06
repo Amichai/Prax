@@ -10,7 +10,7 @@ namespace Prax.OcrEngine.Engine.Tests.PatternRecognition {
 	/// Summary description for LegacyTester
 	/// </summary>
 	[TestClass]
-	public class LegacyTester {
+	public class LegacyRecognitionTest {
 
 		/// <summary>
 		///Gets or sets the test context which provides
@@ -43,7 +43,7 @@ namespace Prax.OcrEngine.Engine.Tests.PatternRecognition {
 		[TestMethod]
 		public void CompareRecognizers() {
 			LegacyDataLibrary library;
-			using (var stream = typeof(LegacyTester).Assembly.GetManifestResourceStream(typeof(LegacyTester), "LegacyTrainingData.dat"))
+			using (var stream = typeof(LegacyRecognitionTest).Assembly.GetManifestResourceStream(typeof(LegacyRecognitionTest), "LegacyTrainingData.dat"))
 				library = LegacyDataLibrary.FromStream(stream);
 
 			var rand = new Random();
