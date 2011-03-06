@@ -17,10 +17,6 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 
 		public virtual int ConsolidationConstant { get { return 3; } }
 
-		///<summary>Processes the data.</summary>
-		///<returns>The new data after the current iteration.</returns>
-		public abstract int[][] IterateBoard();
-
 		private const int iterationCount = 50;
 
 		public ReadOnlyCollection<int> BuildData() {
@@ -34,27 +30,10 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			}
 			return new ReadOnlyCollection<int>(heuristics);
 		}
-
-		//TODO: Visualization methods
-	}
-
-	class WordRecognition : HeuristicGenerator {
-		public WordRecognition(int[][] data)
-			: base(data) {
-			this.IteratedBoard = this.OriginalBoard;
-		}
-		public override int[][] IterateBoard() {
-			throw new NotImplementedException();
-		}
-	}
-
-	class LetterRecognition : HeuristicGenerator {
-		public LetterRecognition(int[][] data)
-			: base(data) {
-			this.IteratedBoard = this.OriginalBoard;
-		}
-
-		public override int[][] IterateBoard() {
+		#region Base Logic
+		///<summary>Processes the data.</summary>
+		///<returns>The new data after the current iteration.</returns>
+		protected virtual int[][] IterateBoard() {
 			int width = IteratedBoard.Width;
 			int height = IteratedBoard.Height;
 			int averageSurroundingDiscrepPxls;
@@ -86,15 +65,16 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			}
 			return newBoard;
 		}
+		#endregion
+
+		//TODO: Visualization methods
 	}
 
-	class WhitespaceRecognition : HeuristicGenerator {
-		public WhitespaceRecognition(int[][] data)
-			: base(data) {
-			this.IteratedBoard = this.OriginalBoard;
-		}
-		public override int[][] IterateBoard() {
-			throw new NotImplementedException();
-		}
-	}
+
+	//class LetterRecognition : HeuristicGenerator {
+	//    public LetterRecognition(int[][] data)
+	//        : base(data) {
+	//        this.IteratedBoard = this.OriginalBoard;
+	//    }
+	//}
 }
