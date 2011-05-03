@@ -4,16 +4,77 @@
     <head>
         <meta charset="utf-8" />
         <title>@ViewBag.Title</title>
-        <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
 
-        <script src="@Url.Content("~/Scripts/jquery-1.5.1.min.js")" type="text/javascript"></script>
+        <script src="@Href("~/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
 
-        <script src="@Url.Content("~/Scripts/modernizr-1.7.min.js")" type="text/javascript"></script>
+        <script type="text/javascript">
+var basePath = "@Href("~/")";
+        </script>
 
+        <style type="text/css">
+            html, body {
+                font-family: "Calibri" , Verdana, Arial, sans-serif;
+                overflow: auto;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                text-align: center;
+            }
+            div.Content {
+                margin: 0 auto;
+                width: 700px;
+                min-height: 100%;
+                height: auto !important;
+                height: 100%;
+                margin-bottom: -42px; /* This padding goes underneath the footer if the document scrolls */
+            }
+            header img {
+                text-align: center;
+                font-size: 3em;
+                margin-top: -1px;
+                -moz-transition: margin-top .5s ease-out;
+                -webkit-transition: margin-top .5s ease-out;
+                -o-transition: margin-top .5s ease-out;
+                transition: margin-top .5s ease-out;
+            }
+            header img.Compact {
+                margin-top: -226px;
+            }
+            .FooterPusher {
+                height: 42px;
+            }
+            footer {
+                width: 100%;
+                background: LightGray;
+                border-top: solid 2px black;
+                padding: 4px 0 6px;
+                text-align: center;
+                height: 30px;
+            }
+        </style>
+        @RenderSection("Head", required: false)
     </head>
 
     <body>
-        @RenderBody()
+        <div class="Content">
+            <header>
+                <img src="@Href("~/Content/Images/Logo.png")" alt="Praxiteles Algorithm Design" /></header>
+            @RenderBody()
+            <div class="FooterPusher">&nbsp;</div>
+        </div>
+        <footer>
+              @Html.ActionLink("About", "About") 
+            | @Html.ActionLink("Privacy", "Privacy Policy")
+            | <a href="http://blog.padocr.com">Blog</a>
+        </footer>
+
+        <script src="@Href("~/Scripts/jquery-1.5.1.js")" type="text/javascript"></script>
+
+        <script type="text/javascript">
+            $('header img').click(function () { $(this).toggleClass('Compact'); });
+        </script>
+
+        @RenderSection("EndScripts", required: false)
     </body>
 
 </html>
