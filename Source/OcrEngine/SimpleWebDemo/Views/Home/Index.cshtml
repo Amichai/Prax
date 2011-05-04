@@ -10,6 +10,7 @@
             height: 90px;
             display: inline-block;
             -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
             box-sizing: border-box;
             position: relative;
             vertical-align: top;
@@ -17,6 +18,7 @@
         div.Button .ui-button-text {
             /* Hack for vertically centering text in fake <button>s */
             -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
             box-sizing: border-box;
             height: 90px;
             width: 190px;
@@ -36,23 +38,60 @@
         #textWizard {
             display: none;
             text-align: left;
+            font-size: 12px;
+            padding: 0;
+            margin: 4px 0 0 0;
+            height: 300px;
+            width: 500px;
+            border-radius: 0;
+        }
+        #textWizard .step .Instructions {
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+            position: absolute;
+            right: 0;
+            width: 150px;
+            background: #ff8;
+            border: solid 1px #dd0;
+            padding: 3px;
+            top: 0;
+            bottom: 0;
+            height: auto;
+        }
+        #textWizard .step .Instructions h2 {
+            font-size: 1.1em;
+            color: Purple;
+            margin: 0 0 .3em 0;
         }
         #sourceText, #translatedText {
-            width: 100%;
-            font-size: 12px;
-            height: 3em;
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+            resize: none;
+            position: absolute;
+            width: 346px;
+            height: auto;
             padding: 3px;
         }
+        #sourceText {
+            top: 0;
+            height: 148px;
+        }
         #translatedText {
+            top: 152px;
+            bottom: 0;
             background: #eee;
         }
         #translatedText.Loading {
-            background: url('/Content/Images/Loading.gif') no-repeat bottom right;
+            background: url('/Content/Images/Loading.gif') no-repeat bottom left;
             color: #ddd;
         }
         #translationBranding {
-            width: 100%;
-            padding-top: 2px;
+            position: absolute;
+            bottom: 0;
+            right: 170px;
+            padding: 0 6px 6px 0;
             text-align: right;
             font-size: 11px;
             color: #686868;
@@ -66,10 +105,15 @@
     Create an image</button>
 <div id="textWizard" title="Create an Image">
     <section class="step" id="translationStep">
-        <textarea rows="3" cols="140" id="sourceText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all">Enter a text here to translate</textarea>
+        <div class="Instructions ui-corner-all">
+            <h2>
+                Instructions</h2>
+            Enter text in any language to translate it into Arabic for the OCR to recognize.
+        </div>
+        <textarea id="sourceText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all">Enter a text here to translate</textarea>
         <div id="translatedText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all">
             Translation will appear here</div>
-        <div id="translationBranding">translation powered by<img style="padding-left: 1px;
+        <div id="translationBranding">translation powered by<img alt=" Google" style="padding-left: 1px;
             vertical-align: middle;" src="https://www.google.com/uds/css/small-logo.png"></div>
     </section>
 </div>

@@ -10,16 +10,36 @@ function TextWizard(container, trigger) {
 	var self = this;
 	trigger = $(trigger);
 
-	this.wizard = $(container)
-		.dialog({
-			autoOpen: false,
-			position: ['center', trigger.position().top + trigger.outerHeight() + 10],
-			resizable: false
-		});
+	this.wizard = $(container);
+
+	var width = this.wizard.width();	//Get the desired height from the CSS
+	var height = this.wizard.height();
+
+	this.wizard.dialog({
+		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
+		resizable: false,
+		width: width, height: height
+	});
+	this.wizard.dialog('option', {	//Force the desired height, taking into account any padding from the dialog
+		width: width + (this.wizard.dialog('option', 'width') - this.wizard.width()),
+		height: height + (this.wizard.dialog('option', 'height') - this.wizard.height())
+	});
 
 	this.translationStep.setUp(this);
 
+	this.wizard.formwizard({
+		historyEnabled: true
+	});
+	this.wizard.bind("step_shown", function (event, data) {
+		if (data.isBackNavigation)
+			return;
+		if ($.isFunction(self[data.currentStep].onEnter))
+			self[data.currentStep].onEnter();
+	});
+
 	trigger.click(function () { self.wizard.dialog("open"); });
+
+
 }
 
 TextWizard.prototype = {
@@ -29,18 +49,14 @@ TextWizard.prototype = {
 		sourceBox: $(),
 		targetBox: $(),
 
+		owner: null,
+
 		setUp: function (parent) {
+			this.owner = parent;
 			var self = this;
 
 			this.targetBox = parent.wizard.find('#translatedText');
 			this.sourceBox = parent.wizard.find('#sourceText')
-				.bind('mousemove mousedown mouseup', function (e) {
-					if (e.which === 1) {
-						self.targetBox.width(self.sourceBox.width());
-						$('#translationBranding').width(self.sourceBox.outerWidth());
-						self.targetBox.height(self.sourceBox.height());
-					}
-				})
 				.bind('input propertychange', function () { self.markDirty(); });
 
 			google.setOnLoadCallback(function () { self.markDirty(true); });
