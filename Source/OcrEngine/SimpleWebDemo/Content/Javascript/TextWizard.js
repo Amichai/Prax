@@ -31,7 +31,7 @@ TextWizard.prototype = {
 
 		setUp: function (parent) {
 			var self = this;
-			var translationUpdateTimer = false;
+
 			this.targetBox = parent.wizard.find('#translatedText');
 			this.sourceBox = parent.wizard.find('#sourceText')
 				.bind('mousemove mousedown mouseup', function (e) {
@@ -41,30 +41,39 @@ TextWizard.prototype = {
 						self.targetBox.height(self.sourceBox.height());
 					}
 				})
-				.bind('input propertychange', function () {
-					if (translationUpdateTimer)
-						clearInterval(translationUpdateTimer);
+				.bind('input propertychange', function () { self.markDirty(); });
 
-					var text = $.trim(self.sourceBox.val());
-					if (text === self.lastSourceText) return;
-					self.targetBox.addClass("Loading");
-
-					translationUpdateTimer = setTimeout(function () {
-						self.updateTranslation();
-						translationUpdateTimer = false;
-					}, 500);
-				});
-			google.setOnLoadCallback(function () {
-				self.updateTranslation();
-			});
+			google.setOnLoadCallback(function () { self.markDirty(true); });
 			google.load("language", "1");
 		},
+		updateTimer: false,
+		stopTimer: function () {
+			if (this.updateTimer) {
+				clearTimeout(this.updateTimer);
+				this.updateTimer = false;
+			}
+		},
+		markDirty: function (updateNow) {
+			this.stopTimer();
 
+			var text = $.trim(this.sourceBox.val());
+			if (text === this.lastSourceText) return;
+
+			var self = this;
+			this.targetBox.addClass("Loading");
+			if (updateNow)
+				this.updateTranslation();
+			else
+				this.updateTimer = setTimeout(function () {
+					self.updateTimer = false;
+					self.updateTranslation();
+				}, 500);
+		},
 		lastSourceText: null,
 		updateTranslation: function () {
 			var text = $.trim(this.sourceBox.val());
 			if (text === this.lastSourceText) {
-				this.targetBox.removeClass("Loading");
+				this.markTranslated();
 				return;
 			}
 
@@ -76,9 +85,16 @@ TextWizard.prototype = {
 				function (result) {
 					self.lastSourceText = text;
 					self.targetBox.text(result.translation)
-								  .removeClass("Loading");
+
+					if (text === $.trim(self.sourceBox.val()))
+						self.markTranslated();
+					else //If the text changed since we sent the call, we're still dirty
+						self.markDirty();
 				}
 			);
+		},
+		markTranslated: function () {
+			this.targetBox.removeClass("Loading");
 		}
 	}
 };
