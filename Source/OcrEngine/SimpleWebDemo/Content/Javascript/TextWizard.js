@@ -4,6 +4,7 @@
 /// <reference path="../../Scripts/jquery.uploadify.v2.1.4.js" />
 /// <reference path="../../Scripts/bbq.js" />
 /// <reference path="../../Scripts/jquery.form.wizard.js" />
+/// <reference path="../../Scripts/tiny_mce/jquery.tinymce.js" />
 
 
 function TextWizard(container, trigger) {
@@ -12,12 +13,17 @@ function TextWizard(container, trigger) {
 
 	this.wizard = $(container);
 
-	var width = this.wizard.width();	//Get the desired height from the CSS
-	var height = this.wizard.height();
+	var width = this.wizard.width(), height = this.wizard.height(); //Get the desired height from the CSS
 
 	this.wizard.dialog({
 		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
 		resizable: false,
+
+		buttons: {
+			"Back": function () { self.wizard.formwizard("back"); },
+			"Next": function () { self.wizard.formwizard("next"); }
+		},
+
 		width: width, height: height
 	});
 	this.wizard.dialog('option', {	//Force the desired height, taking into account any padding from the dialog
@@ -25,25 +31,30 @@ function TextWizard(container, trigger) {
 		height: height + (this.wizard.dialog('option', 'height') - this.wizard.height())
 	});
 
+	var buttons = this.wizard.parent().find(".ui-dialog-buttonset button");
+	this.back = buttons.filter(":contains('Back')");
+	this.next = buttons.filter(":contains('Next')");
+
 	this.translationStep.setUp(this);
+	this.formatStep.setUp(this);
 
 	this.wizard.formwizard({
-		historyEnabled: true
+		inDuration: 0,
+		outDuration: 0
 	});
 	this.wizard.bind("step_shown", function (event, data) {
-		if (data.isBackNavigation)
-			return;
 		if ($.isFunction(self[data.currentStep].onEnter))
-			self[data.currentStep].onEnter();
+			self[data.currentStep].onEnter(data.isBackNavigation);
 	});
 
 	trigger.click(function () { self.wizard.dialog("open"); });
-
-
+	this.translationStep.onEnter();
 }
 
 TextWizard.prototype = {
 	wizard: $(),
+	back: $(),
+	next: $(),
 
 	translationStep: {
 		sourceBox: $(),
@@ -62,6 +73,9 @@ TextWizard.prototype = {
 			google.setOnLoadCallback(function () { self.markDirty(true); });
 			google.load("language", "1");
 		},
+		onEnter: function (isBack) {
+			this.owner.back.hide();
+		},
 		updateTimer: false,
 		stopTimer: function () {
 			if (this.updateTimer) {
@@ -77,6 +91,7 @@ TextWizard.prototype = {
 
 			var self = this;
 			this.targetBox.addClass("Loading");
+			this.owner.next.button("option", "disabled", true);
 			if (updateNow)
 				this.updateTranslation();
 			else
@@ -111,6 +126,36 @@ TextWizard.prototype = {
 		},
 		markTranslated: function () {
 			this.targetBox.removeClass("Loading");
+			this.owner.next.button("option", "disabled", false);
+		}
+	},
+	formatStep: {
+		owner: null,
+		textBox: $(),
+
+		setUp: function (parent) {
+			this.owner = parent;
+			var self = this;
+
+			this.textBox = $('#formatBox');
+			this.textBox.tinymce({
+				script_url: basePath + 'Scripts/tiny_mce/tiny_mce_src.js',
+				theme: "advanced",
+
+				width: '100%',
+				height: this.textBox.parent().height() - 1,
+
+				theme_advanced_buttons1: "bold,italic,underline,separator,fontsizeselect,sub,sup,separator,forecolor,backcolor",
+				theme_advanced_buttons2: "",
+				theme_advanced_buttons3: ""
+
+			});
+		},
+		onEnter: function (isBack) {
+			this.owner.back.show();
+			this.owner.next.show();
+			if (!isBack)
+				this.textBox.text(this.owner.translationStep.targetBox.text());
 		}
 	}
 };
