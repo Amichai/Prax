@@ -10,8 +10,8 @@ $('button, .Button').button();
 
 $('#upload input:file').uploadify({
 	uploader: basePath + 'Content/uploadify.swf',
-	script: basePath + 'Recoginition/Upload',
-	fileDataName: 'file',
+	script: basePath + 'Documents/UploadImage',
+	fileDataName: 'image',
 	auto: true,
 
 	height: $('#upload').outerHeight(),
