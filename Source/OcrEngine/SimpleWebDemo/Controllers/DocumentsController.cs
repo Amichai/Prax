@@ -29,7 +29,7 @@ namespace SimpleWebDemo.Controllers {
 #endif
 		[HttpPost]
 		[ValidateInput(false)]
-		public ActionResult CreateFromText(string html) {
+		public ActionResult CreateFromHtml(string html) {
 			var stream = ImageCreator.CreateImage(html);
 
 			var id = DocumentManager.UploadDocument("Created image, " + Request.UserHostAddress, ImageCreator.ContentType, stream, stream.Length);

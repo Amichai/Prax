@@ -23,3 +23,23 @@ $('#upload input:file').uploadify({
 $('#upload input:file').before("Upload your<br />own image");
 
 var textWizard = new TextWizard("#textWizard", "#showTextWizard");
+
+var buttonArea = $('.LargeButtons');
+
+$('#dropTarget').droppable({
+	hoverClass: "ui-state-hover",
+	tolerance: 'pointer',
+	drop: function (event, ui) {
+		alert($(ui.draggable).html());
+		textWizard.wizard.dialog("close");
+	}
+});
+
+$('.DragImage').bind({
+	dragstart: function () {
+		buttonArea.addClass('Dragging');
+	},
+	dragstop: function () {
+		buttonArea.removeClass('Dragging');
+	}
+});

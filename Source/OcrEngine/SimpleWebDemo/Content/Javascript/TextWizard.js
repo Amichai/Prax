@@ -37,6 +37,7 @@ function TextWizard(container, trigger) {
 
 	this.translationStep.setUp(this);
 	this.formatStep.setUp(this);
+	this.finalStep.setUp(this);
 
 	this.wizard.formwizard({
 		inDuration: 0,
@@ -156,6 +157,47 @@ TextWizard.prototype = {
 			this.owner.next.show();
 			if (!isBack)
 				this.textBox.text(this.owner.translationStep.targetBox.text());
+		}
+	},
+	finalStep: {
+		owner: null,
+		loadingPanel: $(),
+		imagePanel: $(),
+		image: $(),
+
+		setUp: function (parent) {
+			this.owner = parent;
+			var self = this;
+
+			this.loadingPanel = $('#loadingPanel');
+			this.imagePanel = $('#imagePanel');
+			this.image = $('#generatedImage');
+
+			this.image.bind('load', function () {
+				self.loadingPanel.hide();
+				self.imagePanel.show();
+			}); 	//When the image finishes loading, hide the loading icon and show the image.
+			this.image.draggable({
+				appendTo: 'body',
+				revert: 'invalid',		//Only revert if it wasn't dropped
+				helper: 'clone',
+				zIndex: 1256	//Above the dialog
+			});
+		},
+
+		onEnter: function () {	//It is not possible to go back into the final step
+			this.owner.back.show();
+			this.owner.next.hide();
+
+			this.imagePanel.hide();
+			this.loadingPanel.show();
+
+			var html = this.owner.formatStep.textBox.html();
+
+			var self = this;
+			$.post(basePath + "Documents/CreateFromHtml", { html: html }, function (imageId) {
+				self.image.attr('src', basePath + "Documents/View/" + encodeURIComponent(imageId));
+			});
 		}
 	}
 };
