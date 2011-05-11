@@ -18,6 +18,7 @@ function TextWizard(container, trigger) {
 	this.wizard.dialog({
 		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
 		resizable: false,
+		autoOpen: false,
 
 		buttons: {
 			"Back": function () { self.wizard.formwizard("back"); },
@@ -179,7 +180,7 @@ TextWizard.prototype = {
 			}); 	//When the image finishes loading, hide the loading icon and show the image.
 			this.image.draggable({
 				appendTo: 'body',
-				revert: 'invalid',		//Only revert if it wasn't dropped
+				revert: 'invalid', 	//Only revert if it wasn't dropped
 				helper: 'clone',
 				zIndex: 1256	//Above the dialog
 			});

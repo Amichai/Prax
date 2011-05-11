@@ -24,6 +24,7 @@
             width: 190px;
             display: table-cell;
             vertical-align: middle;
+            padding: 0 !important;
         }
         .LargeButtons #dropTarget {
             display: none;
@@ -134,16 +135,31 @@
             background: white;
             border: 2px black groove;
         }
+        
+        #uploadPane {
+            display: none;
+        }
+        .MainProgess {
+            -moz-box-sizing: border-box;
+            -ms-box-sizing: border-box;
+            box-sizing: border-box;
+            width: 312px;
+            margin: 10px auto 0;
+        }
     </style>
 }
 @* Firefox doesn't like to put Flash in real <button>s *@
-<div class="LargeButtons">
+<div class="LargeButtons" id="initialButtons">
     <div id="upload" class="Large Button">
         <input type="file" value="Upload your own image" /></div>
     <div id="dropTarget" class="Large ui-widget ui-corner-all ui-widget-header"><span
         class="ui-button-text">Drop image here</span></div>
     <button id="showTextWizard" class="Large">
         Create an image</button>
+</div>
+<div id="uploadPane">
+    <img src="@Href("~/Content/Images/Loading.gif")" alt="Uploading..." title="Uploading image..." />
+    <div id="uploadProgress" class="MainProgess"></div>
 </div>
 <div id="textWizard" title="Create an Image">
     <section class="step" id="translationStep">
@@ -193,7 +209,7 @@
 
     <script src="@Href("~/Scripts/jquery.uploadify.v2.1.4.js")" type="text/javascript"></script>
 
-    <script src="@Href("~/Scripts/bbq.js")" type="text/javascript"></script>
+    <script src="@Href("~/Scripts/jquery.filedrop.js")" type="text/javascript"></script>
 
     <script src="@Href("~/Scripts/jquery.form.wizard.js")" type="text/javascript"></script>
 
