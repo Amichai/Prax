@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Prax.OcrEngine.Services;
 using Prax.OcrEngine;
 using System.Xml.Linq;
+using System.IO;
 
 namespace SimpleWebDemo.Controllers {
 	public class DocumentsController : Controller {
@@ -40,6 +41,24 @@ namespace SimpleWebDemo.Controllers {
 		public ActionResult UploadImage(HttpPostedFileBase image) {
 			var id = DocumentManager.UploadDocument(image.FileName, image.ContentType, image.InputStream, image.ContentLength);
 			return Content(id.ToString(), "text/plain");
+		}
+
+		public ActionResult Status(Guid id) {
+			var doc = DocumentManager.GetDocument(id);
+			switch (doc.State) {
+				case DocumentState.ScanQueued:
+					return Json(new { state = "Queued", progress = 0 }, JsonRequestBehavior.AllowGet);
+					
+				case DocumentState.Scanning:
+					return Json(new { state = "Scanning", progress = doc.ScanProgress }, JsonRequestBehavior.AllowGet);
+					
+				case DocumentState.Scanned:
+					using (var reader = new StreamReader(doc.OpenStream("PlainText")))
+						return Json(new { state = "Complete", text = reader.ReadToEnd() }, JsonRequestBehavior.AllowGet);
+
+				default:	//Including DocumentState.Error
+					return Json(new { state = "Error" }, JsonRequestBehavior.AllowGet);
+			}
 		}
 	}
 }

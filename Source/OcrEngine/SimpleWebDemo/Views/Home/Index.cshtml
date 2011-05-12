@@ -134,9 +134,16 @@
             padding: 4px;
             background: white;
             border: 2px black groove;
+            display: block;
         }
-        
-        #uploadPane {
+        #scanPreview.Loading {
+            background: white url('/Content/Images/Loading.gif') no-repeat center center;
+            min-height: 40px;
+        }
+        #scanPreview {
+            margin: 4px auto 0;
+        }
+        #uploadPane, #scanPane {
             display: none;
         }
         .MainProgess {
@@ -144,7 +151,7 @@
             -ms-box-sizing: border-box;
             box-sizing: border-box;
             width: 312px;
-            margin: 10px auto 0;
+            margin: 10px auto;
         }
     </style>
 }
@@ -158,8 +165,16 @@
         Create an image</button>
 </div>
 <div id="uploadPane">
+    <h2>
+        Uploading...</h2>
     <img src="@Href("~/Content/Images/Loading.gif")" alt="Uploading..." title="Uploading image..." />
     <div id="uploadProgress" class="MainProgess"></div>
+</div>
+<div id="scanPane">
+    <h2>
+        Recoginzing...</h2>
+    <img class="FramedImage" id="scanPreview" />
+    <div id="scanProgress" class="MainProgess"></div>
 </div>
 <div id="textWizard" title="Create an Image">
     <section class="step" id="translationStep">

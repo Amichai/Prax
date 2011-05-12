@@ -49,7 +49,8 @@ namespace SimpleWebDemo {
 						.InstancePerDependency();
 
 			//TODO: Converters
-			//builder.RegisterInstance(new Stubs.FixedTextConverter("OCR Results go here")).As<IResultsConverter>();
+			//Arabic for "Enter a text here to translate", missing هنا.
+			builder.RegisterInstance(new Stubs.FixedTextConverter("أدخل النص لترجمة")).As<IResultsConverter>();
 
 			builder.RegisterControllers(typeof(MvcApplication).Assembly);
 			var container = builder.Build();

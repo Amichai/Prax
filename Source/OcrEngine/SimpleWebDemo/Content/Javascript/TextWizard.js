@@ -18,7 +18,7 @@ function TextWizard(container, trigger) {
 	this.wizard.dialog({
 		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
 		resizable: false,
-		autoOpen: false,
+		autoOpen: true,
 
 		buttons: {
 			"Back": function () { self.wizard.formwizard("back"); },
@@ -197,7 +197,8 @@ TextWizard.prototype = {
 
 			var self = this;
 			$.post(basePath + "Documents/CreateFromHtml", { html: html }, function (imageId) {
-				self.image.attr('src', basePath + "Documents/View/" + encodeURIComponent(imageId));
+				self.owner.imageId = imageId;
+				self.image.attr('src', basePath + "Documents/View/" + encodeURI(imageId));
 			});
 		}
 	}

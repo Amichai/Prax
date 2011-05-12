@@ -11,7 +11,7 @@
 *   http://www.opensource.org/licenses/mit-license.php
 *
 * Project home:
-*   http://www.github.com/weixiyen/jquery-filedrop
+*   https://github.com/yamatt/jquery-filedrop/
 *
 * Version:  0.1.0
 *
