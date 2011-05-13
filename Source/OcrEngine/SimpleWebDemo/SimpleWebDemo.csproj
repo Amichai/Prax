@@ -120,6 +120,7 @@
     <Content Include="Content\Javascript\DemoPage.js" />
     <Content Include="Content\Javascript\TextWizard.js" />
     <Content Include="Content\uploadify.swf" />
+    <Content Include="FavIcon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\bbq.js" />
     <Content Include="Scripts\jquery-1.5.1-vsdoc.js" />
