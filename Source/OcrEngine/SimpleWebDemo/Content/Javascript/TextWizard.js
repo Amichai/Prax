@@ -48,7 +48,7 @@ function TextWizard(container, trigger) {
 			//Only set up the steps after we get a size.
 			for (var i = 0; i < self.steps.length; i++)
 				self.steps[i].setUp(self);
-			self.setStep(0, true);	//Don't animate
+			self.setStep(0, true); //Don't animate
 
 			hasShown = true;
 		}
@@ -200,10 +200,14 @@ TextWizard.prototype = {
 	formatStep: {
 		owner: null,
 		textBox: $(),
+		fontSizes: [10, 12, 14, 16, 20, 24, 28],
+		fontUnit: "px",
 
 		setUp: function (parent) {
 			this.owner = parent;
 			var self = this;
+
+			var sizesString = this.fontSizes.join(this.fontUnit + ",") + this.fontUnit;
 
 			this.textBox = $('#formatBox');
 			this.textBox.tinymce({
@@ -216,9 +220,16 @@ TextWizard.prototype = {
 
 				theme_advanced_buttons1: "bold,italic,underline,separator,fontsizeselect,sub,sup,separator,forecolor,backcolor",
 				theme_advanced_buttons2: "",
-				theme_advanced_buttons3: ""
+				theme_advanced_buttons3: "",
+				theme_advanced_font_sizes: sizesString,
+				font_size_style_values: sizesString
 			});
 
+		},
+		setText: function (text) {
+			this.textBox.html(
+				$('<span></span>', { text: text, css: { fontSize: this.fontSizes[2] + this.fontUnit} }).wrap('<p></p>').parent().html()
+			);
 		},
 		onEnter: function (isBack) {
 			//Work around Firefox layout bug
@@ -226,7 +237,7 @@ TextWizard.prototype = {
 			iframe.height(iframe.parent().height());
 
 			if (!isBack)
-				this.textBox.text(this.owner.translationStep.targetBox.text());
+				this.setText(this.owner.translationStep.targetBox.text());
 		}
 	},
 	finalStep: {
