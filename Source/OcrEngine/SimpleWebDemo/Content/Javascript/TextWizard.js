@@ -1,9 +1,6 @@
 ﻿/// <reference path="../../Scripts/jquery-1.5.1-vsdoc.js" />
 /// <reference path="../../Scripts/jquery-ui-1.8.11.js" />
 /// <reference path="../../Scripts/modernizr-1.7.js" />
-/// <reference path="../../Scripts/jquery.uploadify.v2.1.4.js" />
-/// <reference path="../../Scripts/bbq.js" />
-/// <reference path="../../Scripts/jquery.form.wizard.js" />
 /// <reference path="../../Scripts/tiny_mce/jquery.tinymce.js" />
 
 //The wizard layout is completely controlled by CSS.
@@ -22,19 +19,22 @@ function TextWizard(container, trigger) {
 
 	var width = this.wizard.width(), height = this.wizard.height(); //Get the desired height from the CSS
 
+	var hasShown = false;
 	this.wizard.dialog({
 		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
 		resizable: false,
 		autoOpen: false,
 
 		buttons: {
-			"Back": function () { self.wizard.formwizard("back"); },
-			"Next": function () { self.wizard.formwizard("next"); }
+			"Back": function () { self.setStep(self.currentStep.index - 1); },
+			"Next": function () { self.setStep(self.currentStep.index + 1); }
 		},
 
 		width: width, height: height,
 
 		open: function myfunction() {
+			if (hasShown) return;
+
 			//After the dialog becomes visible, force 
 			//the desired height, taking into account
 			//any padding from the dialog itself.   I
@@ -46,11 +46,11 @@ function TextWizard(container, trigger) {
 			});
 
 			//Only set up the steps after we get a size.
-			self.translationStep.setUp(self);
-			self.formatStep.setUp(self);
-			self.finalStep.setUp(self);
+			for (var i = 0; i < self.steps.length; i++)
+				self.steps[i].setUp(self);
+			self.setStep(0, true);	//Don't animate
 
-			self.translationStep.onEnter();
+			hasShown = true;
 		}
 	});
 
@@ -58,19 +58,23 @@ function TextWizard(container, trigger) {
 	this.back = buttons.filter(":contains('Back')");
 	this.next = buttons.filter(":contains('Next')");
 
-
-	//Don't animate transitions in the wizard.
-	//Since I can't setup the steps before the
-	//animation starts,  animations would look
-	//weird.
-	this.wizard.formwizard({
-		//inDuration: 0,
-		//outDuration: 0
-	});
 	this.wizard.bind("step_shown", function (event, data) {
 		if ($.isFunction(self[data.currentStep].onEnter))
 			self[data.currentStep].onEnter(data.isBackNavigation);
 	});
+
+	var stepElems = this.wizard.children('.step')
+		.css({ width: width, height: height })
+		.wrapAll('<div class="StepContainer"></div>');
+
+	this.steps = $.map(stepElems, function (elem, index) {
+		var step = self[elem.id];
+		step.id = elem.id;
+		step.element = $(elem);
+		step.index = index;
+		return step;
+	});
+	this.stepContainer = this.steps[0].element.parent();
 
 	trigger.click(function () { self.wizard.dialog("open"); });
 }
@@ -79,6 +83,41 @@ TextWizard.prototype = {
 	wizard: $(),
 	back: $(),
 	next: $(),
+
+	stepContainer: $(),
+	steps: [],
+	currentStep: null,
+
+	setStep: function (index, dontAnimate) {
+		if (index < 0 || index >= this.steps.length)
+			throw new Error("Bad step index " + index);
+
+		var isBack = this.currentStep && this.currentStep.index > index;
+		var targetStep = this.steps[index];
+		targetStep.onEnter(isBack);
+
+		var animSpeed = dontAnimate ? 0 : 600;
+		if (index == 0)
+			this.back.fadeOut(animSpeed);
+		else
+			this.back.fadeIn(animSpeed);
+
+		//To prevent the Back button from ending up
+		//where the Next button belongs, don't hide
+		//Next completely.  Instead, make sure that
+		//it occupies space, but isn't visible.
+		if (index == this.steps.length - 1)
+			this.next.fadeTo(animSpeed, 0);
+		else
+			this.next.fadeTo(animSpeed, 1);
+
+		this.currentStep = targetStep;
+		var targetPos = -targetStep.element.position().left;
+		if (dontAnimate)
+			this.stepContainer.stop().css({ left: targetPos }, animSpeed);
+		else
+			this.stepContainer.stop().animate({ left: targetPos }, animSpeed);
+	},
 
 	hide: function () { this.wizard.dialog("close"); },
 
@@ -100,9 +139,8 @@ TextWizard.prototype = {
 
 			google.load("language", "1", { callback: function () { self.markDirty(true); } });
 		},
-		onEnter: function (isBack) {
-			this.owner.back.hide();
-		},
+		onEnter: function (isBack) { },
+
 		updateTimer: false,
 		stopTimer: function () {
 			if (this.updateTimer) {
@@ -187,8 +225,6 @@ TextWizard.prototype = {
 			var iframe = $('#formatBox_ifr');
 			iframe.height(iframe.parent().height());
 
-			this.owner.back.show();
-			this.owner.next.show().css('visibility', 'visible'); ;
 			if (!isBack)
 				this.textBox.text(this.owner.translationStep.targetBox.text());
 		}
@@ -220,9 +256,6 @@ TextWizard.prototype = {
 		},
 
 		onEnter: function () {	//It is not possible to go back into the final step
-			this.owner.back.show();
-			this.owner.next.css('visibility', 'hidden'); //Don't let the Back button jump to where the Next button belongs
-
 			this.imagePanel.hide();
 			this.loadingPanel.show();
 

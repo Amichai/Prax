@@ -55,6 +55,18 @@
             height: 300px;
             width: 500px;
             border-radius: 0;
+            overflow: hidden;
+        }
+        
+        #textWizard > .StepContainer {
+            width: 2000%;
+            position: absolute;
+            overflow: hidden;
+        }
+        .StepContainer > .step {
+            float: left;
+            position: relative;
+            overflow: hidden;
         }
         #textWizard .step .Instructions {
             -moz-box-sizing: border-box;
@@ -231,8 +243,6 @@
     <script src="@Href("~/Scripts/jquery.uploadify.v2.1.4.js")" type="text/javascript"></script>
 
     <script src="@Href("~/Scripts/jquery.filedrop.js")" type="text/javascript"></script>
-
-    <script src="@Href("~/Scripts/jquery.form.wizard.js")" type="text/javascript"></script>
 
     <script src="@Href("~/Scripts/tiny_mce/jquery.tinymce.js")" type="text/javascript"></script>
 

@@ -2,7 +2,6 @@
 /// <reference path="../../Scripts/jquery-ui-1.8.11.js" />
 /// <reference path="../../Scripts/modernizr-1.7.js" />
 /// <reference path="../../Scripts/jquery.uploadify.v2.1.4.js" />
-/// <reference path="../../Scripts/jquery.form.wizard.js" />
 /// <reference path="../../Scripts/jquery.filedrop.js" />
 /// <reference path="TextWizard.js" />
 
