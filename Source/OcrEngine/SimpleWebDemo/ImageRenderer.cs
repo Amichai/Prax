@@ -139,7 +139,9 @@ namespace SimpleWebDemo {
 
 			var flowDoc = (FlowDocument)XamlReader.Load(XmlReader.Create(new StringReader(xaml)));
 
-			flowDoc.PagePadding = new Thickness();
+			flowDoc.FlowDirection = FlowDirection.RightToLeft;
+
+			flowDoc.PagePadding = new Thickness();	//Supress the default padding
 			//flowDoc.Background = Brushes.White;
 
 			return new FlowDocumentScrollViewer {

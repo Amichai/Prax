@@ -6,6 +6,13 @@
 /// <reference path="../../Scripts/jquery.form.wizard.js" />
 /// <reference path="../../Scripts/tiny_mce/jquery.tinymce.js" />
 
+//The wizard layout is completely controlled by CSS.
+//All layout done in Javascript gets values from the
+//existing CSS layout.
+//Text direction for the translation is specified in
+//the CSS for #translatedText and in the server-side
+//image renderer.  
+//It also needs to be specified for the result view.
 
 function TextWizard(container, trigger) {
 	var self = this;
@@ -18,31 +25,47 @@ function TextWizard(container, trigger) {
 	this.wizard.dialog({
 		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
 		resizable: false,
-		autoOpen: true,
+		autoOpen: false,
 
 		buttons: {
 			"Back": function () { self.wizard.formwizard("back"); },
 			"Next": function () { self.wizard.formwizard("next"); }
 		},
 
-		width: width, height: height
-	});
-	this.wizard.dialog('option', {	//Force the desired height, taking into account any padding from the dialog
-		width: width + (this.wizard.dialog('option', 'width') - this.wizard.width()),
-		height: height + (this.wizard.dialog('option', 'height') - this.wizard.height())
+		width: width, height: height,
+
+		open: function myfunction() {
+			//After the dialog becomes visible, force 
+			//the desired height, taking into account
+			//any padding from the dialog itself.   I
+			//cannot do this when creating it because
+			//invisible elements have no size.
+			self.wizard.dialog('option', {
+				width: width + (self.wizard.dialog('option', 'width') - self.wizard.width()),
+				height: height + (self.wizard.dialog('option', 'height') - self.wizard.height())
+			});
+
+			//Only set up the steps after we get a size.
+			self.translationStep.setUp(self);
+			self.formatStep.setUp(self);
+			self.finalStep.setUp(self);
+
+			self.translationStep.onEnter();
+		}
 	});
 
 	var buttons = this.wizard.parent().find(".ui-dialog-buttonset button");
 	this.back = buttons.filter(":contains('Back')");
 	this.next = buttons.filter(":contains('Next')");
 
-	this.translationStep.setUp(this);
-	this.formatStep.setUp(this);
-	this.finalStep.setUp(this);
 
+	//Don't animate transitions in the wizard.
+	//Since I can't setup the steps before the
+	//animation starts,  animations would look
+	//weird.
 	this.wizard.formwizard({
-		inDuration: 0,
-		outDuration: 0
+		//inDuration: 0,
+		//outDuration: 0
 	});
 	this.wizard.bind("step_shown", function (event, data) {
 		if ($.isFunction(self[data.currentStep].onEnter))
@@ -50,7 +73,6 @@ function TextWizard(container, trigger) {
 	});
 
 	trigger.click(function () { self.wizard.dialog("open"); });
-	this.translationStep.onEnter();
 }
 
 TextWizard.prototype = {
@@ -72,8 +94,9 @@ TextWizard.prototype = {
 			this.sourceBox = parent.wizard.find('#sourceText')
 				.bind('input propertychange', function () { self.markDirty(); });
 
-			google.setOnLoadCallback(function () { self.markDirty(true); });
-			google.load("language", "1");
+			this.setLoading(); 	//We aren't ready until the translation library loads.
+
+			google.load("language", "1", { callback: function () { self.markDirty(true); } });
 		},
 		onEnter: function (isBack) {
 			this.owner.back.hide();
@@ -85,6 +108,10 @@ TextWizard.prototype = {
 				this.updateTimer = false;
 			}
 		},
+		setLoading: function () {
+			this.targetBox.addClass("Loading");
+			this.owner.next.button("option", "disabled", true);
+		},
 		markDirty: function (updateNow) {
 			this.stopTimer();
 
@@ -92,8 +119,7 @@ TextWizard.prototype = {
 			if (text === this.lastSourceText) return;
 
 			var self = this;
-			this.targetBox.addClass("Loading");
-			this.owner.next.button("option", "disabled", true);
+			this.setLoading();
 			if (updateNow)
 				this.updateTranslation();
 			else
@@ -143,19 +169,24 @@ TextWizard.prototype = {
 			this.textBox.tinymce({
 				script_url: basePath + 'Scripts/tiny_mce/tiny_mce_src.js',
 				theme: "advanced",
+				directionality: parent.translationStep.targetBox.css('direction'),
 
 				width: '100%',
-				height: this.textBox.parent().height() - 1,
+				height: '100%',
 
 				theme_advanced_buttons1: "bold,italic,underline,separator,fontsizeselect,sub,sup,separator,forecolor,backcolor",
 				theme_advanced_buttons2: "",
 				theme_advanced_buttons3: ""
-
 			});
+
 		},
 		onEnter: function (isBack) {
+			//Work around Firefox layout bug
+			var iframe = $('#formatBox_ifr');
+			iframe.height(iframe.parent().height());
+
 			this.owner.back.show();
-			this.owner.next.show();
+			this.owner.next.show().css('visibility', 'visible'); ;
 			if (!isBack)
 				this.textBox.text(this.owner.translationStep.targetBox.text());
 		}
@@ -188,7 +219,7 @@ TextWizard.prototype = {
 
 		onEnter: function () {	//It is not possible to go back into the final step
 			this.owner.back.show();
-			this.owner.next.hide();
+			this.owner.next.css('visibility', 'hidden'); //Don't let the Back button jump to where the Next button belongs
 
 			this.imagePanel.hide();
 			this.loadingPanel.show();
