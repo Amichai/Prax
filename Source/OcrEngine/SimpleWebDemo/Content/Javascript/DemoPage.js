@@ -12,7 +12,7 @@ var uploadPane = {
 	pane: $('#uploadPane'),
 	progress: $("#uploadProgress").progressbar(),
 	show: function () {
-		textWizard.wizard.dialog("close");
+		textWizard.hide();
 		$('#initialButtons').slideUp();
 		this.pane.slideDown();
 	},
@@ -110,7 +110,7 @@ var scanPane = {
 		//If we got here from the wizard, the upload pane 
 		//won't have been shown, so we still need to hide
 		//the stuff that it usually hides.
-		textWizard.wizard.dialog("close");
+		textWizard.hide();
 		$('#initialButtons').slideUp();
 
 		this.id = id;

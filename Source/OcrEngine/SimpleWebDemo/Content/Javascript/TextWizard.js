@@ -80,6 +80,8 @@ TextWizard.prototype = {
 	back: $(),
 	next: $(),
 
+	hide: function () { this.wizard.dialog("close"); },
+
 	translationStep: {
 		sourceBox: $(),
 		targetBox: $(),
