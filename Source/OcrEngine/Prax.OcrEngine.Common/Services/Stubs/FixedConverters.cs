@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 namespace Prax.OcrEngine.Services.Stubs {
 	///<summary>An IResultConverter that generates text files containing a hard-coded string.</summary>
 	public class FixedTextConverter : IResultsConverter {
-		public FixedTextConverter(string text) { bytes = Encoding.ASCII.GetBytes(text); }
+		public FixedTextConverter(string text) { bytes = Encoding.UTF8.GetBytes(text); }
 
 		readonly byte[] bytes;
 
