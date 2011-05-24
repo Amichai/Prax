@@ -10,6 +10,7 @@ namespace Prax.OcrEngine.Engine.ImageRecognition {
 	///<remarks>These instances can be used on multiple threads simultaneously; they must not store any class-level state.</remarks>
 	[ImmutableObject(true)]
 	interface IWorkflowStep {
+		string Name { get; }
 		///<summary>Processes an image.  The image should be mutated to store results.</summary>
 		void Process(ImageData image);
 	}

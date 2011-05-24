@@ -29,7 +29,7 @@ namespace Prax.Recognition {
 		public AlgorithmTrainer() {
 			DisplayOptions testDisplayOptions = DisplayOptions.segmentsAndMatch;
 			TrainingDataOptions openOptions = TrainingDataOptions.reset;
-			TrainFunction trainFunction = TrainFunction.trainToo;
+			TrainFunction trainFunction = TrainFunction.justRenderImage;
 
 			int[][] uploadedDocument = null;
 
