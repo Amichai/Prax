@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Diagnostics;
 
 namespace Prax.Recognition {
-	class SegmentatorV2 {
+	public class SegmentatorV2 {
 
 		private int[][] uploadedDocument;
 		private static int width, height;

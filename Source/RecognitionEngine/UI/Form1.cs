@@ -25,6 +25,7 @@ namespace Prax.Recognition {
 		private enum segmentsToDisplay { segmentation, trainingSegments }
 
 		private void trainAlgorithm(object sender, EventArgs e) {
+			//User defined:
 			segmentsToDisplay displayOptions = segmentsToDisplay.trainingSegments;
 			train.Enabled = false;
 			if (displayOptions == segmentsToDisplay.trainingSegments)
@@ -95,28 +96,6 @@ namespace Prax.Recognition {
 			lbl.Location = new Point(1, yValueIndex);
 			yValueIndex += lbl.Size.Height + 6;
 			segView.Controls.Add(lbl);
-		}
-	}
-
-	public class DisplaySegEventArgs : EventArgs {
-		public readonly Bitmap BitmapToDisplay;
-		public readonly Rectangle Location;
-
-		public DisplaySegEventArgs(Bitmap bitmap, Rectangle location) {
-			BitmapToDisplay = bitmap;
-			Location = location;
-		}
-	}
-
-	public class DisplayMatchResultArgs : EventArgs {
-		public readonly string MatchingString;
-		public readonly Rectangle MatchingCoordinates;
-		public readonly double MatchCertainty;
-
-		public DisplayMatchResultArgs(string match, Rectangle rect, double certainty) {
-			MatchingString = match;
-			MatchingCoordinates = rect;
-			MatchCertainty = certainty;
 		}
 	}
 }

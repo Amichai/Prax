@@ -7,3 +7,4 @@ namespace ExtractedOCRFunctionality {
 	public class Class1 {
 	}
 }
+	

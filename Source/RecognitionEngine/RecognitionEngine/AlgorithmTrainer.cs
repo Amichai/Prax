@@ -10,7 +10,29 @@ using System.IO;
 namespace Prax.Recognition {
 	public enum TrainingDataOptions { openAndAddTo, reset };
 
-	class AlgorithmTrainer {
+	public class DisplaySegEventArgs : EventArgs {
+		public readonly Bitmap BitmapToDisplay;
+		public readonly Rectangle Location;
+
+		public DisplaySegEventArgs(Bitmap bitmap, Rectangle location) {
+			BitmapToDisplay = bitmap;
+			Location = location;
+		}
+	}
+
+	public class DisplayMatchResultArgs : EventArgs {
+		public readonly string MatchingString;
+		public readonly Rectangle MatchingCoordinates;
+		public readonly double MatchCertainty;
+
+		public DisplayMatchResultArgs(string match, Rectangle rect, double certainty) {
+			MatchingString = match;
+			MatchingCoordinates = rect;
+			MatchCertainty = certainty;
+		}
+	}
+
+	public class AlgorithmTrainer {
 		private enum DisplayOptions { none, everySegment, segmentsAndMatch, wordSegmentsAndMatch };
 		private enum TrainFunction { trainToo, justRenderImage }
 

@@ -6,7 +6,7 @@ using System.Drawing;
 
 namespace Prax.Recognition
 {
-    class OCRSegment
+    public class OCRSegment
     {
         public Rectangle SegmentLocation;
         public bool IsAWord;

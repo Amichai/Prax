@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Prax.Recognition
 {
-    class UploadDocument
+    public class UploadDocument
     {
         public int[][] uploadedDocument = null;
         private OpenFileDialog openFileDialog = new OpenFileDialog();

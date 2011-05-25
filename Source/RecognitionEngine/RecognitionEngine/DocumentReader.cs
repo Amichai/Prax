@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Prax.Recognition
 {
-	class DocumentReader
+	public class DocumentReader
 	{
 		private enum ReaderOptions { readDocument, readSavedOutput, saveOutput }
 
