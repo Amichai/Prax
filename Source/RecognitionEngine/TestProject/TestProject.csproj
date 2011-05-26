@@ -2,18 +2,20 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0507F74F-3DB1-4FBE-A804-664D2FE52CA5}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{6519D332-4F5D-4388-9438-D7F1BBC9FEE2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Prax.OcrEngine.Engine</RootNamespace>
-    <AssemblyName>Prax.OcrEngine.Engine</AssemblyName>
+    <RootNamespace>TestProject</RootNamespace>
+    <AssemblyName>TestProject</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -22,7 +24,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,7 +36,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,24 +43,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageRecognition\ImageData.cs" />
-    <Compile Include="ImageRecognition\ImageWorkflow.cs" />
-    <Compile Include="PatternRecognition\PatternRecognizer.cs" />
-    <Compile Include="PatternRecognition\RecognizedPattern.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HeuristicGeneration\DataMatrix.cs" />
-    <Compile Include="HeuristicGeneration\HeuristicGenerator.cs" />
-    <Compile Include="ExposedFunctionality\ExposedFunctionality.cs" />
-    <Compile Include="ReferenceData\InMemoryReferenceSet.cs" />
-    <Compile Include="ReferenceData\IReferenceSet.cs" />
-    <Compile Include="ReferenceData\ReferenceItem.cs" />
-    <Compile Include="ReferenceData\IReferenceLibrary.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">
-      <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
-      <Name>Prax.OcrEngine.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

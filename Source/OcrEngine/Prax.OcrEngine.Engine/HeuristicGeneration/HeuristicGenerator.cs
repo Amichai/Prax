@@ -236,6 +236,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 
 		private IList<int> CalculateHeuristics() {
 			var heuristics = new List<int>(1550);
+			heuristics.AddRange(iterationResults);
 
 			heuristics.AddRange(CalcQuadrantSums());
 			//currentIndex = 208

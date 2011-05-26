@@ -96,10 +96,10 @@ namespace Prax.OcrEngine.Engine.Tests.PatternRecognition {
 			for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
 				//foreach(int inspectionLbl in getInspectionLabelIdicies())
 				for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++) //This is the label we are trying to get information about. We want to know how feasible this label is given our current array
-                {
+				{
 					for (int lblTrialIdx = 0; lblTrialIdx < data.listOfIndicies[inspectionLbl].Count; lblTrialIdx++) { //Iterate through every heuristic array within our given label
 						if (heuristicArray[heurIdx] == data.trainingLibrary[data.listOfIndicies[inspectionLbl][lblTrialIdx]].Item2[heurIdx] && heuristicArray[heurIdx] != -1)//  && heuristicArray[heurIdx] != 0) //RESOLVE THE NECESSITY OF != 0 IN THIS STATEMENT
-                        {
+						{
 							lblComparisonResults[inspectionLbl][heurIdx]++;
 						}
 					}
@@ -107,7 +107,7 @@ namespace Prax.OcrEngine.Engine.Tests.PatternRecognition {
 				}
 				for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++)
 				//foreach (int labelIndex in getInspectionLabelIdicies())
-                {
+				{
 					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)data.listOfIndicies[labelIndex].Count;
 				}
 				//This data structure represents:
@@ -125,14 +125,14 @@ namespace Prax.OcrEngine.Engine.Tests.PatternRecognition {
 
 			for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++)
 			//foreach (int inspectionLbl in getInspectionLabelIdicies())
-            {
+			{
 				labelProbability[inspectionLbl] = 1.0 / (double)numberOfLabelsToCount;
 				for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
 					double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
 					double comparisonToOtherLabels = 0;
 					for (int comparisonLbl = 0; comparisonLbl < numberOfUniqueLabels; comparisonLbl++)
 					//foreach (int comparisonLbl in getInspectionLabelIdicies())
-                    {
+					{
 						if (inspectionLbl != comparisonLbl)
 							comparisonToOtherLabels += lblComparisonResults[comparisonLbl][heurIdx];
 					}

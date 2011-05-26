@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace Prax.Recognition
 {
-    class UploadDocument
+    public class UploadDocument
     {
         public int[][] uploadedDocument = null;
         private OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -27,7 +27,7 @@ namespace Prax.Recognition
 
         private void setDialogBoxSettings()
         {
-            openFileDialog.InitialDirectory = "C:\\Users\\Amichai\\Pictures\\Handwritten\\";
+            //openFileDialog.InitialDirectory = "C:\\Users\\Amichai\\Pictures\\Handwritten\\";
             openFileDialog.Filter = " bmp files (*.bmp) | *.bmp | pdf files (*.pdf) | *.pdf | All files (*.*)|*.*";
             openFileDialog.FilterIndex = 3;
             openFileDialog.RestoreDirectory = true;

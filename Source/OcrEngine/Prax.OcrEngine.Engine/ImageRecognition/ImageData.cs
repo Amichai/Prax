@@ -19,6 +19,7 @@ namespace Prax.OcrEngine.Engine.ImageRecognition {
 	///</remarks>
 	class ImageData {
 		Bitmap UploadedImage;
+		//ImageWpf UploadedImage = new ImageWpf();
 		int[][] ImageMatrix;
 		//TODO: Color or B&W?
 	}
