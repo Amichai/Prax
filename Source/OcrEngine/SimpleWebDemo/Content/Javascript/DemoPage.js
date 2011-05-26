@@ -54,6 +54,8 @@ var textWizard = new TextWizard("#textWizard", "#showTextWizard");
 var buttonArea = $('#initialButtons');
 var dropTarget = $('#dropTarget');
 
+$('.GreenShade').css('opacity', .5);
+
 //Handle drag&drop from the file system; this uploads the image.
 dropTarget.filedrop({
 	url: basePath + 'Documents/UploadImage',

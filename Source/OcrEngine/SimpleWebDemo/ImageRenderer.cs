@@ -141,7 +141,7 @@ namespace SimpleWebDemo {
 
 			flowDoc.FlowDirection = FlowDirection.RightToLeft;
 
-			flowDoc.PagePadding = new Thickness();	//Supress the default padding
+			flowDoc.PagePadding = new Thickness();	//Suppress the default padding
 			//flowDoc.Background = Brushes.White;
 
 			return new FlowDocumentScrollViewer {

@@ -29,12 +29,19 @@
         .LargeButtons #dropTarget {
             display: none;
             font-weight: bold;
+            color: Black;
         }
         .LargeButtons.Dragging #upload {
             display: none;
         }
         .LargeButtons.Dragging #dropTarget {
             display: inline-block;
+        }
+        .GreenShade {
+            background: green;
+            height: 100%;
+            width: 100%;
+            position: absolute;
         }
         #upload {
             position: relative;
@@ -177,8 +184,9 @@
 <div class="LargeButtons" id="initialButtons">
     <div id="upload" class="Large Button">
         <input type="file" value="Upload your own image" /></div>
-    <div id="dropTarget" class="Large ui-widget ui-corner-all ui-widget-header"><span
-        class="ui-button-text">Drop image here</span></div>
+    <div id="dropTarget" class="Large ui-widget ui-corner-all ui-state-default ui-button">
+        <div class="GreenShade"></div>
+        <span class="ui-button-text">Drop image here</span> </div>
     <button id="showTextWizard" class="Large">
         Create an image</button>
 </div>
