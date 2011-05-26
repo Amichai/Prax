@@ -7,11 +7,20 @@ using System.Windows.Documents;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace TextRenderer {
 	public static class Renderer {
+		public static MemoryStream CreateStream(this BitmapSource image) {
+			var stream = new MemoryStream();
+			var encoder = new PngBitmapEncoder();
+			encoder.Frames.Add(BitmapFrame.Create(image));
+			encoder.Save(stream);
+			stream.Position = 0;
+			return stream;
+		}
 
-		public static ImageSource RenderImage(string text) {
+		public static BitmapSource RenderImage(string text) {
 			var c = CreateFlowDoc(text);
 			//var c = CreateTextBlock(text);
 
