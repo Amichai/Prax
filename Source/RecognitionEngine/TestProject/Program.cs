@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Prax.Recognition;
 using ExtractedOCRFunctionality;
+using TextRenderer;
+using System.Windows.Media.Imaging;
+using System.IO;
+using System.Drawing;
 
 namespace TestProject {
 	class Program {
@@ -13,6 +16,7 @@ namespace TestProject {
 			Document uploadDocument = new Document(fileName);
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
 			uploadDocument.Segment();
+			Renderer.RenderImage("test").CreateStream();
 		}
 	}
 }

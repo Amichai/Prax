@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI", "UI\UI.csproj", "{E3D5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphics", "Graphics\Graphics.csproj", "{DC793707-6461-4074-A8DC-3A4495922D03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgRenderer", "ClassLibrary1\ImgRenderer.csproj", "{7F2057C2-741F-4EB7-BC65-9712A0C420F3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,16 @@ Global
 		{DC793707-6461-4074-A8DC-3A4495922D03}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DC793707-6461-4074-A8DC-3A4495922D03}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DC793707-6461-4074-A8DC-3A4495922D03}.Release|x86.ActiveCfg = Release|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
