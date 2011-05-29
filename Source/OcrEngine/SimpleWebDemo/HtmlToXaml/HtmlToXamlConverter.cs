@@ -2007,10 +2007,13 @@ namespace SimpleWebDemo.HtmlToXaml
                         break;
                     case "font-variant":
                         //  Convert from font-variant into xaml property
-                        break;
-                    case "font-weight":
-                        xamlElement.SetAttribute(Xaml_FontWeight, (string)propertyEnumerator.Value);
-                        break;
+						break;
+					case "text-variant":
+						xamlElement.SetAttribute("Typography.Variants", (string)propertyEnumerator.Value);
+						break;
+					case "font-weight":
+						xamlElement.SetAttribute(Xaml_FontWeight, (string)propertyEnumerator.Value);
+						break;
                     case "font-size":
                         //  Convert from css size into FontSize
                         xamlElement.SetAttribute(Xaml_FontSize, (string)propertyEnumerator.Value);
@@ -2356,8 +2359,10 @@ namespace SimpleWebDemo.HtmlToXaml
                     localProperties["text-align"] = "Left";
                     break;
                 case "sub":
+					localProperties["text-variant"] = "Subscript";
                     break;
                 case "sup":
+					localProperties["text-variant"] = "Superscript";
                     break;
 
                 // Hyperlinks
