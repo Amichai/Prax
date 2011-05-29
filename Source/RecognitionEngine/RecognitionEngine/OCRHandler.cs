@@ -87,7 +87,7 @@ namespace Prax.Recognition
         #region Train Test preprocess (iterated boards and heuristics)
 
         private const int numberOfIterations = 8;
-
+			
         private int[][][] setOfIteratedBoards { get; set; }
 
         private int boardIterationCounter;

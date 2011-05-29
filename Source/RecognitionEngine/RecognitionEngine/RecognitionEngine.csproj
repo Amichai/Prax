@@ -61,7 +61,6 @@
     <Compile Include="DisplayUtility.cs" />
     <Compile Include="DocumentReader.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="GraphicsHelper.cs" />
     <Compile Include="HeuristicsControlPanel.cs" />
     <Compile Include="ImageAndSegmentLocations.cs" />
     <Compile Include="OCRHandler.cs" />
@@ -81,6 +80,19 @@
     <None Include="Arabic Source.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TxtToRender.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExtractedOCRFunctionality\OCRFunctionality.csproj">
+      <Project>{D219AEDF-0DE6-4EA0-87D8-4DA13085E7FC}</Project>
+      <Name>OCRFunctionality</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Graphics\Graphics.csproj">
+      <Project>{DC793707-6461-4074-A8DC-3A4495922D03}</Project>
+      <Name>Graphics</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

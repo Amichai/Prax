@@ -1,5 +1,4 @@
-﻿/*
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,9 +6,9 @@ using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
 using ExtractedOCRFunctionality;
+using Prax.Recognition;
 
-namespace Prax.Recognition
-{
+namespace ExtractedOCRFunctionality {
     public class Document {
         public int[][] document = null;
         private OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -55,7 +54,7 @@ namespace Prax.Recognition
             Bitmap FileBitmap = null;
             if (Path.GetExtension(filename) == ".pdf")
             {
-                FileBitmap = GraphicsHelper.ConvertPdfToBitmap(filename);
+                //FileBitmap = GraphicsHelper.ConvertPdfToBitmap(filename);
             }
             else
             {
@@ -84,5 +83,3 @@ namespace Prax.Recognition
 		}
     }
 }
-
-*/

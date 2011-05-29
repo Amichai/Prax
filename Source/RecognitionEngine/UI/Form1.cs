@@ -8,24 +8,27 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Diagnostics;
+using ExtractedOCRFunctionality;
+
 
 namespace Prax.Recognition {
 	public partial class Form1 : Form {
 		public Form1() {
 			InitializeComponent();
 		}
-		private UploadDocument uploadDocument = null;
+		private Document uploadDocument = null;
 
 		private void uploadFile(object sender, EventArgs e) {
 			upload.Enabled = false;
-			uploadDocument = new UploadDocument();
+			//Contains the upload functionality:
+			uploadDocument = new Document();
 			upload.Enabled = true;
 		}
 
 		private enum segmentsToDisplay { segmentation, trainingSegments }
 
 		private void trainAlgorithm(object sender, EventArgs e) {
-			//User defined:
+			//UserDefined:
 			segmentsToDisplay displayOptions = segmentsToDisplay.trainingSegments;
 			train.Enabled = false;
 			if (displayOptions == segmentsToDisplay.trainingSegments)
@@ -33,6 +36,7 @@ namespace Prax.Recognition {
 			if (displayOptions == segmentsToDisplay.segmentation)
 				SegmentatorV2.DisplaySegment += ShowSeg;
 			AlgorithmTrainer.DisplayResult += ShowResult;
+			//Contains the train functionality
 			AlgorithmTrainer trainHandler = new AlgorithmTrainer();
 			train.Enabled = true;
 		}
@@ -40,7 +44,7 @@ namespace Prax.Recognition {
 		private void readDocument(object sender, EventArgs e) {
 			read.Enabled = false;
 			SegmentatorV2.DisplaySegment += ShowSeg;
-			DocumentReader readHandler = new DocumentReader(uploadDocument.uploadedDocument);
+			DocumentReader readHandler = new DocumentReader(uploadDocument.document);
 			//DocumentReader readHandler = new DocumentReader();
 			read.Enabled = true;
 		}

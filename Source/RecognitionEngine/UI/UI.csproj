@@ -77,6 +77,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ExtractedOCRFunctionality\OCRFunctionality.csproj">
+      <Project>{D219AEDF-0DE6-4EA0-87D8-4DA13085E7FC}</Project>
+      <Name>OCRFunctionality</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Graphics\Graphics.csproj">
+      <Project>{DC793707-6461-4074-A8DC-3A4495922D03}</Project>
+      <Name>Graphics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RecognitionEngine\RecognitionEngine.csproj">
       <Project>{C4A17DAD-40D3-4978-8D59-C3A45C582067}</Project>
       <Name>RecognitionEngine</Name>

@@ -31,7 +31,7 @@ namespace Prax.Recognition {
 			using (var font = new Font(dataFontName, float.Parse(dataSize), style, GraphicsUnit.Pixel)) {
 				var lines = WrapLines(File.ReadLines(dataFileName)).ToArray();
 				var text = String.Join(Environment.NewLine, lines);
-
+				//TODO: Figure out why we can't get the image to render in two lines
 				var size = TextRenderer.MeasureText(text, font);
 				var image = new Bitmap(size.Width * 2, size.Height * 2);
 
