@@ -118,6 +118,7 @@ namespace Prax.Recognition {
 				return CompressImage(newFileName);
 		}
 
+
 		public static int[][] BitmapToDoubleArray(Bitmap fileBitmap) {
 			int[][] uploadedDocument;
 			int width = fileBitmap.Width;
