@@ -13,7 +13,7 @@ namespace TestProject {
 		[STAThreadAttribute]
 		static void Main(string[] args) {
 			string fileName = @"C:\Users\Public\Pictures\temp.bmp"; 
-			Renderer.RenderImage("test").CreateStream(fileName);
+			Renderer.RenderImage("تلبستبي بيسا سي").CreateStream(fileName).Close();
 			Document uploadDocument = new Document(fileName);
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
 			uploadDocument.Segment();

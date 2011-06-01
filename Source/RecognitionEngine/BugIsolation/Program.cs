@@ -6,6 +6,7 @@ using System.Text;
 namespace BugIsolation {
 	class Program {
 		static void Main(string[] args) {
+
 		}
 	}
 }
