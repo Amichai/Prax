@@ -3,6 +3,8 @@
 /// <reference path="../../Scripts/modernizr-1.7.js" />
 /// <reference path="../../Scripts/jquery.uploadify.v2.1.4.js" />
 /// <reference path="../../Scripts/jquery.filedrop.js" />
+/// <reference path="../../Scripts/jsdiff.js" />
+/// <reference path="../../Scripts/wDiff.js" />
 /// <reference path="TextWizard.js" />
 
 $('button, .Button').button();
@@ -144,8 +146,7 @@ var scanPane = {
 				case "Complete":
 					//Show a full bar as it slides up
 					self.progress.progressbar("option", "value", 100);
-					self.pane.slideUp();
-					alert(doc.text);
+					showResults(doc.text);
 					break;
 
 				default: alert("Unknown state: " + doc.state);
@@ -153,3 +154,22 @@ var scanPane = {
 		});
 	}
 };
+
+function showResults(result) {
+	if (!textWizard.text) {
+		$('#resultTabs').tabs('option', 'selected', 1); //Select the Results tab
+		$('.GenerationResult').hide();
+	} else {
+		$('#originalText').text(textWizard.text);
+		$('#diff').html(WDiffString(textWizard.text, result));
+		$('#resultTabs').tabs('option', 'selected', 2); //Select the Diff tab
+		//TODO: Stats
+	}
+
+	$('#resultText').text(result);
+	$('#resultImage img').attr('src', basePath + "Documents/View/" + encodeURI(scanPane.id));
+	scanPane.pane.slideUp();
+
+	$('#resultTabs').slideDown();
+}
+$('#resultTabs').tabs();

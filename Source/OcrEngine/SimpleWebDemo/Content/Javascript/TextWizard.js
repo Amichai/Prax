@@ -88,6 +88,9 @@ TextWizard.prototype = {
 	steps: [],
 	currentStep: null,
 
+	html: null,
+	text: null,
+
 	setStep: function (index, dontAnimate) {
 		if (index < 0 || index >= this.steps.length)
 			throw new Error("Bad step index " + index);
@@ -271,10 +274,11 @@ TextWizard.prototype = {
 			this.imagePanel.hide();
 			this.loadingPanel.show();
 
-			var html = this.owner.formatStep.textBox.html();
+			this.owner.html = this.owner.formatStep.textBox.html();
+			this.owner.text = this.owner.formatStep.textBox.text();
 
 			var self = this;
-			$.post(basePath + "Documents/CreateFromHtml", { html: html }, function (imageId) {
+			$.post(basePath + "Documents/CreateFromHtml", { html: this.owner.html }, function (imageId) {
 				self.owner.imageId = imageId;
 				self.image.attr('src', basePath + "Documents/View/" + encodeURI(imageId));
 			});
