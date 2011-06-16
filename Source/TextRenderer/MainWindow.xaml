@@ -10,7 +10,7 @@
 		</Grid.RowDefinitions>
 		<TextBox Name="textBox" TextChanged="textBox_TextChanged" AcceptsReturn="True" />
 		<GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-		<Border  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" BorderBrush="Black" BorderThickness="1">
+		<Border  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="2" BorderBrush="Black" BorderThickness="0">
 			<Image Name="preview" Stretch="None"/></Border>
 	</Grid>
 </Window>
