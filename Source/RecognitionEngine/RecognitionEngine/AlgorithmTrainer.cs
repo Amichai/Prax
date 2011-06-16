@@ -49,6 +49,7 @@ namespace Prax.Recognition {
 		}
 
 		public AlgorithmTrainer() {
+			//UserDefined:
 			DisplayOptions testDisplayOptions = DisplayOptions.segmentsAndMatch;
 			TrainingDataOptions openOptions = TrainingDataOptions.reset;
 			TrainFunction trainFunction = TrainFunction.justRenderImage;

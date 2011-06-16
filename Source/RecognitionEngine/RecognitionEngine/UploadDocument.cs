@@ -1,24 +1,40 @@
-﻿using System;
+﻿/*
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Drawing;
+using ExtractedOCRFunctionality;
 
 namespace Prax.Recognition
 {
-    public class UploadDocument
-    {
-        public int[][] uploadedDocument = null;
+    public class Document {
+        public int[][] document = null;
         private OpenFileDialog openFileDialog = new OpenFileDialog();
         private PictureBox pictureBox;
+		public Bitmap documentImage { get; set; }
+		private string filename;
 
-        public UploadDocument()
+		/// <summary>
+		/// Document upload happens in the constructor.
+		/// </summary>
+		/// <param name="filename"></param>
+		public Document(string filename) {
+			this.filename = filename;
+			documentToDoubleArray();
+			preprocessImage();
+		}
+		/// <summary>
+		/// Document upload happens in the constructor.
+		/// </summary>
+        public Document()
         {
             setDialogBoxSettings();
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
+				filename = openFileDialog.FileName;
                 documentToDoubleArray();
                 preprocessImage();
             }
@@ -37,24 +53,36 @@ namespace Prax.Recognition
         {
             #region Get Bitmap
             Bitmap FileBitmap = null;
-            
-            if (Path.GetExtension(openFileDialog.FileName) == ".pdf")
+            if (Path.GetExtension(filename) == ".pdf")
             {
-                FileBitmap = GraphicsHelper.ConvertPdfToBitmap(openFileDialog.FileName);
+                FileBitmap = GraphicsHelper.ConvertPdfToBitmap(filename);
             }
             else
             {
                 //FileBitmap = GraphicsHelper.CompressBitmap(openFileDialog.FileName);
-                FileBitmap = Bitmap.FromFile(openFileDialog.FileName) as Bitmap;
+                FileBitmap = Bitmap.FromFile(filename) as Bitmap;
             }
             //FileBitmap = GraphicsHelper.MakeGrayscale(FileBitmap);
             #endregion
-            uploadedDocument = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
+			documentImage = FileBitmap;
+            document = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
         }
 
         private void preprocessImage()
         {
             //Intended to house noise reduction and rotation algorithm
         }
+
+		public IteratedBoards DefineIteratedBoards() {
+			IteratedBoards boards = new IteratedBoards();
+			MatrixBoard currentBoard = new MatrixBoard(document);
+			for (int i = 0; i < IteratedBoards.numberOfIterations; i++) {
+				boards.Boards.Add(currentBoard);
+				currentBoard = currentBoard.IterateBoard();
+			}
+			return boards;
+		}
     }
 }
+
+*/
