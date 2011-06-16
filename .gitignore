@@ -1,6 +1,7 @@
 
 #VS Extensions
 *.vs10x
+*.docstates
 #Office temp files
 ~$*
 #ignore thumbnails created by windows
