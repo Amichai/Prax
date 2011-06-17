@@ -16,6 +16,7 @@ namespace TestProject {
 			Renderer.RenderImage("تلبستبي بيسا سي").CreateStream(fileName).Close();
 			Document uploadDocument = new Document(fileName);
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
+			//TODO: automated training
 			uploadDocument.Segment();
 		}
 	}

@@ -21,7 +21,6 @@ namespace SimpleWebDemo.Controllers {
 			return File(doc.OpenRead(), doc.MimeType);
 		}
 
-
 #if DEBUG
 		[ValidateInput(false)]	//This method exists to test the image renderer.
 		public ActionResult RenderImage(string html) {

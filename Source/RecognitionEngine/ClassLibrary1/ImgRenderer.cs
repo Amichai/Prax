@@ -8,6 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.IO;
+using System.Windows.Media.TextFormatting;
+
 
 namespace TextRenderer {
 	public static class Renderer {
@@ -21,6 +23,7 @@ namespace TextRenderer {
 		}
 
 		public static BitmapSource RenderImage(string text) {
+
 			var c = CreateFlowDoc(text);
 			//var c = CreateTextBlock(text);
 
@@ -40,8 +43,9 @@ namespace TextRenderer {
 
 		static FrameworkElement CreateFlowDoc(string text) {
 			var flowDoc = new FlowDocument();
-			flowDoc.Blocks.Add(new Paragraph(new Run(text)));
-
+			Paragraph ParagraphToAdd = new Paragraph(new Run(text));
+			flowDoc.Blocks.Add(ParagraphToAdd);
+			new GlyphLocations(ParagraphToAdd);
 			flowDoc.FlowDirection = FlowDirection.RightToLeft;
 
 			flowDoc.PagePadding = new Thickness();	//Suppress the default padding
@@ -56,6 +60,9 @@ namespace TextRenderer {
 				Document = flowDoc,
 			};
 		}
-
+	}
+	public class GlyphLocations {
+		public GlyphLocations(Paragraph text) {
+		}
 	}
 }

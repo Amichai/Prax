@@ -12,5 +12,8 @@ namespace ExtractedOCRFunctionality {
 	class HeuristicArray {
 		List<int> heuristics = new List<int>();
 		List<string> dataLabels = new List<string>();
+		IteratedBoards boards = new IteratedBoards();
+		//Make a matching algortihm which can match boards of different sizes over dimensions
+
 	}
 }

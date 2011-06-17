@@ -9,7 +9,6 @@ namespace ExtractedOCRFunctionality {
 	public class IteratedBoards{
 		public List<MatrixBoard> Boards = new List<MatrixBoard>();
 		public const int numberOfIterations = 8;
-
 	}
 	public class MatrixBoard {
 		public int[][] Matrix { get; set; }
@@ -57,6 +56,14 @@ namespace ExtractedOCRFunctionality {
 			}
 			iteratedBoard.MatrixImg = GraphicsHelper.ConvertDoubleArrayToBitmap(iteratedBoard.Matrix, Color.White);
 			return iteratedBoard;
+		}
+		/// <summary>
+		/// This returns a comparison value for two boards of equal size
+		/// </summary>
+		/// <returns></returns>
+		public int CompareBoards(IteratedBoards compBoards){
+
+			return int.MaxValue;
 		}
 	}
 }
