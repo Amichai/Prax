@@ -138,9 +138,7 @@ TextWizard.prototype = {
 			this.sourceBox = parent.wizard.find('#sourceText')
 				.bind('input propertychange', function () { self.markDirty(); });
 
-			this.setLoading(); 	//We aren't ready until the translation library loads.
-
-			google.load("language", "1", { callback: function () { self.markDirty(true); } });
+			this.markDirty(true);
 		},
 		onEnter: function (isBack) { },
 
@@ -180,13 +178,19 @@ TextWizard.prototype = {
 			}
 
 			var self = this;
-			google.language.translate(
-				{ text: text, type: "text" },
-				"", //Detect source language
-				"ar",
+
+			$.getJSON(
+				"http://api.microsofttranslator.com/V2/Ajax.svc/Translate?oncomplete=?",
+				{
+					appId: "1D5D705DC49FBC716892B81D6455001C5732735E",
+					text: text,
+					to: "ar",
+					contentType: "text/plain",
+					category: "general"
+				},
 				function (result) {
 					self.lastSourceText = text;
-					self.targetBox.text(result.translation)
+					self.targetBox.text(result)
 
 					if (text === $.trim(self.sourceBox.val()))
 						self.markTranslated();
