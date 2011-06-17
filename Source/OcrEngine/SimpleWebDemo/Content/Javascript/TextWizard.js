@@ -20,8 +20,8 @@ function TextWizard(container, trigger) {
 	var width = this.wizard.width(), height = this.wizard.height(); //Get the desired height from the CSS
 
 	var hasShown = false;
-	this.wizard.dialog({
-		position: ['center', trigger.position().top + trigger.outerHeight() + 10],
+	this.wizard.dialog({	//The vertical position whould line up with the button, after collapsing the logo.  The collapsed logo is 225 pixels shorter
+		position: ['center', trigger.position().top + trigger.outerHeight() + 5 - 225],
 		resizable: false,
 		autoOpen: false,
 
@@ -76,7 +76,10 @@ function TextWizard(container, trigger) {
 	});
 	this.stepContainer = this.steps[0].element.parent();
 
-	trigger.click(function () { self.wizard.dialog("open"); });
+	trigger.click(function () {
+		self.wizard.dialog("open");
+		$('header img').addClass("Compact");
+	});
 }
 
 TextWizard.prototype = {
