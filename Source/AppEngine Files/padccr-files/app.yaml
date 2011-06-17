@@ -1,0 +1,17 @@
+application: padccr-files
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /
+  static_files: Index.html
+  upload: Index\.html
+
+- url: /[Aa]bout
+  static_files: About.html
+  upload: About\.html
+
+- url: /(favicon\.ico|Logo\.png)
+  static_files: \1
+  upload: favicon\.ico|Logo\.png
