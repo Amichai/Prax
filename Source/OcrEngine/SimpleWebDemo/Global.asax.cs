@@ -22,9 +22,15 @@ namespace SimpleWebDemo {
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
 			routes.MapRoute(
-				"Default", // Route name
-				"{controller}/{action}/{id}", // URL with parameters
-				new { controller = "Home", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+				"Documents", // Route name
+				"Documents/{action}/{id}", // URL with parameters
+				new { controller = "Documents", id = UrlParameter.Optional } // Parameter defaults
+			);
+
+			routes.MapRoute(
+				"Home Action", // Route name
+				"{action}", // URL with parameters
+				new { controller = "Home", action = "Index" } // Parameter defaults
 			);
 		}
 
