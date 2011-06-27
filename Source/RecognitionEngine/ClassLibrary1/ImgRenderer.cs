@@ -49,7 +49,7 @@ namespace TextRenderer {
 			flowDoc.FlowDirection = FlowDirection.RightToLeft;
 
 			flowDoc.PagePadding = new Thickness();	//Suppress the default padding
-			//flowDoc.Background = Brushes.White;
+			flowDoc.Background = Brushes.White;
 
 			return new FlowDocumentScrollViewer {
 				Width = 300,

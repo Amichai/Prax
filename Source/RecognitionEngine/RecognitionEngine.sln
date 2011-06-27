@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graphics", "Graphics\Graphi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgRenderer", "ClassLibrary1\ImgRenderer.csproj", "{7F2057C2-741F-4EB7-BC65-9712A0C420F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextRenderer", "..\TextRenderer\TextRenderer.csproj", "{87DC4997-9C1B-462D-840F-1F9910549430}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextMeasuring", "TextMeasuring\TextMeasuring.csproj", "{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +87,26 @@ Global
 		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{7F2057C2-741F-4EB7-BC65-9712A0C420F3}.Release|x86.ActiveCfg = Release|Any CPU
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Debug|x86.ActiveCfg = Debug|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Debug|x86.Build.0 = Debug|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Release|Any CPU.ActiveCfg = Release|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Release|Mixed Platforms.Build.0 = Release|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Release|x86.ActiveCfg = Release|x86
+		{87DC4997-9C1B-462D-840F-1F9910549430}.Release|x86.Build.0 = Release|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Debug|x86.ActiveCfg = Debug|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Debug|x86.Build.0 = Debug|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Release|Any CPU.ActiveCfg = Release|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Release|Mixed Platforms.Build.0 = Release|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Release|x86.ActiveCfg = Release|x86
+		{ED227ECA-78A4-4AE7-9DFA-B8EBBCE7178B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

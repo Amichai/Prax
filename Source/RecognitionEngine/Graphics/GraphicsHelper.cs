@@ -7,6 +7,8 @@ using System.Drawing.Imaging;
 using System.IO;
 //using PdfToImage;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Windows;
 //using iTextSharp;
 
 namespace Prax.Recognition {
@@ -21,13 +23,13 @@ namespace Prax.Recognition {
 			//create the grayscale ColorMatrix
 			ColorMatrix colorMatrix = new ColorMatrix(
 			   new float[][] 
-      {
-         new float[] {.3f, .3f, .3f, 0, 0},
-         new float[] {.59f, .59f, .59f, 0, 0},
-         new float[] {.11f, .11f, .11f, 0, 0},
-         new float[] {0, 0, 0, 1, 0},
-         new float[] {0, 0, 0, 0, 1}
-      });
+	  {
+		 new float[] {.3f, .3f, .3f, 0, 0},
+		 new float[] {.59f, .59f, .59f, 0, 0},
+		 new float[] {.11f, .11f, .11f, 0, 0},
+		 new float[] {0, 0, 0, 1, 0},
+		 new float[] {0, 0, 0, 0, 1}
+	  });
 
 			//create some image attributes
 			ImageAttributes attributes = new ImageAttributes();
@@ -160,6 +162,17 @@ namespace Prax.Recognition {
 				}
 			}
 			return bitmapReturn;
+		}
+
+		static public System.Drawing.Bitmap BitmapSourceToBitmap2(this System.Windows.Media.Imaging.BitmapSource srs) {
+			System.Drawing.Bitmap btm = null;
+			int width = srs.PixelWidth;
+			int height = srs.PixelHeight;
+			int stride = width * ((srs.Format.BitsPerPixel + 7) / 8);
+			IntPtr ptr = Marshal.AllocHGlobal(height * stride);
+			srs.CopyPixels(new Int32Rect(0, 0, width, height), ptr, height * stride, stride);
+			btm = new System.Drawing.Bitmap(width, height, stride, System.Drawing.Imaging.PixelFormat.Format1bppIndexed, ptr);
+			return btm;
 		}
 	}
 

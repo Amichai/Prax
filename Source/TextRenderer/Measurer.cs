@@ -29,7 +29,7 @@ namespace TextRenderer {
 		public override TextDecorationCollection TextDecorations { get { return null; } }
 		public override TextEffectCollection TextEffects { get { return null; } }
 	}
-	class BasicTextParagraphProperties : TextParagraphProperties {
+	public class BasicTextParagraphProperties : TextParagraphProperties {
 		public BasicTextParagraphProperties(string font, int size, FlowDirection direction = FlowDirection.LeftToRight) : this(new BasicTextRunProperties(font, size), direction) { }
 		public BasicTextParagraphProperties(TextRunProperties runProperties, FlowDirection direction = FlowDirection.LeftToRight) {
 			defaultRunProperties = runProperties;
@@ -53,7 +53,7 @@ namespace TextRenderer {
 
 		public override TextMarkerProperties TextMarkerProperties { get { return null; } }
 	}
-	static class Measurer {
+	public static class Measurer {
 		class BasicSource : TextSource {
 			readonly string text;
 			readonly TextRunProperties properties;

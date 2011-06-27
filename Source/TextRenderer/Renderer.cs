@@ -11,8 +11,8 @@ using System.IO;
 
 namespace TextRenderer {
 	public static class Renderer {
-		public static MemoryStream CreateStream(this BitmapSource image) {
-			var stream = new MemoryStream();
+		public static FileStream CreateStream(this BitmapSource image, string filename) {
+			var stream = new FileStream(filename, FileMode.Create);
 			var encoder = new PngBitmapEncoder();
 			encoder.Frames.Add(BitmapFrame.Create(image));
 			encoder.Save(stream);
