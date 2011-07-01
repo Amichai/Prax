@@ -6,7 +6,8 @@ using Prax.Recognition;
 using System.Drawing;
 
 namespace ExtractedOCRFunctionality {
-	public class Heuristics {
+	public class HeuristicReturnValues {
+		public string Label { public get; set; }
 		private List<int> heuristics = new List<int>();
 		public void AddHeursitics(int[][] board) {
 			for (int i = 0; i < board.Length; i++) {

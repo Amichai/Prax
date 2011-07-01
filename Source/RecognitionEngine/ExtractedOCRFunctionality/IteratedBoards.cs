@@ -12,18 +12,24 @@ namespace ExtractedOCRFunctionality {
 
 		public TrainingData Train(CharacterBounds charBounds) {
 			int midpoint;
+			int boardWidth = Boards.First().Matrix.Length;
 			foreach(var character in charBounds.items){
 				midpoint = character.Item1.X + (int)Math.Round(character.Item1.Width / 2d);
+				Rectangle rect = new Rectangle(midpoint - 6, 0, boardWidth, character.Item1.Height);
+				HeuristicReturnValues heursitics = new HeuristicReturnValues();
+				heursitics.GoThroughBoards(Boards, rect);
+				TrainingData trainingData = new TrainingData();
 			}
 			//Find the midpoint of the charbounds
 			//Use that midpoint to extract the heursitcis
 			throw new NotImplementedException();
 		}
-		private Heuristics ExtractHeursitics(int midpoint){
-			Heuristics heuristics = new Heuristics();
+
+		private HeuristicReturnValues ExtractHeursitics(int midpoint){
+			HeuristicReturnValues heuristics = new HeuristicReturnValues();
 			int idx = midpoint - 6; 
-			int width =Boards.First().Matrix[0].Length;
-			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.widthOfSubBoard, width));
+			int width = Boards.First().Matrix[0].Length;
+			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.WidthOfCanvas, width));
 			return heuristics;
 		}
 	}

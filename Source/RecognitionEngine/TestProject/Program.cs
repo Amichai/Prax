@@ -39,7 +39,7 @@ namespace TestProject {
 			CharacterBounds charBounds = new CharacterBounds(words);
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
 			TrainingData trainingData = boards.Train(charBounds);
-			Heuristics heuristics = boards.Segment();
+			HeuristicReturnValues heuristics = boards.Segment();
 			
 		}
 	}
