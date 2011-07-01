@@ -24,32 +24,23 @@ namespace TestProject {
 				c.DrawImage(new DrawingImage(dg), new Rect(dg.Bounds.Size));
 			var rtb = new RenderTargetBitmap((int)dg.Bounds.Width, (int)dg.Bounds.Height, 96, 96, PixelFormats.Pbgra32);
 			rtb.Render(dv);
-
 			return rtb;
 		}
-
 
 		[STAThreadAttribute]
 		static void Main(string[] args) {
 			string fileName = @"C:\Users\Public\Pictures\temp.png";
 			string renderMe = "تلبستبي بيسا سي";
-//			string renderMe = //"تلبستبي بيسا سي";
-
-
 			var output = new DrawingGroup();
 			BasicTextParagraphProperties format = new BasicTextParagraphProperties("Tahoma", 13, FlowDirection.LeftToRight);
-
-			//Execute the entire iterator
 			var words = TextSegment.GetWords(renderMe, Measurer.MeasureLines(renderMe, 200, format, output)).ToList();
 			output.ToBitmap().CreateStream(fileName).Close();
 			Document uploadDocument = new Document(fileName);
 			CharacterBounds charBounds = new CharacterBounds(words);
-			//charBounds.DrawOnImage(uploadDocument.documentImage);
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
-			boards.Segment();
-			//TODO: automated training
-			Bitmap temp = uploadDocument.document.ExtractRectangularContentArea(charBounds.bounds.Last().Item1)
-						.ConvertDoubleArrayToBitmap(System.Drawing.Color.White); 
+			TrainingData trainingData = boards.Train(charBounds);
+			Heuristics heuristics = boards.Segment();
+			
 		}
 	}
 }

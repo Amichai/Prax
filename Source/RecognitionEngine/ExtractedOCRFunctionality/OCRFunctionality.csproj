@@ -46,10 +46,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharacterBounds.cs" />
+    <Compile Include="Heuristics.cs" />
     <Compile Include="IteratedBoards.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Segmentation.cs" />
     <Compile Include="TextSegment.cs" />
+    <Compile Include="TrainingData.cs" />
     <Compile Include="TrainingDataLibrary.cs" />
     <Compile Include="UploadDocument.cs" />
   </ItemGroup>

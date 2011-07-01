@@ -9,7 +9,26 @@ namespace ExtractedOCRFunctionality {
 	public class IteratedBoards{
 		public List<MatrixBoard> Boards = new List<MatrixBoard>();
 		public const int numberOfIterations = 8;
+
+		public TrainingData Train(CharacterBounds charBounds) {
+			int midpoint;
+			foreach(var character in charBounds.items){
+				midpoint = character.Item1.X + (int)Math.Round(character.Item1.Width / 2d);
+			}
+			//Find the midpoint of the charbounds
+			//Use that midpoint to extract the heursitcis
+			throw new NotImplementedException();
+		}
+		private Heuristics ExtractHeursitics(int midpoint){
+			Heuristics heuristics = new Heuristics();
+			int idx = midpoint - 6; 
+			int width =Boards.First().Matrix[0].Length;
+			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.widthOfSubBoard, width));
+			return heuristics;
+		}
 	}
+
+
 	public class MatrixBoard {
 		public int[][] Matrix { get; set; }
 		public Bitmap MatrixImg;
