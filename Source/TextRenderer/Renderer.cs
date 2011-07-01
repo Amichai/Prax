@@ -17,8 +17,11 @@ namespace TextRenderer {
 			encoder.Frames.Add(BitmapFrame.Create(image));
 			encoder.Save(stream);
 			stream.Position = 0;
+			
 			return stream;
 		}
+
+
 
 		public static BitmapSource RenderImage(string text) {
 			var c = CreateFlowDoc(text);

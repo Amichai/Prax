@@ -90,7 +90,7 @@ namespace TextRenderer {
 			using (var formatter = TextFormatter.Create()) {
 				int index = 0;
 				double y = 0;
-
+				
 				var source = new BasicSource(text, format.DefaultTextRunProperties);
 				while (index < text.Length) {
 					var line = formatter.FormatLine(source, index, width, format, null);
