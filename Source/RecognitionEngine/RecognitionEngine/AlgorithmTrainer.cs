@@ -57,7 +57,7 @@ namespace Prax.Recognition {
 			int[][] uploadedDocument = null;
 
 			ImageAndSegmentLocations generateTrainingSeg = new ImageAndSegmentLocations();
-			uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage);
+			uploadedDocument = GraphicsHelper.BitmapToDoubleArray(generateTrainingSeg.TrainingImage, ".bmp");
 
 			SegmentatorV2 segmentation = new SegmentatorV2(uploadedDocument);
 			OCRHandler ocrHandler = new OCRHandler(openOptions);

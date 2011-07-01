@@ -8,6 +8,7 @@ using System.Drawing;
 using ExtractedOCRFunctionality;
 using Prax.Recognition;
 using System.Drawing.Imaging;
+using System.Diagnostics;
 
 namespace ExtractedOCRFunctionality {
 	public class Document {
@@ -53,24 +54,21 @@ namespace ExtractedOCRFunctionality {
 		{
 			#region Get Bitmap
 			Bitmap FileBitmap = null;
-			if (Path.GetExtension(filename) == ".pdf")
+			string extension = Path.GetExtension(filename);
+			if (extension == ".pdf")
 			{
 				//FileBitmap = GraphicsHelper.ConvertPdfToBitmap(filename);
 			}
-			if (Path.GetExtension(filename) == ".png") {
-				Image temp = Image.FromFile(filename);
-				filename = Path.GetFileNameWithoutExtension(filename) + ".bmp";
-				temp.Save(filename, ImageFormat.Bmp);
-			}
-			if (Path.GetExtension(filename) == ".bmp")
-			{
-				//FileBitmap = GraphicsHelper.CompressBitmap(openFileDialog.FileName);
+			if (extension == ".png") {
 				FileBitmap = Bitmap.FromFile(filename) as Bitmap;
 			}
-			//FileBitmap = GraphicsHelper.MakeGrayscale(FileBitmap);
+			if (extension == ".bmp")
+			{
+				FileBitmap = Bitmap.FromFile(filename) as Bitmap;
+			}
 			#endregion
 			documentImage = FileBitmap;
-			document = GraphicsHelper.BitmapToDoubleArray(FileBitmap);
+			document = GraphicsHelper.BitmapToDoubleArray(FileBitmap, extension);
 		}
 
 		private void preprocessImage()
