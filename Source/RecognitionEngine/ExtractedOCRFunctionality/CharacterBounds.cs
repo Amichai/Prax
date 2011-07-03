@@ -8,16 +8,17 @@ using Prax.Recognition;
 
 namespace ExtractedOCRFunctionality {
 	public class CharacterBounds {
-		public List<Tuple<Rectangle, string>> items { private set; get; }
-		public void AddBound(Rectangle bound, string charString){
-			items.Add(new Tuple<Rectangle, string>(bound, charString));
-		}
+		public string Word;
+		public int LetterLocation;
+		public List<LetterAndBounds> items { private set; get; }
 
-		public CharacterBounds(List<TextSegment> words){
-			items = new List<Tuple<Rectangle, string>>();
+		public CharacterBounds(List<TextSegment> words, string originalText){
+			Word = originalText;
+			items = new List<LetterAndBounds>();
+			
 			foreach (var word in words) {
 				var r = word.Bounds;
-				items.Add(new Tuple<Rectangle, string>(asRectangle(r), word.Text));
+				items.Add(new LetterAndBounds(word.Text, word.LetterIndexValue, asRectangle(r)));
 			}
 		}
 		
@@ -27,8 +28,20 @@ namespace ExtractedOCRFunctionality {
 
 		public void DrawOnImage(Bitmap bitmap) {
 			foreach (var bound in items) {
-				GraphicsHelper.DrawBounds(bound.Item1, bitmap);
+				GraphicsHelper.DrawBounds(bound.Bounds, bitmap);
 			}
+		}
+	}
+	public class LetterAndBounds {
+		public string Letter;
+		public int IndexLocation;
+		public string Word;
+		public Rectangle Bounds;
+		public LetterAndBounds(string letter, int index, Rectangle bounds) {
+			this.Letter = letter;
+			this.IndexLocation = index;
+			//this.Word = word;
+			this.Bounds = bounds;
 		}
 	}
 }

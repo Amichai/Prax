@@ -7,6 +7,7 @@ using System.Drawing;
 
 namespace ExtractedOCRFunctionality {
 	public class HeuristicReturnValues {
+		public int Count;
 		public string Label { get; set; }
 		private List<int> heuristics = new List<int>();
 		public void AddHeursitics(int[][] board) {
@@ -15,6 +16,10 @@ namespace ExtractedOCRFunctionality {
 					heuristics.Add(board[i][j]);
 				}
 			}
+			this.Count = heuristics.Count();
+		}
+		public int GetAtIndex(int index) {
+			return heuristics[index];
 		}
 		public void GoThroughBoards(List<MatrixBoard> boards, Rectangle rect) {
 			foreach (var board in boards) {

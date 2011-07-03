@@ -29,18 +29,16 @@ namespace ExtractedOCRFunctionality {
 		}
 		/// <summary>Take an unlabeled HeursiticReturnVaules object and compare it to each key value pair in the 
 		/// library and return the best match as a LookupResult</summary>
-		public LookupResult PerformLookUp(HeuristicReturnValues unlabeledReturnValues) {
+		public List<LookupResult> PerformLookUp(HeuristicReturnValues unlabeledReturnValues) {
 			if (unlabeledReturnValues.Label != null)
-				throw new Exception("This guy should is supposed to be unlabeled!");
+				throw new Exception("This guy is supposed to be unlabeled!");
 			List<LookupResult> comparisonValues = new List<LookupResult>();
-			foreach (var labeledReturnValues in library) {
-				comparisonValues.Add(labeledReturnValues.Value.Compare(unlabeledReturnValues));
-			}
-			return comparisonValues.OrderBy(i => i.ConfidenceValue).Last();
+			comparisonValues = library.Compare(unlabeledReturnValues);
+			return comparisonValues.OrderBy(i => i.ConfidenceValue).ToList();
 		}
 	}
 	/// <summary>Contains the label to be associated with the unlabeled HeuristicReturnValues and a confidence value
-	/// with which reflects the algorithm's confidence in making that assignment.</summary>
+	/// which reflects the algorithm's confidence in making that assignment.</summary>
 	public class LookupResult {
 		public LookupResult(string lbl, double confidence) {
 			this.Label = lbl;
@@ -53,8 +51,93 @@ namespace ExtractedOCRFunctionality {
 	public static class LibraryExtensionMethods {
 		public static LookupResult Compare(this List<HeuristicReturnValues> labeledSet, 
 																		HeuristicReturnValues unlabledHeuristic) {
-			//Implement a comparison between labeled and unlabeled heuristics retrun values
+			//Implement a comparison between labeled and unlabeled heuristic return values
 			throw new NotImplementedException();
+		}
+
+		public static List<LookupResult> Compare(this Dictionary<string, List<HeuristicReturnValues>> library, HeuristicReturnValues unlabledHeuristic) {
+			{
+				throw new NotImplementedException();
+				/*
+				int numberOfUniqueLabels = library.Count();
+				int sizeOfHeuristicArray = unlabledHeuristic.Count;
+				//int numberOfLabelsToCount = numberOfUniqueLabels - IndiciesToCheck.Count;
+				int numberOfLabelsToCount = numberOfUniqueLabels;
+				double[][] probabilityFromEachHeuristic = new double[numberOfLabelsToCount][];
+				double[][] lblComparisonResults = new double[numberOfLabelsToCount][];
+				double[] labelProbability;
+				double[] totalComparison_test = new double[numberOfLabelsToCount];
+
+				for (int i = 0; i < numberOfLabelsToCount; i++) {
+					probabilityFromEachHeuristic[i] = new double[sizeOfHeuristicArray];
+					lblComparisonResults[i] = new double[sizeOfHeuristicArray];
+				}
+
+				for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
+						foreach(var indicies in library){
+							for(int lblTrial =0; lblTrial < indicies.Value.Count(); lblTrial++){
+								if(unlabledHeuristic.GetAtIndex(heurIdx) == indicies.Value[lblTrial].GetAtIndex(heurIdx)){
+									lblComparisonResults[inspectionLbl][heurIdx]++;
+								}
+							}
+							totalComparison_test[inspectionLbl] += lblComparisonResults[inspectionLbl][heurIdx];
+						}
+					for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++)
+					//foreach (int labelIndex in getInspectionLabelIdicies())
+                {
+						lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)listOfIndicies[labelIndex].Count;
+					}
+					//This data structure represents:
+				}       //What percentage of the time the current heuristics on the current heuristic array were equal to the heuristics on the training data for every given number
+
+				//We are working to produce two DSs: lblComparisonResults[][], totalComparison_test[]
+
+				double heuristicProbabilisticIndication;
+				double multiplicativeOffset;
+				labelProbability = new double[numberOfLabelsToCount];
+				double maxProb = 0;
+				int maxProbIndex = 0;
+				double aprioriProb = 1.0 / (double)numberOfLabelsToCount;
+				double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
+
+				for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++)
+				//foreach (int inspectionLbl in getInspectionLabelIdicies())
+            {
+					labelProbability[inspectionLbl] = 1.0 / (double)numberOfLabelsToCount;
+					for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
+						double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
+						double comparisonToOtherLabels = 0;
+						for (int comparisonLbl = 0; comparisonLbl < numberOfUniqueLabels; comparisonLbl++)
+						//foreach (int comparisonLbl in getInspectionLabelIdicies())
+                    {
+							if (inspectionLbl != comparisonLbl)
+								comparisonToOtherLabels += lblComparisonResults[comparisonLbl][heurIdx];
+						}
+
+						if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
+							heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
+							heuristicsControl.buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, inspectionLbl, heurIdx);
+							multiplicativeOffset = variances.newVarianceValue(heuristicProbabilisticIndication, heurIdx, inspectionLbl);
+							multiplicativeOffset += aprioriProb / (double)variances.var2[heurIdx][inspectionLbl].n;
+							if (multiplicativeOffset < double.MaxValue) {
+								labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+							}
+							if (double.IsInfinity(labelProbability[inspectionLbl]) || labelProbability[inspectionLbl] == 0)
+								heurIdx = sizeOfHeuristicArray;
+						}
+					}
+					if (labelProbability[inspectionLbl] > maxProb && listOfIndicies[maxProbIndex].Count > 0) {
+						maxProb = labelProbability[inspectionLbl];
+						maxProbIndex = inspectionLbl;
+					}
+				}
+				if (maxProb > 0) {
+					return new Tuple<string, double>(listOfIndexLabels[maxProbIndex], maxProb);
+				} else {
+					return null;
+				}
+				 */ 
+			}
 		}
 	}
 }

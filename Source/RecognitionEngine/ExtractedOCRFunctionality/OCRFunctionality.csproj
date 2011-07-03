@@ -53,6 +53,7 @@
     <Compile Include="TextSegment.cs" />
     <Compile Include="TrainingData.cs" />
     <Compile Include="TrainingDataLibrary.cs" />
+    <Compile Include="UnicodeConversion.cs" />
     <Compile Include="UploadDocument.cs" />
   </ItemGroup>
   <ItemGroup>

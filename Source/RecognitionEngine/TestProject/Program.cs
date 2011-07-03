@@ -33,13 +33,20 @@ namespace TestProject {
 			string renderMe = "تلبستبي بيسا سي";
 			var output = new DrawingGroup();
 			BasicTextParagraphProperties format = new BasicTextParagraphProperties("Tahoma", 13, FlowDirection.LeftToRight);
-			var words = TextSegment.GetWords(renderMe, Measurer.MeasureLines(renderMe, 200, format, output)).ToList();
+			var segments = TextSegment.GetWords(renderMe, Measurer.MeasureLines(renderMe, 200, format, output)).ToList();
 			output.ToBitmap().CreateStream(fileName).Close();
 			Document uploadDocument = new Document(fileName);
-			CharacterBounds charBounds = new CharacterBounds(words);
+			List<string> wordsRendered = renderMe.Split(' ').ToList();
+			List<CharacterBounds> boundsForeachWord = new List<CharacterBounds>();
+			foreach (var word in wordsRendered) {
+				boundsForeachWord.Add(new CharacterBounds(segments, word));
+			}
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
-			TrainingData trainingData = boards.Train(charBounds);
-			HeuristicReturnValues heuristics = boards.Segment();
+			TrainingData trainingData;
+			foreach (var word in boundsForeachWord) {
+				trainingData = boards.Train(word);
+			}
+			ExtractedOCRFunctionality.HeuristicReturnValues heuristics = boards.Segment();
 			
 		}
 	}

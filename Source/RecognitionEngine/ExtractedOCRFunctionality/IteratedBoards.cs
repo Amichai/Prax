@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Prax.Recognition;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace ExtractedOCRFunctionality {
 	public class IteratedBoards{
@@ -13,16 +14,21 @@ namespace ExtractedOCRFunctionality {
 		public TrainingData Train(CharacterBounds charBounds) {
 			int midpoint;
 			int boardWidth = Boards.First().Matrix.Length;
-			foreach(var character in charBounds.items){
-				midpoint = character.Item1.X + (int)Math.Round(character.Item1.Width / 2d);
-				Rectangle rect = new Rectangle(midpoint - 6, 0, boardWidth, character.Item1.Height);
+			TrainingData trainingData = new TrainingData();
+			for (int idx = 0; idx < charBounds.items.Count(); idx++ ){
+				LetterAndBounds character = charBounds.items[idx];
+				midpoint = character.Bounds.X + (int)Math.Round(character.Bounds.Width / 2d);
+				Rectangle rect = new Rectangle(midpoint - 6, 0, character.Bounds.Width, character.Bounds.Height);
 				HeuristicReturnValues heursitics = new HeuristicReturnValues();
 				heursitics.GoThroughBoards(Boards, rect);
-				TrainingData trainingData = new TrainingData();
+				string label = character.Letter;
+				if (idx < charBounds.Word.Count()) {
+					char newChar = UnicodeConversion.convertUnicodeChar(charBounds.Word, ref idx);
+					heursitics.Label = newChar.ToString();
+					trainingData.AddHeuristics(heursitics);
+				}
 			}
-			//Find the midpoint of the charbounds
-			//Use that midpoint to extract the heursitcis
-			throw new NotImplementedException();
+			return trainingData;
 		}
 
 		private HeuristicReturnValues ExtractHeursitics(int midpoint){
