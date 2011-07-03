@@ -7,7 +7,7 @@ using Prax.Recognition;
 
 namespace ExtractedOCRFunctionality {
 	public static class Segmentation {
-		public static const int WidthOfCanvas = 11;
+		public const int WidthOfCanvas = 11;
 		public static HeuristicReturnValues Segment(this IteratedBoards boards) {
 			HeuristicReturnValues heuristics = new HeuristicReturnValues();
 			int width = boards.Boards.First().Matrix.Length;

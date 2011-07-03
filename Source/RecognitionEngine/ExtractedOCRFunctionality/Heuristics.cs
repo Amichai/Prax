@@ -7,7 +7,7 @@ using System.Drawing;
 
 namespace ExtractedOCRFunctionality {
 	public class HeuristicReturnValues {
-		public string Label { public get; set; }
+		public string Label { get; set; }
 		private List<int> heuristics = new List<int>();
 		public void AddHeursitics(int[][] board) {
 			for (int i = 0; i < board.Length; i++) {
