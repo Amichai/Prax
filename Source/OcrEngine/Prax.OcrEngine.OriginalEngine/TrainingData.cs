@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
+using Prax.OcrEngine.Services;
 
 namespace Prax.OcrEngine.Engine {
-	
+
 
 	/// <summary>Training data is a set of heuristics return values associated with their corresponding input label.
 	/// Traning data is used to take an unlabeled set of heuristic return values and to compare those return values
@@ -13,31 +14,31 @@ namespace Prax.OcrEngine.Engine {
 	/// associate.</summary>
 	public class TrainingData {
 		private Library Library = new Library();
-		
+
 		public void AddHeuristics(HeuristicReturnValues returnValuesToAdd) {
 			if (returnValuesToAdd.Label == null) {
 				throw new NullReferenceException(
 					"Trying to add an unlabeled set of heuristic return values to the traning data library");
 			}
-			if(Library.Content.ContainsKey(returnValuesToAdd.Label)){
+			if (Library.Content.ContainsKey(returnValuesToAdd.Label)) {
 				//Add the heuristic return values to the list associated with the corresponding label in the library
 				List<HeuristicReturnValues> listOfHeuristics = Library.Content[returnValuesToAdd.Label];
 				listOfHeuristics.Add(returnValuesToAdd);
 				Library.Content[returnValuesToAdd.Label] = listOfHeuristics;
 			} else {
 				//Create a new label entry in the library
-				Library.Content.Add(returnValuesToAdd.Label, new List<HeuristicReturnValues>(){returnValuesToAdd});
+				Library.Content.Add(returnValuesToAdd.Label, new List<HeuristicReturnValues>() { returnValuesToAdd });
 				Library.ListOfLabels.Add(returnValuesToAdd.Label);
 			}
 		}
 		/// <summary>Take an unlabeled HeursiticReturnVaules object and compare it to each key value pair in the 
-		/// library and return the be	st match as a LookupResult</summary>
-		public List<LookupResult> PerformLookUp(HeuristicReturnValues unlabeledReturnValues) {
+		/// library and return the best match as a LookupResult</summary>
+		public IEnumerable<RecognizedSegment> PerformLookUp(HeuristicReturnValues unlabeledReturnValues) {
 			if (unlabeledReturnValues.Label != null)
 				throw new Exception("This guy is supposed to be unlabeled!");
-			List<LookupResult> comparisonValues = new List<LookupResult>();
-			comparisonValues = Library.Compare(unlabeledReturnValues);
-			return comparisonValues.OrderBy(i => i.ConfidenceValue).ToList();
+
+			var comparisonValues = Library.Compare(unlabeledReturnValues);
+			return comparisonValues.OrderBy(i => i.Certainty);
 		}
 	}
 	/// <summary>Contains the label to be associated with the unlabeled HeuristicReturnValues and a confidence value
@@ -51,13 +52,12 @@ namespace Prax.OcrEngine.Engine {
 		public double ConfidenceValue { get; set; }
 	}
 
-	public class Library{
+	public class Library {
 		/// <summary>Key is the label associated with the value which is a set of heuristic return values</summary>
-		public Dictionary<string, List<HeuristicReturnValues>> Content 
+		public Dictionary<string, List<HeuristicReturnValues>> Content
 															= new Dictionary<string, List<HeuristicReturnValues>>();
 		public List<string> ListOfLabels = new List<string>();
-		public List<LookupResult> Compare(HeuristicReturnValues unlabledHeuristic) {
-			var results = new List<LookupResult>();
+		public IEnumerable<RecognizedSegment> Compare(HeuristicReturnValues unlabledHeuristic) {
 			int numberOfUniqueLabels = ListOfLabels.Count();
 			int sizeOfHeuristicArray = unlabledHeuristic.Count;
 			int numberOfLabelsToCount = numberOfUniqueLabels;
@@ -76,16 +76,16 @@ namespace Prax.OcrEngine.Engine {
 			}
 
 			for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
-				for (int lblIdx = 0; lblIdx < numberOfUniqueLabels; lblIdx++){
+				for (int lblIdx = 0; lblIdx < numberOfUniqueLabels; lblIdx++) {
 					string currentLabel = ListOfLabels[lblIdx];
-					for (int lblTrialIdx = 0; lblTrialIdx < Content[currentLabel].Count(); lblTrialIdx++){
-						if(unlabledHeuristic.GetAtIndex(heurIdx) == Content[currentLabel][lblTrialIdx].GetAtIndex(heurIdx)){
+					for (int lblTrialIdx = 0; lblTrialIdx < Content[currentLabel].Count(); lblTrialIdx++) {
+						if (unlabledHeuristic.GetAtIndex(heurIdx) == Content[currentLabel][lblTrialIdx].GetAtIndex(heurIdx)) {
 							lblComparisonResults[lblIdx][heurIdx]++;
 						}
 					}
 					totalComparison_test[lblIdx] += lblComparisonResults[lblIdx][heurIdx];
 				}
-				for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++){
+				for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++) {
 					string currentLabel = ListOfLabels[labelIndex];
 					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)Content[currentLabel].Count;
 				}
@@ -99,14 +99,12 @@ namespace Prax.OcrEngine.Engine {
 			double aprioriProb = 1.0 / (double)numberOfLabelsToCount;
 			double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
 
-			for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++)
-			{
+			for (int inspectionLbl = 0; inspectionLbl < numberOfUniqueLabels; inspectionLbl++) {
 				labelProbability[inspectionLbl] = 1.0 / (double)numberOfLabelsToCount;
 				for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
 					double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
 					double comparisonToOtherLabels = 0;
-					for (int comparisonLbl = 0; comparisonLbl < numberOfUniqueLabels; comparisonLbl++)
-					{
+					for (int comparisonLbl = 0; comparisonLbl < numberOfUniqueLabels; comparisonLbl++) {
 						if (inspectionLbl != comparisonLbl)
 							comparisonToOtherLabels += lblComparisonResults[comparisonLbl][heurIdx];
 					}
@@ -124,14 +122,8 @@ namespace Prax.OcrEngine.Engine {
 				}
 				string currentLabel = ListOfLabels[inspectionLbl];
 				if (Content[currentLabel].Count > 0) {
-					var result = new LookupResult(currentLabel, labelProbability[inspectionLbl]);
-					results.Add(result);
+					yield return new RecognizedSegment(unlabledHeuristic.Bounds, currentLabel, labelProbability[inspectionLbl]);
 				}
-			}
-			if (results.Count() > 0) {
-				return results;
-			} else {
-				return null;
 			}
 		}
 
