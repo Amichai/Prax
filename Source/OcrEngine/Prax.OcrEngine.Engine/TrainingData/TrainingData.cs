@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
-using Prax.OcrEngine.Services;
 
 namespace Prax.OcrEngine.Engine.Training {
 	/// <summary>Training data is a set of heuristics return values associated with their corresponding input label.
@@ -11,11 +10,6 @@ namespace Prax.OcrEngine.Engine.Training {
 	/// to labeled sets of heuristic return value and use that comparison to determine the most appropriate label to 
 	/// associate.</summary>
 	public class TrainingData {
-		public TrainingData(){}
-		public TrainingData(IDataCache data) {
-			//AzureDataUploader.UpdateStorage();
-		}
-
 		/// <summary>Key is the label associated with the value which is a set of heuristic return values</summary>
 		private Dictionary<string, List<HeuristicReturnValues>> library 
 															= new Dictionary<string, List<HeuristicReturnValues>>();

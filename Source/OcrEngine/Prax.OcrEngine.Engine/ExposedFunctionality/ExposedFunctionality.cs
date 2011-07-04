@@ -54,12 +54,12 @@ namespace Prax.OcrEngine.Engine.ExposedFunctionality {
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Tahoma", 13, FlowDirection.LeftToRight);
 			var charSegments = TextSegment.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
-			var renderedText = new RenderedText(renderText, charSegments);
+			var RenderedText = new RenderedText(renderText, charSegments);
 			var stream = output.ToBitmap().CreateStream();
 			var imageData = new ImageData(stream);
 				stream.Close();
 			var boards = imageData.DefineIteratedBoards();
-			var trainingData = renderedText.ProduceTrainingData(boards);
+			var trainingData = RenderedText.ProduceTrainingData(boards);
 			var heuristics = boards.Segment();
 		}
 	}
