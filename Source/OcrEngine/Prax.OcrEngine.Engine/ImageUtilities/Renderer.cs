@@ -11,8 +11,9 @@ using System.IO;
 
 namespace TextRenderer {
 	public static class Renderer {
-		public static FileStream CreateStream(this BitmapSource image, string filename) {
-			var stream = new FileStream(filename, FileMode.Create);
+		public static MemoryStream CreateStream(this BitmapSource image) {
+			//var stream = new FileStream(filename, FileMode.Create);
+			var stream = new MemoryStream();
 			var encoder = new PngBitmapEncoder();
 			encoder.Frames.Add(BitmapFrame.Create(image));
 			encoder.Save(stream);
@@ -20,6 +21,8 @@ namespace TextRenderer {
 			
 			return stream;
 		}
+
+
 
 		public static BitmapSource RenderImage(string text) {
 			var c = CreateFlowDoc(text);

@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{0507F74F-3DB1-4FBE-A804-664D2FE52CA5}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Prax.OcrEngine.Engine</RootNamespace>
     <AssemblyName>Prax.OcrEngine.Engine</AssemblyName>
@@ -30,19 +30,34 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutomatedTraining\CharacterBounds.cs" />
+    <Compile Include="AutomatedTraining\UnicodeConvert.cs" />
+    <Compile Include="HeuristicGeneration\Heuristics.cs" />
+    <Compile Include="HeuristicGeneration\IterateBoards.cs" />
     <Compile Include="ImageRecognition\ImageData.cs" />
     <Compile Include="ImageRecognition\ImageWorkflow.cs" />
+    <Compile Include="ImageUtilities\Measurer.cs" />
+    <Compile Include="ImageUtilities\Renderer.cs" />
+    <Compile Include="AutomatedTraining\TextToRender.cs" />
+    <Compile Include="ImageUtilities\Utilities.cs" />
     <Compile Include="PatternRecognition\PatternRecognizer.cs" />
     <Compile Include="PatternRecognition\RecognizedPattern.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -53,6 +68,9 @@
     <Compile Include="ReferenceData\IReferenceSet.cs" />
     <Compile Include="ReferenceData\ReferenceItem.cs" />
     <Compile Include="ReferenceData\IReferenceLibrary.cs" />
+    <Compile Include="Segmentation\Segmentation.cs" />
+    <Compile Include="Segmentation\TextSegment.cs" />
+    <Compile Include="TrainingData\TrainingData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">

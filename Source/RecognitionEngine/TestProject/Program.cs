@@ -18,15 +18,6 @@ using System.Windows.Controls;
 
 namespace TestProject {
 	static class Program {
-		static BitmapSource ToBitmap(this DrawingGroup dg) {
-			var dv = new DrawingVisual();
-			using (var c = dv.RenderOpen())
-				c.DrawImage(new DrawingImage(dg), new Rect(dg.Bounds.Size));
-			var rtb = new RenderTargetBitmap((int)dg.Bounds.Width, (int)dg.Bounds.Height, 96, 96, PixelFormats.Pbgra32);
-			rtb.Render(dv);
-			return rtb;
-		}
-
 		[STAThreadAttribute]
 		static void Main(string[] args) {
 			string fileName = @"C:\Users\Public\Pictures\temp.png";
