@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
 
-namespace Prax.OcrEngine.Engine.Training {
+namespace Prax.OcrEngine.Engine {
 	/// <summary>Training data is a set of heuristics return values associated with their corresponding input label.
 	/// Traning data is used to take an unlabeled set of heuristic return values and to compare those return values
 	/// to labeled sets of heuristic return value and use that comparison to determine the most appropriate label to 
