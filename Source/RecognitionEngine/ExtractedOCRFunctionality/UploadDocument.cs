@@ -65,6 +65,7 @@ namespace ExtractedOCRFunctionality {
 			if (extension == ".bmp")
 			{
 				FileBitmap = Bitmap.FromFile(filename) as Bitmap;
+				
 			}
 			#endregion
 			documentImage = FileBitmap;

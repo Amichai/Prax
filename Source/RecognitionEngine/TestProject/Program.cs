@@ -38,7 +38,6 @@ namespace TestProject {
 				trainingData = boards.Train(word);
 			}
 			ExtractedOCRFunctionality.HeuristicReturnValues heuristics = boards.Segment();
-			
 		}
 	}
 }
