@@ -8,14 +8,12 @@ using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Services {
 	///<summary>Performs OCR processing.</summary>
+	///<remarks>When implementing this interface, you should inherit the DocumentProcessorBase class to get basic logic.</remarks>
 	public interface IDocumentProcessor {
 		//Amichai: Your main class should implement this interface.
-		//Please modify its public methods as appropiate.  We will 
+		//Please modify its public methods as appropriate.  We will
 		//also create a dummy implementation of the interface which
 		//does no actual work but takes a long time.
-
-		///<summary>Indicates whether this instance is currently processing a document.</summary>
-		bool IsProcessing { get; }
 
 		//TODO: What types should this method take and return?
 		///<summary>Processes a document.</summary>
@@ -37,8 +35,6 @@ namespace Prax.OcrEngine.Services {
 		//TODO: Add classes or interfaces to Common
 		//that store the OCR's results, then expose
 		//them as properties in this interface.
-		///<summary>Performs any initialization necessary before the processor can be used.</summary>
-		void Initialize();
 		///<summary>Gets the results of the recognition.</summary>
 		ReadOnlyCollection<RecognizedSegment> Results { get; }
 	}
