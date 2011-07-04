@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Segmentation;
-using Prax.OcrEngine.Engine.Training;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
 
 namespace Prax.OcrEngine.Engine.AutomatedTraining {

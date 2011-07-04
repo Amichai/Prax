@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Diagnostics;
-using Prax.OcrEngine.Engine.Training;
 using Prax.OcrEngine.Engine.AutomatedTraining;
 using Prax.OcrEngine.Engine.ImageUtilities;
 using Prax.OcrEngine.Engine.Segmentation;
@@ -38,7 +37,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			HeuristicReturnValues heuristics = new HeuristicReturnValues();
 			int idx = midpoint - 6; 
 			int width = Boards.First().Matrix[0].Length;
-			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.Segmentation.WidthOfCanvas, width));
+			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.Segmentator.WidthOfCanvas, width));
 			return heuristics;
 		}
 	

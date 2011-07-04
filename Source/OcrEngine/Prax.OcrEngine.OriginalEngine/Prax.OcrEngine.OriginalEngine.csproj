@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0507F74F-3DB1-4FBE-A804-664D2FE52CA5}</ProjectGuid>
+    <ProjectGuid>{EDBDAF6E-A58F-438E-954A-558B9C6B3302}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Prax.OcrEngine.Engine</RootNamespace>
-    <AssemblyName>Prax.OcrEngine.Engine</AssemblyName>
+    <RootNamespace>Prax.OcrEngine.OriginalEngine</RootNamespace>
+    <AssemblyName>Prax.OcrEngine.OriginalEngine</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,9 +30,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -48,23 +45,20 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageRecognition\ImageData.cs" />
-    <Compile Include="ImageRecognition\ImageWorkflow.cs" />
-    <Compile Include="PatternRecognition\PatternRecognizer.cs" />
-    <Compile Include="PatternRecognition\RecognizedPattern.cs" />
+    <Compile Include="AutomatedTraining\CharacterBounds.cs" />
+    <Compile Include="AutomatedTraining\TextToRender.cs" />
+    <Compile Include="AutomatedTraining\UnicodeConvert.cs" />
+    <Compile Include="ExposedFunctionality.cs" />
+    <Compile Include="HeuristicGeneration\Heuristics.cs" />
+    <Compile Include="HeuristicGeneration\IterateBoards.cs" />
+    <Compile Include="ImageData.cs" />
+    <Compile Include="ImageUtilities\Measurer.cs" />
+    <Compile Include="ImageUtilities\Renderer.cs" />
+    <Compile Include="ImageUtilities\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="HeuristicGeneration\DataMatrix.cs" />
-    <Compile Include="HeuristicGeneration\HeuristicGenerator.cs" />
-    <Compile Include="ReferenceData\InMemoryReferenceSet.cs" />
-    <Compile Include="ReferenceData\IReferenceSet.cs" />
-    <Compile Include="ReferenceData\ReferenceItem.cs" />
-    <Compile Include="ReferenceData\IReferenceLibrary.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">
-      <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
-      <Name>Prax.OcrEngine.Common</Name>
-    </ProjectReference>
+    <Compile Include="Segmentation\Segmentator.cs" />
+    <Compile Include="Segmentation\TextSegment.cs" />
+    <Compile Include="TrainingData.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

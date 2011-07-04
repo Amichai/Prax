@@ -6,9 +6,10 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Prax.OcrEngine.Engine.ImageUtilities;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
 
-namespace Prax.OcrEngine.Engine.ImageRecognition {
+namespace Prax.OcrEngine.Engine {
 	///<summary>Stores image data and recognized information.</summary>
 	///<remarks>
 	/// This class passes through the ImageWorkflow and is
@@ -22,10 +23,24 @@ namespace Prax.OcrEngine.Engine.ImageRecognition {
 	/// and final output from OCR.
 	///</remarks>
 	class ImageData {
+		public ImageData(Stream stream) {
+			UploadedImage = (Bitmap)Bitmap.FromStream(stream);
+			this.ImageMatrix = UploadedImage.BitmapToDoubleArray(".png");
+		}
 		Bitmap UploadedImage;
 		//ImageWpf UploadedImage = new ImageWpf();
 		int[][] ImageMatrix;
 		//TODO: Color or B&W?
 
+		public IterateBoards DefineIteratedBoards() {
+			var boards = new IterateBoards();
+			var currentBoard = new MatrixBoard(ImageMatrix);
+			for (int i = 0; i < IterateBoards.numberOfIterations; i++) {
+				boards.Boards.Add(currentBoard);
+				currentBoard = currentBoard.IterateBoard();
+			}
+			return boards;
+		}
 	}
+
 }

@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Prax.OcrEngine.Engine.PatternRecognition;
-using Prax.OcrEngine.Engine.ImageRecognition;
-using System.Windows.Media;
+﻿using System.Linq;
 using System.Windows;
+using System.Windows.Media;
+using Prax.OcrEngine.Engine.AutomatedTraining;
+using Prax.OcrEngine.Engine.Segmentation;
 using Segmentation;
 using TextRenderer;
-using System.IO;
-using Prax.OcrEngine.Engine.ImageUtilities;
-using Prax.OcrEngine.Engine.AutomatedTraining;
-using Prax.OcrEngine.Engine.HeuristicGeneration;
-using Prax.OcrEngine.Engine.Training;
-using Prax.OcrEngine.Engine.Segmentation;
 
-namespace Prax.OcrEngine.Engine.ExposedFunctionality {
+namespace Prax.OcrEngine.Engine {
 	class ExposedFunctionality {
 		//FileQueue fileQueue = new FileQueue();
 		//OCRResults results = new OCRResults();
 		//TrainingDataLibrary = new ReferenceLibrary();
-		PatternRecognizer patternRecognizer = new PatternRecognizer();
 
 		public void GetImage(){
 			//Open file dialog
