@@ -33,11 +33,13 @@ namespace TestProject {
 				boundsForeachWord.Add(new CharacterBounds(segments, word));
 			}
 			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
-			TrainingData trainingData;
-			foreach (var word in boundsForeachWord) {
-				trainingData = boards.Train(word);
+			//TrainingData trainingData;
+			//foreach (var word in boundsForeachWord) {
+			//    trainingData = boards.Train(word);
+			//}
+			foreach (var testBoard in boards.Segment()) {
+
 			}
-			ExtractedOCRFunctionality.HeuristicReturnValues heuristics = boards.Segment();
 		}
 	}
 }

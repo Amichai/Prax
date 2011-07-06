@@ -50,7 +50,9 @@ namespace Prax.OcrEngine.Engine {
 				stream.Close();
 			var boards = imageData.DefineIteratedBoards();
 			var trainingData = RenderedText.ProduceTrainingData(boards);
-			var heuristics = boards.Segment();
+			foreach (var segment in boards.Segment()) {
+				var returnVal = trainingData.PerformLookUp(segment);
+			}
 		}
 	}
 	static class Program {
