@@ -20,9 +20,7 @@ namespace Prax.OcrEngine.Engine {
 			var imageData = new ImageData(document);
 			var boards = imageData.DefineIteratedBoards();
 
-			//TODO: Segment
-			//var heuristics = boards.Segment();
-			IEnumerable<HeuristicReturnValues> heuristics = null;
+			IEnumerable<HeuristicReturnValues> heuristics = boards.Segment();
 
 			Results = new ReadOnlyCollection<RecognizedSegment>(
 				heuristics.Select(h => trainingData.PerformLookUp(h).FirstOrDefault())
