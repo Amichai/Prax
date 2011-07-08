@@ -8,6 +8,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 	public class MutableReferenceSet : KeyedCollection<string, ReferenceLabel>, IReferenceSet {
 		public ReferenceLabel GetOrAdd(string key) {
 			ReferenceLabel retVal;
+			
 			if (!Dictionary.TryGetValue(key, out retVal))
 				Add(retVal = new ReferenceLabel(key));
 			return retVal;

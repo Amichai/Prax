@@ -31,7 +31,9 @@ namespace Prax.OcrEngine.Engine {
 		//ImageWpf UploadedImage = new ImageWpf();
 		int[][] ImageMatrix;
 		//TODO: Color or B&W?
-
+		public void SaveFile(string filename) {
+			UploadedImage.Save(filename);
+		}
 		public IterateBoards DefineIteratedBoards() {
 			var boards = new IterateBoards();
 			var currentBoard = new MatrixBoard(ImageMatrix);
