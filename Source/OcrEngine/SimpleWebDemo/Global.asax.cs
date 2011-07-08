@@ -38,7 +38,7 @@ namespace SimpleWebDemo {
 			var builder = new ContainerBuilder();
 			builder.RegisterType<DocumentManager>().As<IDocumentManager>();
 
-			builder.RegisterType<MsSampleImageRenderer>().As<IImageCreator>();
+			builder.RegisterInstance(new MsSampleImageRenderer("Times New Roman")).As<IImageCreator>();
 
 			//Trivial users
 			builder.RegisterType<Stubs.InMemoryUserAccount>().As<IUserAccount>();

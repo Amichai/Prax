@@ -51,7 +51,7 @@ namespace Prax.OcrEngine.Engine {
 		public void TrainAlgorithm() {
 			string renderText = "أدخل نص هنا لترجمة";
 			var output = new DrawingGroup();
-			var format = new BasicTextParagraphProperties("Tahoma", 14, FlowDirection.LeftToRight);
+			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
 			var charSegments = TextSegment.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
 			var RenderedText = new RenderedText(renderText, charSegments);
 			var stream = output.ToBitmap().CreateStream();

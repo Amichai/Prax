@@ -128,6 +128,10 @@ namespace SimpleWebDemo {
 #endif
 
 	public class MsSampleImageRenderer : WpfImageRenderer {
+		public string Font { get; private set; }
+
+		public MsSampleImageRenderer(string font) { Font = font; }
+
 		//This uses a Microsoft sample to convert HTML 
 		//to a FlowDocument.
 		//The sample doesn't support external resources
@@ -138,10 +142,9 @@ namespace SimpleWebDemo {
 			var xaml = HtmlToXamlConverter.ConvertHtmlToXaml(html, asFlowDocument: true);
 
 			var flowDoc = (FlowDocument)XamlReader.Load(XmlReader.Create(new StringReader(xaml)));
-			flowDoc.FontFamily = new FontFamily("Tahoma");
+			flowDoc.FontFamily = new FontFamily(Font);
 			flowDoc.FlowDirection = FlowDirection.RightToLeft;
 
-			//For some reason, Tahoma needs some vertical padding
 			flowDoc.PagePadding = new Thickness(0, 0, 0, 2);	//Suppress the default padding
 			//flowDoc.Background = Brushes.White;
 

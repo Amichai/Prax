@@ -4,6 +4,11 @@
 @section Head {
     <link href="@Href("~/Content/CSS/themes/base/jquery.ui.all.css")" rel="stylesheet" type="text/css" />
     <style type="text/css">
+        .OcrFont {
+            font-family: "Times New Roman";
+            font-size: 14px;
+        }
+        
         .LargeButtons > * {
             font-size: 18px;
             width: 190px;
@@ -223,7 +228,7 @@
             Enter text in any language to translate it into Arabic for the OCR to recognize.
         </div>
         <textarea id="sourceText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all">Enter a text here to translate</textarea>
-        <div id="translatedText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all">
+        <div id="translatedText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all OcrFont">
             Translation will appear here</div>
     </section>
     <section class="step" id="formatStep">

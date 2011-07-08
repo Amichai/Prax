@@ -235,7 +235,7 @@ TextWizard.prototype = {
 				theme_advanced_font_sizes: sizesString,
 				font_size_style_values: sizesString
 			});
-
+			this.textBox.addClass("OcrFont");
 		},
 		setText: function (text) {
 			this.textBox.html(
