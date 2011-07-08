@@ -37,6 +37,7 @@ namespace Prax.OcrEngine.Engine {
 			//results.Display();
 		}
 
+		static readonly string trainingFolder = Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining");
 		public void TestAlgorithm() {
 			string renderText = "أدخل نص هنا لترجمة";
 			var output = new DrawingGroup();
@@ -49,7 +50,7 @@ namespace Prax.OcrEngine.Engine {
 			stream.Close();
 			var boards = imageData.DefineIteratedBoards();
 			var trainingData = new MutableReferenceSet();
-
+			trainingData.ReadFrom(trainingFolder);
 			var searcher = new ReferenceSearcher(trainingData);
 			foreach (var segment in boards.Segment()) {
 				var returnVal = searcher.PerformLookup(segment);
@@ -69,7 +70,6 @@ namespace Prax.OcrEngine.Engine {
 			imageData.SaveFile("RenderedFile1.png");
 			stream.Close();
 
-			var trainingFolder= Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining");
 			Directory.CreateDirectory(trainingFolder);
 
 			var boards = imageData.DefineIteratedBoards();

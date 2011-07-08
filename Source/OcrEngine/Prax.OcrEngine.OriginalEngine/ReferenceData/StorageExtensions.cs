@@ -24,7 +24,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 					writer.Write(label.Samples.Count);
 
 					foreach (var sample in label.Samples) {
-						foreach (var num in sample.Heuristics) {
+						foreach (int num in sample.Heuristics) {
 							writer.Write(num);
 						}
 					}
@@ -50,7 +50,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 			if (!Directory.Exists(folder)) throw new DirectoryNotFoundException(folder + " does not exist");
 
 			#region Samples
-			using (var reader = new BinaryReader(File.Create(Path.Combine(folder, "Samples.dat")))) {
+			using (var reader = new BinaryReader(File.OpenRead(Path.Combine(folder, "Samples.dat")))) {
 				int labelCount = reader.ReadInt32();
 				int heuristicCount = reader.ReadInt32();
 
@@ -72,7 +72,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 			#endregion
 
 			#region Variances
-			using (var reader = new BinaryReader(File.Create(Path.Combine(folder, "Variances.dat")))) {
+			using (var reader = new BinaryReader(File.OpenRead(Path.Combine(folder, "Variances.dat")))) {
 				while (!reader.IsEOF()) {
 					var label = set.GetOrAdd(reader.ReadString());
 					label.Variances.Deserialize(reader);
