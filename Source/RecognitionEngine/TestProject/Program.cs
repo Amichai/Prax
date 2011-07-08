@@ -27,19 +27,18 @@ namespace TestProject {
 			var segments = TextSegment.GetWords(renderMe, Measurer.MeasureLines(renderMe, 200, format, output)).ToList();
 			output.ToBitmap().CreateStream(fileName).Close();
 			Document uploadDocument = new Document(fileName);
-			List<string> wordsRendered = renderMe.Split(' ').ToList();
-			List<CharacterBounds> boundsForeachWord = new List<CharacterBounds>();
-			foreach (var word in wordsRendered) {
-				boundsForeachWord.Add(new CharacterBounds(segments, word));
-			}
-			IteratedBoards boards = uploadDocument.DefineIteratedBoards();
-			//TrainingData trainingData;
-			//foreach (var word in boundsForeachWord) {
-			//    trainingData = boards.Train(word);
-			//}
-			foreach (var testBoard in boards.Segment()) {
 
-			}
+			//List<string> wordsRendered = renderMe.Split(' ').ToList();
+			//List<CharacterBounds> boundsForeachWord = new List<CharacterBounds>();
+			//foreach (var word in wordsRendered) {
+			//    boundsForeachWord.Add(new CharacterBounds(segments, word));
+			//}
+			//IteratedBoards boards = uploadDocument.DefineIteratedBoards();
+			////TrainingData trainingData;
+			////foreach (var word in boundsForeachWord) {
+			////    trainingData = boards.Train(word);
+			////}
+			//foreach (var testBoard in boards.Segment()) {}
 		}
 	}
 }

@@ -95,14 +95,7 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			}
 			for (int i = 0; i < bounds.Width; i++) {
 				for (int j = 0; j < bounds.Height; j++) {
-					try {
-						extractedContent[i][j] = content[bounds.X + i][bounds.Y + j];
-					} catch {
-						if (j == content[0].Length)
-							j = bounds.Height;
-						if (i == content.Length)
-							i = bounds.Width;
-					}
+					extractedContent[i][j] = content[bounds.X + i][bounds.Y + j];
 				}
 			}
 			return extractedContent;

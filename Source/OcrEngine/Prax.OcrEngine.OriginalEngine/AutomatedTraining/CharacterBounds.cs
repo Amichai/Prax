@@ -25,6 +25,7 @@ namespace Prax.OcrEngine.Engine.AutomatedTraining {
 		
 		private Rectangle asRectangle(Rect r){
 			return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width), (int)Math.Round(r.Height));
+			
 		}
 
 		public void DrawOnImage(Bitmap bitmap) {
