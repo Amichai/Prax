@@ -22,6 +22,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 	public class ReferenceLabel {
 		public ReferenceLabel(string label) {
 			Label = label;
+			Samples = new Collection<LabelSample>();
 			Variances = new RollingVariance();
 		}
 
