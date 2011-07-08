@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using Prax.OcrEngine.Engine.AutomatedTraining;
 using Prax.OcrEngine.Engine.Segmentation;
+using Prax.OcrEngine.Engine.ImageUtilities;
 using Segmentation;
 using TextRenderer;
 using Prax.OcrEngine.Engine.ReferenceData;

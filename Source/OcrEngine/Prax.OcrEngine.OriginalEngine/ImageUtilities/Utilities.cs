@@ -3,9 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Windows.Media.Imaging;
+using System.IO;
+using System.Windows.Media;
+using System.Windows;
+using Color = System.Drawing.Color;
 
 namespace Prax.OcrEngine.Engine.ImageUtilities {
 	static class Utilities {
+		public static Stream CreateStream(this BitmapSource image) {
+			var stream = new MemoryStream();
+			var encoder = new PngBitmapEncoder();
+			encoder.Frames.Add(BitmapFrame.Create(image));
+			encoder.Save(stream);
+			stream.Position = 0;
+
+			return stream;
+		}
+		public static BitmapSource ToBitmap(this DrawingGroup dg) {
+			var dv = new DrawingVisual();
+			using (var c = dv.RenderOpen())
+				c.DrawImage(new DrawingImage(dg), new Rect(dg.Bounds.Size));
+			var rtb = new RenderTargetBitmap((int)dg.Bounds.Width, (int)dg.Bounds.Height, 96, 96, PixelFormats.Pbgra32);
+			rtb.Render(dv);
+			return rtb;
+		}
+
+
 		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension) {
 			int[][] uploadedDocument;
 			int width = fileBitmap.Width;

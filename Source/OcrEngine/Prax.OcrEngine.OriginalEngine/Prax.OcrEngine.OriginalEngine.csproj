@@ -56,7 +56,6 @@
     <Compile Include="HeuristicGeneration\IterateBoards.cs" />
     <Compile Include="ImageData.cs" />
     <Compile Include="ImageUtilities\Measurer.cs" />
-    <Compile Include="ImageUtilities\Renderer.cs" />
     <Compile Include="ImageUtilities\Utilities.cs" />
     <Compile Include="OriginalDocumentProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
