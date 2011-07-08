@@ -8,6 +8,7 @@ using Segmentation;
 using TextRenderer;
 using Prax.OcrEngine.Engine.ReferenceData;
 using System.IO;
+using System;
 
 namespace Prax.OcrEngine.Engine {
 	class ExposedFunctionality {
@@ -59,11 +60,16 @@ namespace Prax.OcrEngine.Engine {
 			imageData.SaveFile("RenderedFile1.png");
 			stream.Close();
 
+			var trainingFolder= Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining");
+			Directory.CreateDirectory(trainingFolder);
+
 			var boards = imageData.DefineIteratedBoards();
 			var trainingData = new MutableReferenceSet();
 
 			foreach (var word in RenderedText.WordBounds)
 				boards.Train(word, trainingData);
+
+			trainingData.WriteTo(trainingFolder);
 		}
 
 		//BUG: Run OriginalEngine as the startup project and call the TrainAlgorithm() method to see a null reference exception
