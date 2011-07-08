@@ -6,9 +6,12 @@ using Prax.OcrEngine.Engine.HeuristicGeneration;
 using Prax.OcrEngine.Services;
 using System.Collections.ObjectModel;
 using System.IO;
+using Prax.OcrEngine.Engine.ReferenceData;
 
-namespace Prax.OcrEngine.Engine {
-	public interface IReferenceLibrary {
+namespace Prax.OcrEngine.Engine.ReferenceData {
+	///<summary>Searches a set of reference data to find matching labels.</summary>
+	public interface IReferenceSearcher {
+		///<summary>Finds the best matching labels for a given piece of heuristics.</summary>
 		IEnumerable<RecognizedSegment> PerformLookup(HeuristicSet heuristics);
 	}
 
@@ -16,89 +19,20 @@ namespace Prax.OcrEngine.Engine {
 	/// Training data is used to take an unlabeled set of heuristic return values and to compare those return values
 	/// to labeled sets of heuristic return value and use that comparison to determine the most appropriate label to 
 	/// associate.</summary>
-	public class TrainingLibrary : IReferenceLibrary {
-		class RollingVariance {
-			public void Serialize(BinaryWriter writer) {
-				writer.Write(Count);
-				writer.Write(mean);
-				writer.Write(M2);
-			}
-			public void Deserialize(BinaryReader reader) {
-				Count = reader.ReadInt64();
-				mean = reader.ReadDouble();
-				M2 = reader.ReadDouble();
-			}
+	public class ReferenceSearcher : IReferenceSearcher {
+		public IReferenceSet content { get; private set; }
 
-			public long Count { get; private set; }
-			double mean = 0,
-					M2 = 0;
+		public ReferenceSearcher(IReferenceSet data) { content = data; }
 
-			public double Append(double x) {
-				Count++;
-				double delta = x - mean;
-				mean = mean + delta / Count;
-				M2 = M2 + delta * (x - mean);
-
-				double variance = M2 / (Count - 1);
-				return variance;
-			}
-		}
-
-		class ReferenceCollection : KeyedCollection<string, ReferenceLabel> {
-			public ReferenceLabel GetOrAdd(string key) {
-				ReferenceLabel retVal;
-				if (!Dictionary.TryGetValue(key, out retVal))
-					Add(retVal = new ReferenceLabel(key));
-				return retVal;
-			}
-
-			protected override string GetKeyForItem(ReferenceLabel item) {
-				return item.Label;
-			}
-		}
-
-		class ReferenceLabel {
-			public ReferenceLabel(string label) {
-				Label = label;
-				Variance = new RollingVariance();
-			}
-
-			public string Label { get; private set; }
-			public Collection<ReferenceItem> Items { get; private set; }
-			public RollingVariance Variance { get; private set; }
-		}
-		class ReferenceItem {
-			public ReferenceItem(IList<int> heuristics) {
-				Heuristics = new ReadOnlyCollection<int>(heuristics);
-			}
-
-			public ReadOnlyCollection<int> Heuristics { get; private set; }
-		}
-
-		/// <summary>Take an unlabeled HeursiticReturnVaules object and compare it to each key value pair in the 
-		/// library and return the best match as a LookupResult</summary>
+		///<summary>Finds the best matching labels for a given piece of heuristics.</summary>
 		public IEnumerable<RecognizedSegment> PerformLookup(HeuristicSet heuristics) {
 			if (heuristics.Label != null)
 				throw new ArgumentException("PerformLookup expects an unidentified segment", "heuristics");
 
-			return GetMatches(heuristics).OrderBy(i => i.Certainty);
+			return GetMatchesIterator(heuristics).OrderBy(i => i.Certainty);
 		}
 
-		public void AddAll(IEnumerable<HeuristicSet> heruistics) {
-			foreach (var item in heruistics)
-				AddHeuristics(item);
-		}
-		public void AddHeuristics(HeuristicSet heruistics) {
-			if (heruistics.Label == null)
-				throw new ArgumentException("The training library requires labeled heuristics", "heruistics");
-
-			content.GetOrAdd(heruistics.Label).Items.Add(new ReferenceItem(heruistics.Heuristics));
-		}
-
-		/// <summary>Key is the label associated with the value which is a set of heuristic return values</summary>
-		private readonly ReferenceCollection content = new ReferenceCollection();
-
-		private IEnumerable<RecognizedSegment> GetMatches(HeuristicSet unlabledHeuristic) {
+		private IEnumerable<RecognizedSegment> GetMatchesIterator(HeuristicSet unlabledHeuristic) {
 			int numberOfUniqueLabels = content.Count;
 			int sizeOfHeuristicArray = unlabledHeuristic.Heuristics.Count;
 			int numberOfLabelsToCount = numberOfUniqueLabels;
@@ -117,14 +51,14 @@ namespace Prax.OcrEngine.Engine {
 				for (int lblIdx = 0; lblIdx < numberOfUniqueLabels; lblIdx++) {
 					var current = content[lblIdx];
 
-					foreach (var item in current.Items) {
+					foreach (var item in current.Samples) {
 						if (unlabledHeuristic.GetAtIndex(heurIdx) == item.Heuristics[heurIdx])
 							lblComparisonResults[lblIdx][heurIdx]++;
 					}
 					//totalComparison_test[lblIdx] += lblComparisonResults[lblIdx][heurIdx];
 				}
 				for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++) {
-					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)content[labelIndex].Items.Count;
+					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)content[labelIndex].Samples.Count;
 				}
 			}
 			//We are working to produce two DSs: lblComparisonResults[][], totalComparison_test[]
@@ -148,8 +82,8 @@ namespace Prax.OcrEngine.Engine {
 					if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
 						heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
 						heuristicsControl.buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, inspectionLbl, heurIdx);
-						multiplicativeOffset = content[inspectionLbl].Variance.Append(heuristicProbabilisticIndication);
-						multiplicativeOffset += aprioriProb / (double)content[inspectionLbl].Variance.Count;
+						multiplicativeOffset = content[inspectionLbl].Variances.Append(heuristicProbabilisticIndication);
+						multiplicativeOffset += aprioriProb / (double)content[inspectionLbl].Variances.Count;
 						if (multiplicativeOffset < double.MaxValue) {
 							labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 						}
@@ -157,7 +91,7 @@ namespace Prax.OcrEngine.Engine {
 							heurIdx = sizeOfHeuristicArray;
 					}
 				}
-				if (content[inspectionLbl].Items.Count > 0) {
+				if (content[inspectionLbl].Samples.Count > 0) {
 					yield return new RecognizedSegment(unlabledHeuristic.Bounds, content[inspectionLbl].Label, labelProbability[inspectionLbl]);
 				}
 			}

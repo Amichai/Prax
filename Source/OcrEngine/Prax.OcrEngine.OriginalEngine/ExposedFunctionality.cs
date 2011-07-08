@@ -5,6 +5,7 @@ using Prax.OcrEngine.Engine.AutomatedTraining;
 using Prax.OcrEngine.Engine.Segmentation;
 using Segmentation;
 using TextRenderer;
+using Prax.OcrEngine.Engine.ReferenceData;
 
 namespace Prax.OcrEngine.Engine {
 	class ExposedFunctionality {
@@ -50,13 +51,14 @@ namespace Prax.OcrEngine.Engine {
 			stream.Close();
 
 			var boards = imageData.DefineIteratedBoards();
-			var trainingData = new TrainingLibrary();
+			var trainingData = new MutableReferenceSet();
 
 			foreach (var word in RenderedText.WordBounds)
 				boards.Train(word, trainingData);
 
+			var searcher = new ReferenceSearcher(trainingData);
 			foreach (var segment in boards.Segment()) {
-				var returnVal = trainingData.PerformLookup(segment);
+				var returnVal = searcher.PerformLookup(segment);
 			}
 		}
 	}

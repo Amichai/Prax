@@ -8,11 +8,12 @@ using System.ComponentModel;
 using System.IO;
 using Prax.OcrEngine.Engine.Segmentation;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
+using Prax.OcrEngine.Engine.ReferenceData;
 
 namespace Prax.OcrEngine.Engine {
 	public class OriginalDocumentProcessor : DocumentProcessorBase {
-		readonly IReferenceLibrary trainingData;
-		public OriginalDocumentProcessor(IReferenceLibrary trainingData) { this.trainingData = trainingData; }
+		readonly IReferenceSearcher trainingData;
+		public OriginalDocumentProcessor(IReferenceSearcher trainingData) { this.trainingData = trainingData; }
 
 		public override void ProcessDocument(Stream document) {
 			//TODO: Report progress

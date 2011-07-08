@@ -60,9 +60,11 @@
     <Compile Include="ImageUtilities\Utilities.cs" />
     <Compile Include="OriginalDocumentProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReferenceData\IReferenceSet.cs" />
+    <Compile Include="ReferenceData\MutableReferenceSet.cs" />
     <Compile Include="Segmentation\Segmentator.cs" />
     <Compile Include="Segmentation\TextSegment.cs" />
-    <Compile Include="TrainingLibrary.cs" />
+    <Compile Include="ReferenceData\ReferenceSearcher .cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">
