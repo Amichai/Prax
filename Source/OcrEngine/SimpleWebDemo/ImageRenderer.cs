@@ -138,10 +138,11 @@ namespace SimpleWebDemo {
 			var xaml = HtmlToXamlConverter.ConvertHtmlToXaml(html, asFlowDocument: true);
 
 			var flowDoc = (FlowDocument)XamlReader.Load(XmlReader.Create(new StringReader(xaml)));
-
+			flowDoc.FontFamily = new FontFamily("Tahoma");
 			flowDoc.FlowDirection = FlowDirection.RightToLeft;
 
-			flowDoc.PagePadding = new Thickness();	//Suppress the default padding
+			//For some reason, Tahoma needs some vertical padding
+			flowDoc.PagePadding = new Thickness(0, 0, 0, 2);	//Suppress the default padding
 			//flowDoc.Background = Brushes.White;
 
 			return new FlowDocumentScrollViewer {
