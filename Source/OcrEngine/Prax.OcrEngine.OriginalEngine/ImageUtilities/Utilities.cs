@@ -64,7 +64,7 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 		/// Extracts a sub-rectangle of content from a larger double array
 		/// </summary>
 		public static int[][] ExtractRectangularContentArea(this int[][] content, Rectangle bounds) {
-			Bitmap contentAsBitmap = content.ConvertDoubleArrayToBitmap(Color.White);
+			//Bitmap contentAsBitmap = content.ConvertDoubleArrayToBitmap(Color.White);
 			int[][] extractedContent = new int[bounds.Width][];
 			for (int i = 0; i < bounds.Width; i++) {
 				extractedContent[i] = new int[bounds.Height];
