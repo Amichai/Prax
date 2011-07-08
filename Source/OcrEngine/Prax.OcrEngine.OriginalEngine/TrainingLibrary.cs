@@ -5,6 +5,7 @@ using System.Text;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
 using Prax.OcrEngine.Services;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace Prax.OcrEngine.Engine {
 	public interface IReferenceLibrary {
@@ -17,6 +18,17 @@ namespace Prax.OcrEngine.Engine {
 	/// associate.</summary>
 	public class TrainingLibrary : IReferenceLibrary {
 		class RollingVariance {
+			public void Serialize(BinaryWriter writer) {
+				writer.Write(Count);
+				writer.Write(mean);
+				writer.Write(M2);
+			}
+			public void Deserialize(BinaryReader reader) {
+				Count = reader.ReadInt64();
+				mean = reader.ReadDouble();
+				M2 = reader.ReadDouble();
+			}
+
 			public long Count { get; private set; }
 			double mean = 0,
 					M2 = 0;
@@ -31,7 +43,6 @@ namespace Prax.OcrEngine.Engine {
 				return variance;
 			}
 		}
-
 
 		class ReferenceCollection : KeyedCollection<string, ReferenceLabel> {
 			public ReferenceLabel GetOrAdd(string key) {
