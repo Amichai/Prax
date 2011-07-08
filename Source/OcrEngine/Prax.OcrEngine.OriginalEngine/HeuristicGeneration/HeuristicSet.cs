@@ -27,6 +27,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			return writableHeuristics[index];
 		}
 		public void GoThroughBoards(List<MatrixBoard> boards, Rectangle rect) {
+			Bounds = rect;
 			foreach (var board in boards) {
 				AddHeursitics(
 					board.Matrix.ExtractRectangularContentArea(rect));
