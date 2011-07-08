@@ -13,15 +13,16 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 		public List<MatrixBoard> Boards = new List<MatrixBoard>();
 		public const int numberOfIterations = 8;
 
-		public TrainingData Train(CharacterBounds charBounds) {
+		public void Train(CharacterBounds charBounds, TrainingLibrary library) {
 			int midpoint;
 			int boardWidth = Boards.First().Matrix.Length;
-			TrainingData trainingData = new TrainingData();
+			TrainingLibrary trainingData = new TrainingLibrary();
+
 			for (int idx = 0; idx < charBounds.items.Count(); idx++ ){
 				LetterAndBounds character = charBounds.items[idx];
 				midpoint = character.Bounds.X + (int)Math.Round(character.Bounds.Width / 2d);
 				Rectangle rect = new Rectangle(midpoint - 6, 0, character.Bounds.Width, character.Bounds.Height);
-				HeuristicReturnValues heursitics = new HeuristicReturnValues();
+				HeuristicSet heursitics = new HeuristicSet();
 				heursitics.GoThroughBoards(Boards, rect);
 				string label = character.Letter;
 				if (idx < charBounds.Word.Count()) {
@@ -30,11 +31,10 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 					trainingData.AddHeuristics(heursitics);
 				}
 			}
-			return trainingData;
 		}
 
-		private HeuristicReturnValues ExtractHeursitics(int midpoint){
-			HeuristicReturnValues heuristics = new HeuristicReturnValues();
+		private HeuristicSet ExtractHeursitics(int midpoint){
+			HeuristicSet heuristics = new HeuristicSet();
 			int idx = midpoint - 6; 
 			int width = Boards.First().Matrix[0].Length;
 			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.Segmentator.WidthOfCanvas, width));

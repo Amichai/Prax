@@ -11,8 +11,8 @@ using Prax.OcrEngine.Engine.HeuristicGeneration;
 
 namespace Prax.OcrEngine.Engine {
 	public class OriginalDocumentProcessor : DocumentProcessorBase {
-		readonly TrainingData trainingData;
-		public OriginalDocumentProcessor(TrainingData trainingData) { this.trainingData = trainingData; }
+		readonly IReferenceLibrary trainingData;
+		public OriginalDocumentProcessor(IReferenceLibrary trainingData) { this.trainingData = trainingData; }
 
 		public override void ProcessDocument(Stream document) {
 			//TODO: Report progress
@@ -20,10 +20,10 @@ namespace Prax.OcrEngine.Engine {
 			var imageData = new ImageData(document);
 			var boards = imageData.DefineIteratedBoards();
 
-			IEnumerable<HeuristicReturnValues> heuristics = boards.Segment();
+			IEnumerable<HeuristicSet> heuristics = boards.Segment();
 
 			Results = new ReadOnlyCollection<RecognizedSegment>(
-				heuristics.Select(h => trainingData.PerformLookUp(h).FirstOrDefault())
+				heuristics.Select(h => trainingData.PerformLookup(h).FirstOrDefault())
 						  .Where(rs => !String.IsNullOrWhiteSpace(rs.Text))	//Where it isn't default(RecognizedSegment)
 						  .ToList()
 			);

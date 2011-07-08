@@ -8,8 +8,8 @@ using Prax.OcrEngine.Engine.HeuristicGeneration;
 namespace Prax.OcrEngine.Engine.Segmentation {
 	public static class Segmentator {
 		public const int WidthOfCanvas = 11;
-		public static IEnumerable<HeuristicReturnValues> Segment(this IterateBoards boards) {
-			var heuristics = new HeuristicReturnValues();
+		public static IEnumerable<HeuristicSet> Segment(this IterateBoards boards) {
+			var heuristics = new HeuristicSet();
 			int width = boards.Boards.First().Matrix.Length;
 			int height = boards.Boards.First().Matrix[0].Length;
 			for (int idx = 0; idx < width - WidthOfCanvas; idx++) {

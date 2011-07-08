@@ -12,31 +12,31 @@ namespace Prax.OcrEngine.Engine {
 		//OCRResults results = new OCRResults();
 		//TrainingDataLibrary = new ReferenceLibrary();
 
-		public void GetImage(){
+		public void GetImage() {
 			//Open file dialog
 			//ImageData imageData = new ImageData();
 			//fileQueue.Add(imageData);
 		}
 
-		public void OpenTrainingData(){
+		public void OpenTrainingData() {
 			//Open file dialog
 			//trainingDataLibrary = new ReferenceLibrary();
 		}
 
-		public void EditTrainingData(){
+		public void EditTrainingData() {
 			//if(trainingDataLibrary != null)
-				//trainingDataLibrary.ContentEditor();
+			//trainingDataLibrary.ContentEditor();
 		}
 
-		public void OpenOCRResults(){
+		public void OpenOCRResults() {
 			//results.Display();
 		}
 
-		public void TestAlgorithm(){
+		public void TestAlgorithm() {
 			//fileQueue.ProcessFiles();
 		}
 
-		public void TrainAlgorithm(){
+		public void TrainAlgorithm() {
 			//AlgorithmTrainer trainer = new AlgorithmTrainer();
 		}
 		public void RenderAnImage() {
@@ -47,11 +47,16 @@ namespace Prax.OcrEngine.Engine {
 			var RenderedText = new RenderedText(renderText, charSegments);
 			var stream = output.ToBitmap().CreateStream();
 			var imageData = new ImageData(stream);
-				stream.Close();
+			stream.Close();
+
 			var boards = imageData.DefineIteratedBoards();
-			var trainingData = RenderedText.ProduceTrainingData(boards);
+			var trainingData = new TrainingLibrary();
+
+			foreach (var word in RenderedText.WordBounds)
+				boards.Train(word, trainingData);
+
 			foreach (var segment in boards.Segment()) {
-				var returnVal = trainingData.PerformLookUp(segment);
+				var returnVal = trainingData.PerformLookup(segment);
 			}
 		}
 	}

@@ -4,61 +4,52 @@ using System.Linq;
 using System.Text;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
 using Prax.OcrEngine.Services;
+using System.Collections.ObjectModel;
 
 namespace Prax.OcrEngine.Engine {
-
+	public interface IReferenceLibrary {
+		IEnumerable<RecognizedSegment> PerformLookup(HeuristicSet heuristics);
+	}
 
 	/// <summary>Training data is a set of heuristics return values associated with their corresponding input label.
-	/// Traning data is used to take an unlabeled set of heuristic return values and to compare those return values
+	/// Training data is used to take an unlabeled set of heuristic return values and to compare those return values
 	/// to labeled sets of heuristic return value and use that comparison to determine the most appropriate label to 
 	/// associate.</summary>
-	public class TrainingData {
-		private Library Library = new Library();
+	public class TrainingLibrary : IReferenceLibrary {
 
-		public void AddHeuristics(HeuristicReturnValues returnValuesToAdd) {
-			if (returnValuesToAdd.Label == null) {
-				throw new NullReferenceException(
-					"Trying to add an unlabeled set of heuristic return values to the traning data library");
-			}
-			if (Library.Content.ContainsKey(returnValuesToAdd.Label)) {
-				//Add the heuristic return values to the list associated with the corresponding label in the library
-				List<HeuristicReturnValues> listOfHeuristics = Library.Content[returnValuesToAdd.Label];
-				listOfHeuristics.Add(returnValuesToAdd);
-				Library.Content[returnValuesToAdd.Label] = listOfHeuristics;
-			} else {
-				//Create a new label entry in the library
-				Library.Content.Add(returnValuesToAdd.Label, new List<HeuristicReturnValues>() { returnValuesToAdd });
-				Library.ListOfLabels.Add(returnValuesToAdd.Label);
-			}
-		}
 		/// <summary>Take an unlabeled HeursiticReturnVaules object and compare it to each key value pair in the 
 		/// library and return the best match as a LookupResult</summary>
-		public IEnumerable<RecognizedSegment> PerformLookUp(HeuristicReturnValues unlabeledReturnValues) {
-			if (unlabeledReturnValues.Label != null)
-				throw new Exception("This guy is supposed to be unlabeled!");
+		public IEnumerable<RecognizedSegment> PerformLookup(HeuristicSet heuristics) {
+			if (heuristics.Label != null)
+				throw new ArgumentException("PerformLookup expects an unidentified segment", "heuristics");
 
-			var comparisonValues = Library.Compare(unlabeledReturnValues);
-			return comparisonValues.OrderBy(i => i.Certainty);
+			return GetMatches(heuristics).OrderBy(i => i.Certainty);
 		}
-	}
-	/// <summary>Contains the label to be associated with the unlabeled HeuristicReturnValues and a confidence value
-	/// which reflects the algorithm's confidence in making that assignment.</summary>
-	public class LookupResult {
-		public LookupResult(string lbl, double confidence) {
-			this.Label = lbl;
-			this.ConfidenceValue = confidence;
-		}
-		public string Label { get; set; }
-		public double ConfidenceValue { get; set; }
-	}
 
-	public class Library {
+		public void AddAll(IEnumerable<HeuristicSet> heruistics) {
+			foreach (var item in heruistics)
+				AddHeuristics(item);
+		}
+		public void AddHeuristics(HeuristicSet heruistics) {
+			if (heruistics.Label == null)
+				throw new ArgumentException("The training library requires labeled heuristics", "heruistics");
+
+			List<HeuristicSet> list;
+			if (!content.TryGetValue(heruistics.Label, out list))
+				content.Add(heruistics.Label, (list = new List<HeuristicSet>()));
+
+			list.Add(heruistics);
+
+			allLabels.Add(heruistics.Label);
+		}
+
 		/// <summary>Key is the label associated with the value which is a set of heuristic return values</summary>
-		public Dictionary<string, List<HeuristicReturnValues>> Content
-															= new Dictionary<string, List<HeuristicReturnValues>>();
-		public List<string> ListOfLabels = new List<string>();
-		public IEnumerable<RecognizedSegment> Compare(HeuristicReturnValues unlabledHeuristic) {
-			int numberOfUniqueLabels = ListOfLabels.Count();
+		private readonly Dictionary<string, List<HeuristicSet>> content
+															= new Dictionary<string, List<HeuristicSet>>();
+		private readonly List<string> allLabels = new List<string>();
+
+		private IEnumerable<RecognizedSegment> GetMatches(HeuristicSet unlabledHeuristic) {
+			int numberOfUniqueLabels = allLabels.Count();
 			int sizeOfHeuristicArray = unlabledHeuristic.Count;
 			int numberOfLabelsToCount = numberOfUniqueLabels;
 			double[][] probabilityFromEachHeuristic = new double[numberOfLabelsToCount][];
@@ -77,17 +68,17 @@ namespace Prax.OcrEngine.Engine {
 
 			for (int heurIdx = 0; heurIdx < sizeOfHeuristicArray; heurIdx++) {
 				for (int lblIdx = 0; lblIdx < numberOfUniqueLabels; lblIdx++) {
-					string currentLabel = ListOfLabels[lblIdx];
-					for (int lblTrialIdx = 0; lblTrialIdx < Content[currentLabel].Count(); lblTrialIdx++) {
-						if (unlabledHeuristic.GetAtIndex(heurIdx) == Content[currentLabel][lblTrialIdx].GetAtIndex(heurIdx)) {
+					string currentLabel = allLabels[lblIdx];
+					for (int lblTrialIdx = 0; lblTrialIdx < content[currentLabel].Count(); lblTrialIdx++) {
+						if (unlabledHeuristic.GetAtIndex(heurIdx) == content[currentLabel][lblTrialIdx].GetAtIndex(heurIdx)) {
 							lblComparisonResults[lblIdx][heurIdx]++;
 						}
 					}
 					totalComparison_test[lblIdx] += lblComparisonResults[lblIdx][heurIdx];
 				}
 				for (int labelIndex = 0; labelIndex < numberOfUniqueLabels; labelIndex++) {
-					string currentLabel = ListOfLabels[labelIndex];
-					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)Content[currentLabel].Count;
+					string currentLabel = allLabels[labelIndex];
+					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)content[currentLabel].Count;
 				}
 			}
 			//We are working to produce two DSs: lblComparisonResults[][], totalComparison_test[]
@@ -111,8 +102,8 @@ namespace Prax.OcrEngine.Engine {
 					if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
 						heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
 						heuristicsControl.buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, inspectionLbl, heurIdx);
-						multiplicativeOffset = variances.newVarianceValue(heuristicProbabilisticIndication, heurIdx, inspectionLbl);
-						multiplicativeOffset += aprioriProb / (double)variances.var2[heurIdx][inspectionLbl].n;
+						multiplicativeOffset = variances.AddValue(heuristicProbabilisticIndication, heurIdx, inspectionLbl);
+						multiplicativeOffset += aprioriProb / (double)variances.var2[heurIdx][inspectionLbl].Count;
 						if (multiplicativeOffset < double.MaxValue) {
 							labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 						}
@@ -120,44 +111,44 @@ namespace Prax.OcrEngine.Engine {
 							heurIdx = sizeOfHeuristicArray;
 					}
 				}
-				string currentLabel = ListOfLabels[inspectionLbl];
-				if (Content[currentLabel].Count > 0) {
+				string currentLabel = allLabels[inspectionLbl];
+				if (content[currentLabel].Count > 0) {
 					yield return new RecognizedSegment(unlabledHeuristic.Bounds, currentLabel, labelProbability[inspectionLbl]);
 				}
 			}
 		}
 
 		private class variancesForEachHeuristic {
-			public List<List<rollingVarianceCalc>> var2 = new List<List<rollingVarianceCalc>>();
+			public List<List<RollingVariance>> var2 = new List<List<RollingVariance>>();
 
 			public variancesForEachHeuristic(int numberOfHeur) {
 				for (int i = 0; i < numberOfHeur; i++)
-					var2.Add(new List<rollingVarianceCalc>());
+					var2.Add(new List<RollingVariance>());
 			}
 
-			public class rollingVarianceCalc {
-				public int n = 0;
+			public class RollingVariance {
+				public int Count { get; private set; }
 				double mean = 0,
 						M2 = 0;
 
-				public double calcOnlineVar(double x) {
-					n++;
+				public double Append(double x) {
+					Count++;
 					double delta = x - mean;
-					mean = mean + delta / n;
+					mean = mean + delta / Count;
 					M2 = M2 + delta * (x - mean);
 
-					double variance = M2 / (n - 1);
+					double variance = M2 / (Count - 1);
 					return variance;
 				}
 			}
 
-			public double newVarianceValue(double value, int heuristicIdx, int labelIdx) {
+			public double AddValue(double value, int heuristicIdx, int labelIdx) {
 				if (labelIdx >= var2[heuristicIdx].Count) {
 					while (labelIdx >= var2[heuristicIdx].Count)
-						var2[heuristicIdx].Add(new rollingVarianceCalc());
-					return var2[heuristicIdx][labelIdx].calcOnlineVar(value);
+						var2[heuristicIdx].Add(new RollingVariance());
+					return var2[heuristicIdx][labelIdx].Append(value);
 				} else {
-					return var2[heuristicIdx][labelIdx].calcOnlineVar(value);
+					return var2[heuristicIdx][labelIdx].Append(value);
 				}
 			}
 		}

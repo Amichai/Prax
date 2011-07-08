@@ -6,7 +6,7 @@ using System.Drawing;
 using Prax.OcrEngine.Engine.ImageUtilities;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
-	public class HeuristicReturnValues {
+	public class HeuristicSet {
 		public int Count { get { return heuristics.Count; } }
 		public string Label { get; set; }
 		public Rectangle Bounds { get; set; }	//TODO: Set this property
@@ -27,7 +27,6 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 				AddHeursitics(
 					board.Matrix.ExtractRectangularContentArea(rect));
 			}
-
 		}
 	}
 }

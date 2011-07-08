@@ -49,10 +49,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutomatedTraining\CharacterBounds.cs" />
-    <Compile Include="AutomatedTraining\TextToRender.cs" />
+    <Compile Include="AutomatedTraining\RenderedText.cs" />
     <Compile Include="AutomatedTraining\UnicodeConvert.cs" />
     <Compile Include="ExposedFunctionality.cs" />
-    <Compile Include="HeuristicGeneration\Heuristics.cs" />
+    <Compile Include="HeuristicGeneration\HeuristicSet.cs" />
     <Compile Include="HeuristicGeneration\IterateBoards.cs" />
     <Compile Include="ImageData.cs" />
     <Compile Include="ImageUtilities\Measurer.cs" />
@@ -62,7 +62,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Segmentation\Segmentator.cs" />
     <Compile Include="Segmentation\TextSegment.cs" />
-    <Compile Include="TrainingData.cs" />
+    <Compile Include="TrainingLibrary.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Prax.OcrEngine.Common\Prax.OcrEngine.Common.csproj">
