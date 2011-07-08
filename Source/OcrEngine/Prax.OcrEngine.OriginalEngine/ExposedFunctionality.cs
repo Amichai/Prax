@@ -9,6 +9,7 @@ using TextRenderer;
 using Prax.OcrEngine.Engine.ReferenceData;
 using System.IO;
 using System;
+using System.Diagnostics;
 
 namespace Prax.OcrEngine.Engine {
 	class ExposedFunctionality {
@@ -37,7 +38,13 @@ namespace Prax.OcrEngine.Engine {
 		}
 
 		public void TestAlgorithm() {
-			MemoryStream stream = new MemoryStream();
+			string renderText = "أدخل نص هنا لترجمة";
+			var output = new DrawingGroup();
+			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
+			var charSegments = TextSegment.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
+			var RenderedText = new RenderedText(renderText, charSegments);
+			var stream = output.ToBitmap().CreateStream();
+
 			var imageData = new ImageData(stream);
 			stream.Close();
 			var boards = imageData.DefineIteratedBoards();
@@ -46,6 +53,8 @@ namespace Prax.OcrEngine.Engine {
 			var searcher = new ReferenceSearcher(trainingData);
 			foreach (var segment in boards.Segment()) {
 				var returnVal = searcher.PerformLookup(segment);
+				Debug.Print(returnVal.First().Text + " " + returnVal.First().Certainty);
+				Debug.Print(returnVal.Last().Text + " " + returnVal.Last().Certainty);
 			}
 		}
 
@@ -80,7 +89,7 @@ namespace Prax.OcrEngine.Engine {
 	static class Program {
 		static void Main(string[] args) {
 			var UI = new ExposedFunctionality();
-			UI.TrainAlgorithm();
+			UI.TestAlgorithm();
 		}
 	}
 }

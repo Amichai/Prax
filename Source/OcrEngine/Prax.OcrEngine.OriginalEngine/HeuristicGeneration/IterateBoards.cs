@@ -21,9 +21,8 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			for (int idx = 0; idx < charBounds.items.Count(); idx++) {
 				LetterAndBounds character = charBounds.items[idx];
 				midpoint = character.Bounds.X + (int)Math.Round(character.Bounds.Width / 2d);
-				//Rectangle rect = new Rectangle(midpoint - 6, 0, character.Bounds.Width, character.Bounds.Height);
-				if (midpoint - 6 >= 0 && midpoint + 6 < character.Bounds.Width) {
-					Rectangle rect = new Rectangle(midpoint - 6, 0, 12, character.Bounds.Height);
+				if (midpoint - 6 >= 0 && midpoint + 6 < boardWidth) {
+					Rectangle rect = new Rectangle(midpoint - 6, 0, 12, character.Bounds.Height - 1);
 
 					HeuristicSet heursitics = new HeuristicSet();
 					heursitics.GoThroughBoards(Boards, rect);

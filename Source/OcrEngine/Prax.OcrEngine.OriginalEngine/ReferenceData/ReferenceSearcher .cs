@@ -29,7 +29,8 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 			if (heuristics.Label != null)
 				throw new ArgumentException("PerformLookup expects an unidentified segment", "heuristics");
 
-			return GetMatchesIterator(heuristics).OrderBy(i => i.Certainty);
+			var results = GetMatchesIterator(heuristics).OrderBy(i => i.Certainty);
+			return results;
 		}
 
 		private IEnumerable<RecognizedSegment> GetMatchesIterator(HeuristicSet unlabledHeuristic) {
