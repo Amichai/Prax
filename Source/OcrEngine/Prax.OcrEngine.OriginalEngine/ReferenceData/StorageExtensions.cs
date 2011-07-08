@@ -55,7 +55,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 				int heuristicCount = reader.ReadInt32();
 
 				for (int i = 0; i < labelCount; i++) {
-					var label = new ReferenceLabel(reader.ReadString());
+					var label = set.GetOrAdd(reader.ReadString());
 					int sampleCount = reader.ReadInt32();
 
 					for (int s = 0; s < sampleCount; s++) {

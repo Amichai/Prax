@@ -53,7 +53,7 @@ namespace Prax.OcrEngine.Engine {
 			trainingData.ReadFrom(trainingFolder);
 			var searcher = new ReferenceSearcher(trainingData);
 			foreach (var segment in boards.Segment()) {
-				var returnVal = searcher.PerformLookup(segment);
+				var returnVal = searcher.PerformLookup(segment).ToList();
 				Debug.Print(returnVal.First().Text + " " + returnVal.First().Certainty);
 				Debug.Print(returnVal.Last().Text + " " + returnVal.Last().Certainty);
 			}
