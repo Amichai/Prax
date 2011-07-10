@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppEngine", "AppEngine", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prax.OcrEngine.OriginalEngine", "Prax.OcrEngine.OriginalEngine\Prax.OcrEngine.OriginalEngine.csproj", "{EDBDAF6E-A58F-438E-954A-558B9C6B3302}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OriginalEngine.DevUI", "OriginalEngine.DevUI\OriginalEngine.DevUI.csproj", "{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = OcrEngine.vsmdi
@@ -184,6 +186,16 @@ Global
 		{EDBDAF6E-A58F-438E-954A-558B9C6B3302}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EDBDAF6E-A58F-438E-954A-558B9C6B3302}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EDBDAF6E-A58F-438E-954A-558B9C6B3302}.Release|x86.ActiveCfg = Release|Any CPU
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Debug|x86.ActiveCfg = Debug|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Debug|x86.Build.0 = Debug|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Release|Any CPU.ActiveCfg = Release|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Release|Mixed Platforms.Build.0 = Release|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Release|x86.ActiveCfg = Release|x86
+		{EBEAC75D-1A62-44E9-90D1-E33F6CE282BC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

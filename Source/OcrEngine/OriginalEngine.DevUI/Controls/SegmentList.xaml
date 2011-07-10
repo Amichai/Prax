@@ -1,0 +1,51 @@
+﻿<UserControl x:Class="Prax.OcrEngine.Engine.DevUI.Controls.SegmentList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:local="clr-namespace:Prax.OcrEngine.Engine.DevUI"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+			 Name="root" HorizontalAlignment="Center" VerticalAlignment="Center">
+	<!--<UserControl.DataContext>
+		<local:TrainingContext Text="أدخل نص هنا لترجمةنص هنا لت" />
+	</UserControl.DataContext>-->
+	
+	<ListBox ItemsSource="{Binding Segments}" Name="list" SelectedItem="{Binding SelectedItem, ElementName=root}" SelectedIndex="5"
+			 Width="{Binding ElementName=list, Path=Background.ImageSource.PixelWidth}" Height="{Binding ElementName=list, Path=Background.ImageSource.PixelHeight}">
+		<ListBox.Background>
+			<ImageBrush ImageSource="{Binding Image}" Stretch="None" />
+		</ListBox.Background>
+		<ListBox.ItemContainerStyle>
+			<Style TargetType="ListBoxItem">
+				<Setter Property="Canvas.Left" Value="{Binding Bounds.X}" />
+				<Setter Property="Canvas.Top" Value="{Binding Bounds.Y}" />
+
+				<Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+ 				<Style.Resources>	<!-- Suppress the default selection colors -->
+					<SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+					<SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="Transparent"/>
+				</Style.Resources>
+			</Style>
+		</ListBox.ItemContainerStyle>
+		<ListBox.ItemTemplate>
+			<DataTemplate>
+				<Rectangle Name="rect" Width="{Binding Bounds.Width}" Height="{Binding Bounds.Height}"
+						   Stroke="#44888800" />
+				<DataTemplate.Triggers>
+					<DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" Value="True">
+						<Setter TargetName="rect" Property="StrokeThickness" Value="2" />
+					</DataTrigger>
+					<DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBoxItem}}" Value="True">
+						<Setter TargetName="rect" Property="Fill" Value="#660000FF" />
+						<Setter TargetName="rect" Property="Stroke" Value="Blue" />
+					</DataTrigger>
+				</DataTemplate.Triggers>
+			</DataTemplate>
+		</ListBox.ItemTemplate>
+		<ListBox.ItemsPanel>
+			<ItemsPanelTemplate>
+				<Canvas />
+			</ItemsPanelTemplate>
+		</ListBox.ItemsPanel>
+	</ListBox>
+</UserControl>
