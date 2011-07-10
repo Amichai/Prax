@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="AutomatedTraining\CharacterBounds.cs" />
     <Compile Include="AutomatedTraining\RenderedText.cs" />
+    <Compile Include="AutomatedTraining\BoundedWord.cs" />
     <Compile Include="AutomatedTraining\UnicodeConvert.cs" />
     <Compile Include="ExposedFunctionality.cs" />
     <Compile Include="HeuristicGeneration\HeuristicSet.cs" />
