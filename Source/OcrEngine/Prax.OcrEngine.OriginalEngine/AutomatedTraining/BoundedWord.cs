@@ -32,7 +32,7 @@ namespace Prax.OcrEngine.Engine.AutomatedTraining {
 					List<BoundedCharacter> letters = new List<BoundedCharacter>(word.Length);
 					for (int i = 0; i < word.Length; i++) {
 						var ch = UnicodeConvert.convertUnicodeChar(word, ref i);
-						var letterBounds = line.GetTextBounds(i, 1)[0].Rectangle;
+						var letterBounds = line.GetTextBounds(lastSpace + i, 1)[0].Rectangle;
 						letters.Add(new BoundedCharacter(ch, Rect.Offset(letterBounds, 0, top)));
 					}
 					var wordBounds = line.GetTextBounds(lastSpace, word.Length)[0].Rectangle;
