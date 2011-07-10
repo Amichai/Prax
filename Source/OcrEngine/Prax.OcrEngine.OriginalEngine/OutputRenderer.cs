@@ -98,14 +98,15 @@ namespace Prax.OcrEngine.Engine {
 				outputString += new string(outputToAdd.Reverse().ToArray());
 			}
 
-			public void PrintStoredOutput() {
+			public string PrintStoredOutput() {
 				if (!paragraph.IsEmpty()) {
 					doc.Add(paragraph);
 					doc.Close();
 					outputString = new string(outputString.Reverse().ToArray());
 					writer.Close();
 					File.WriteAllText("TxtToRender.txt", outputString);
-				}
+					return outputString;
+				} else return null;
 			}
 		}
 
@@ -114,7 +115,7 @@ namespace Prax.OcrEngine.Engine {
 
 		private enum writerPosition { firstSeg, newLine, sameLine };
 
-		public void Render() {
+		public string Render() {
 			outputObject resultsRenderer = new outputObject();
 			List<RecognizedSegment> sortedOutput = orderAllResults(resolvedSegmentsList.AsReadOnly());
 
@@ -186,7 +187,7 @@ namespace Prax.OcrEngine.Engine {
 					}
 				}
 			}
-			resultsRenderer.PrintStoredOutput();
+			return resultsRenderer.PrintStoredOutput();
 		}
 	}
 }

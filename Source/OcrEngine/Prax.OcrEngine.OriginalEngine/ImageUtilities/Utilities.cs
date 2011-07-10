@@ -34,30 +34,45 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			return rtb;
 		}
 
-
-		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension) {
+		/// <summary>Extension method converts a bitmap to a double array</summary>
+		/// <param name="fileBitmap">The input image</param>
+		/// <param name="extension">Image File extension</param>
+		/// <param name="whitespaceBuffer">Number of pixels of whitespace to add on the right and left of the image</param>
+		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension, int whitespaceBuffer) {
 			int[][] uploadedDocument;
-			int width = fileBitmap.Width;
+			int width = fileBitmap.Width + whitespaceBuffer*2;
 			int height = fileBitmap.Height;
-			uploadedDocument = new int[width][];
+			uploadedDocument = new int[width ][];
 			for (int i = 0; i < width; i++)
 				uploadedDocument[i] = new int[height];
 
 			Color pixelColor;
-			for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				for (int i = 0; i < whitespaceBuffer; i++) {
+					uploadedDocument[i][j] = 255;
+				}
+				for (int i = width - whitespaceBuffer; i < width; i++) {
+					uploadedDocument[i][j] = 255;
+				}
+			}
+			for (int i = whitespaceBuffer; i < width - whitespaceBuffer; i++) {
 				for (int j = 0; j < height; j++) {
 					switch (extension) {
 						case ".bmp":
-							pixelColor = fileBitmap.GetPixel(i, j);
+							pixelColor = fileBitmap.GetPixel(i - whitespaceBuffer, j);
 							uploadedDocument[i][j] = (int)(pixelColor.R * 0.3 + pixelColor.G * 0.59 + pixelColor.B * 0.11);
 							break;
 						case ".png":
-							uploadedDocument[i][j] = (255 - (int)fileBitmap.GetPixel(i, j).A);
+							uploadedDocument[i][j] = (255 - (int)fileBitmap.GetPixel(i - whitespaceBuffer, j).A);
 							break;
 					}
 				}
 			}
 			return uploadedDocument;
+		}
+
+		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension) {
+			return fileBitmap.BitmapToDoubleArray(extension, 0);
 		}
 		public static void DrawBounds(this System.Drawing.Bitmap bitmap, Rectangle r) {
 			Graphics g = Graphics.FromImage(bitmap);
@@ -100,9 +115,14 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			}
 			for (int i = 0; i < bounds.Width; i++) {
 				for (int j = 0; j < bounds.Height; j++) {
-					extractedContent[i][j] = content[bounds.X + i][bounds.Y + j];
+					if (bounds.X + i < 0 || bounds.X + i >= content.Length) {
+						throw new IndexOutOfRangeException();
+					} else {
+						extractedContent[i][j] = content[bounds.X + i][bounds.Y + j];
+					}
 				}
 			}
+			Bitmap temp = extractedContent.ConvertDoubleArrayToBitmap(Color.White);
 			return extractedContent;
 		}
 
