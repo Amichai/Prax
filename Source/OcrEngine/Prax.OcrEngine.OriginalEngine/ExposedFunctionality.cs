@@ -50,11 +50,12 @@ namespace Prax.OcrEngine.Engine {
 			var trainingData = new MutableReferenceSet();
 			trainingData.ReadFrom(trainingFolder);
 			var searcher = new ReferenceSearcher(trainingData);
+			var results = new OutputRenderer();
 			foreach (var segment in boards.Segment()) {
-				var returnVal = searcher.PerformLookup(segment).ToList();
-				Debug.Print(returnVal.First().Text + " " + returnVal.First().Certainty);
-				Debug.Print(returnVal.Last().Text + " " + returnVal.Last().Certainty);
+				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > OutputRenderer.ThresholdCertainty);
+				results.Add(returnVal);
 			}
+			results.Render();
 		}
 
 		public void TrainAlgorithm() {
@@ -82,6 +83,7 @@ namespace Prax.OcrEngine.Engine {
 		//TODO: Train for white space recognition 
 		//BUG: The font being used to render the image in the simple web demo is different than the font being used to render 
 		//within OriginalEngine and these need to be the same.
+		//TODO: Produce text from the OCR results
 	}
 	static class Program {
 		static void Main(string[] args) {
