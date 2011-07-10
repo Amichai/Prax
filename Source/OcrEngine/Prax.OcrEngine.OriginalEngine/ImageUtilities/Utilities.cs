@@ -10,7 +10,7 @@ using System.Windows;
 using Color = System.Drawing.Color;
 
 namespace Prax.OcrEngine.Engine.ImageUtilities {
-	static class Utilities {
+	public static class Utilities {
 		public static Rectangle ToGdi(this Rect r) {
 			return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width), (int)Math.Round(r.Height));
 		}

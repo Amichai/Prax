@@ -22,7 +22,7 @@ namespace Prax.OcrEngine.Engine {
 	/// Add properties to this class to store all intermediary
 	/// and final output from OCR.
 	///</remarks>
-	class ImageData {
+	public class ImageData {
 		public ImageData(Stream stream) {
 			UploadedImage = (Bitmap)Bitmap.FromStream(stream);
 			this.ImageMatrix = UploadedImage.BitmapToDoubleArray(".png");
