@@ -17,18 +17,18 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 		public const int numberOfIterations = 8;
 
 		public HeuristicSet GetHeuristics(BoundedCharacter ch) {
-			var rect = ch.Bounds.ToGdi();
+				var rect = ch.Bounds.ToGdi();
 
 			int midpoint = rect.X + (int)Math.Round(rect.Width / 2d);
 			if (midpoint - 6 >= 0 && midpoint + 6 < BoardWidth) {
-				Rectangle smallerRect = new Rectangle(midpoint - 6, 0, 12, rect.Height - 1);
+					Rectangle smallerRect = new Rectangle(midpoint - 6, 0, Segmentator.WidthOfCanvas, rect.Height - 1);
 
 				HeuristicSet heursitics = new HeuristicSet { Bounds = rect, Label = ch.ToString() };
-				heursitics.GoThroughBoards(Boards, smallerRect);
+					heursitics.GoThroughBoards(Boards, smallerRect);
 
 				return heursitics;
-			} else {
-				//TODO: Handle smaller chars
+				} else {
+					//TODO: Handle smaller chars
 				return null;
 			}
 		}
