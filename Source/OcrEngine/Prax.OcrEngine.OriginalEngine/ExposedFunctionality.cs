@@ -52,13 +52,17 @@ namespace Prax.OcrEngine.Engine {
 			var searcher = new ReferenceSearcher(trainingData);
 			var results = new OutputRenderer();
 			foreach (var segment in boards.Segment()) {
-				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > OutputRenderer.ThresholdCertainty);
-				results.Add(returnVal);
+				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > OutputRenderer.ThresholdCertainty).ToList();
+				if (returnVal.Count() > 0) {
+					results.Add(returnVal);
+					Debug.Print(returnVal.First().Text + " " + returnVal.First().Certainty.ToString());
+				}
 			}
 			var outputString = results.Render();
 		}
 
 		public void TrainAlgorithm() {
+
 			string renderText = "أدخل نص هنا لترجمة";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
@@ -72,6 +76,9 @@ namespace Prax.OcrEngine.Engine {
 
 			var boards = imageData.DefineIteratedBoards();
 			var trainingData = new MutableReferenceSet();
+			
+			//ADD TO EXISTING TRAINING DATA LIBRARY:
+				//trainingData.ReadFrom(trainingFolder);
 
 			foreach (var ch in words.SelectMany(w => w.Characters)) {
 				var heuristics = boards.GetHeuristics(ch);
@@ -81,12 +88,7 @@ namespace Prax.OcrEngine.Engine {
 
 			trainingData.WriteTo(trainingFolder);
 		}
-
-		//BUG: Run OriginalEngine as the startup project and call the TrainAlgorithm() method to see a null reference exception
 		//TODO: Train for white space recognition 
-		//BUG: The font being used to render the image in the simple web demo is different than the font being used to render 
-		//within OriginalEngine and these need to be the same.
-		//TODO: Produce text from the OCR results
 	}
 	static class Program {
 		static void Main(string[] args) {

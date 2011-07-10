@@ -33,7 +33,8 @@ namespace Prax.OcrEngine.Engine.AutomatedTraining {
 					for (int i = 0; i < word.Length; i++) {
 						var ch = UnicodeConvert.convertUnicodeChar(word, ref i);
 						var letterBounds = line.GetTextBounds(lastSpace + i, 1)[0].Rectangle;
-						letters.Add(new BoundedCharacter(ch, Rect.Offset(letterBounds, 0, top)));
+						letterBounds.X = letterBounds.X + ImageData.OffsetBuffer;
+						letters.Add(new BoundedCharacter(ch, Rect.Offset(letterBounds, 0, top)));						
 					}
 					var wordBounds = line.GetTextBounds(lastSpace, word.Length)[0].Rectangle;
 					yield return new BoundedWord(word, Rect.Offset(wordBounds, 0, top), letters);

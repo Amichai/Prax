@@ -25,8 +25,7 @@ namespace Prax.OcrEngine.Engine {
 	public class ImageData {
 		public ImageData(Stream stream) {
 			UploadedImage = (Bitmap)Bitmap.FromStream(stream);
-			int whiteSpaceBuffer = 6;
-			this.ImageMatrix = UploadedImage.BitmapToDoubleArray(".png", whiteSpaceBuffer);
+			this.ImageMatrix = UploadedImage.BitmapToDoubleArray(".png", ImageData.OffsetBuffer);
 			UploadedImage = ImageMatrix.ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
 		}
 		Bitmap UploadedImage;
@@ -45,6 +44,8 @@ namespace Prax.OcrEngine.Engine {
 			}
 			return boards;
 		}
+
+		public static int OffsetBuffer = 6;
 	}
 
 }

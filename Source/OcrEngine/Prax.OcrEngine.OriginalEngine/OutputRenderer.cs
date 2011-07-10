@@ -13,7 +13,7 @@ namespace Prax.OcrEngine.Engine {
 		public const int ThresholdCertainty = 500;
 		public List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();
 
-		internal void Add(IEnumerable<RecognizedSegment> returnVal) {
+		internal void Add(List<RecognizedSegment> returnVal) {
 			resolvedSegmentsList.AddRange(returnVal);
 		}
 
