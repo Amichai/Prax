@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Media.TextFormatting;
 
 namespace Prax.OcrEngine.Engine.AutomatedTraining {
-	class BoundedWord {
+	public class BoundedWord {
 		static readonly char[] whitespaceChars = " \t\r\n".ToCharArray();	//TODO: More chars
 		public static IEnumerable<BoundedWord> GetWords(string text, IEnumerable<TextLine> lines) {
 			string fullText = text + "\n";
@@ -55,8 +55,12 @@ namespace Prax.OcrEngine.Engine.AutomatedTraining {
 		public string Text { get; private set; }
 		public Rect Bounds { get; private set; }
 		public ReadOnlyCollection<BoundedCharacter> Characters { get; private set; }
+
+		public override string ToString() {
+			return "Word: " + Text + ", Bounds = " + Bounds;
+		}
 	}
-	class BoundedCharacter {
+	public class BoundedCharacter {
 		public BoundedCharacter(char ch, Rect bounds) {
 			Character = ch;
 			Bounds = bounds;
@@ -64,5 +68,9 @@ namespace Prax.OcrEngine.Engine.AutomatedTraining {
 
 		public char Character { get; private set; }
 		public Rect Bounds { get; private set; }
+
+		public override string ToString() {
+			return "Character: " + Character + ", Bounds = " + Bounds;
+		}
 	}
 }

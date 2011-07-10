@@ -48,8 +48,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutomatedTraining\CharacterBounds.cs" />
-    <Compile Include="AutomatedTraining\RenderedText.cs" />
     <Compile Include="AutomatedTraining\BoundedWord.cs" />
     <Compile Include="AutomatedTraining\UnicodeConvert.cs" />
     <Compile Include="ExposedFunctionality.cs" />
@@ -64,7 +62,6 @@
     <Compile Include="ReferenceData\MutableReferenceSet.cs" />
     <Compile Include="ReferenceData\StorageExtensions.cs" />
     <Compile Include="Segmentation\Segmentator.cs" />
-    <Compile Include="Segmentation\TextSegment.cs" />
     <Compile Include="ReferenceData\ReferenceSearcher .cs" />
   </ItemGroup>
   <ItemGroup>

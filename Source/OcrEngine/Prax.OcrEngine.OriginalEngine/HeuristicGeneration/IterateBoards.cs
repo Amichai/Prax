@@ -14,24 +14,22 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 		public List<MatrixBoard> Boards = new List<MatrixBoard>();
 		public const int numberOfIterations = 8;
 
-		public void Train(CharacterBounds charBounds, MutableReferenceSet library) {
+		public void Train(BoundedWord word, MutableReferenceSet library) {
 			int midpoint;
 			int boardWidth = Boards.First().Matrix.Length;
+			foreach (var ch in word.Characters) {
+				var rect = ch.Bounds.ToGdi();
 
-			for (int idx = 0; idx < charBounds.items.Count(); idx++) {
-				LetterAndBounds character = charBounds.items[idx];
-				midpoint = character.Bounds.X + (int)Math.Round(character.Bounds.Width / 2d);
+				midpoint = rect.X + (int)Math.Round(rect.Width / 2d);
 				if (midpoint - 6 >= 0 && midpoint + 6 < boardWidth) {
-					Rectangle rect = new Rectangle(midpoint - 6, 0, 12, character.Bounds.Height - 1);
+					Rectangle smallerRect = new Rectangle(midpoint - 6, 0, 12, rect.Height - 1);
 
 					HeuristicSet heursitics = new HeuristicSet();
-					heursitics.GoThroughBoards(Boards, rect);
+					heursitics.GoThroughBoards(Boards, smallerRect);
 
-					if (idx < charBounds.Word.Length) {
-						char newChar = UnicodeConvert.convertUnicodeChar(charBounds.Word, ref idx);
-
-						library.GetOrAdd(newChar.ToString()).Samples.Add(new LabelSample(heursitics.Heuristics));
-					}
+					library.GetOrAdd(ch.Character.ToString()).Samples.Add(new LabelSample(heursitics.Heuristics));
+				} else {
+					//TODO: Handle smaller chars
 				}
 			}
 		}

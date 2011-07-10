@@ -11,6 +11,11 @@ using Color = System.Drawing.Color;
 
 namespace Prax.OcrEngine.Engine.ImageUtilities {
 	static class Utilities {
+		public static Rectangle ToGdi(this Rect r) {
+			return new Rectangle((int)Math.Round(r.X), (int)Math.Round(r.Y), (int)Math.Round(r.Width), (int)Math.Round(r.Height));
+		}
+
+
 		public static Stream CreateStream(this BitmapSource image) {
 			var stream = new MemoryStream();
 			var encoder = new PngBitmapEncoder();
@@ -41,13 +46,13 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			Color pixelColor;
 			for (int i = 0; i < width; i++) {
 				for (int j = 0; j < height; j++) {
-					switch(extension){
+					switch (extension) {
 						case ".bmp":
-						pixelColor = fileBitmap.GetPixel(i, j);
-						uploadedDocument[i][j] = (int)(pixelColor.R * 0.3 + pixelColor.G * 0.59 + pixelColor.B * 0.11);
+							pixelColor = fileBitmap.GetPixel(i, j);
+							uploadedDocument[i][j] = (int)(pixelColor.R * 0.3 + pixelColor.G * 0.59 + pixelColor.B * 0.11);
 							break;
 						case ".png":
-							uploadedDocument[i][j] = (255 - (int)fileBitmap.GetPixel(i,j).A);
+							uploadedDocument[i][j] = (255 - (int)fileBitmap.GetPixel(i, j).A);
 							break;
 					}
 				}

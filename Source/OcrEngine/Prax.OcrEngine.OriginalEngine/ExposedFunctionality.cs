@@ -4,7 +4,6 @@ using System.Windows.Media;
 using Prax.OcrEngine.Engine.AutomatedTraining;
 using Prax.OcrEngine.Engine.Segmentation;
 using Prax.OcrEngine.Engine.ImageUtilities;
-using Segmentation;
 using TextRenderer;
 using Prax.OcrEngine.Engine.ReferenceData;
 using System.IO;
@@ -42,8 +41,7 @@ namespace Prax.OcrEngine.Engine {
 			string renderText = "أدخل نص هنا لترجمة";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
-			var charSegments = TextSegment.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
-			var RenderedText = new RenderedText(renderText, charSegments);
+			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
 			var stream = output.ToBitmap().CreateStream();
 
 			var imageData = new ImageData(stream);
@@ -63,8 +61,7 @@ namespace Prax.OcrEngine.Engine {
 			string renderText = "أدخل نص هنا لترجمة";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
-			var charSegments = TextSegment.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
-			var RenderedText = new RenderedText(renderText, charSegments);
+			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
 			var stream = output.ToBitmap().CreateStream();
 			var imageData = new ImageData(stream);
 			imageData.SaveFile("RenderedFile1.png");
@@ -75,7 +72,7 @@ namespace Prax.OcrEngine.Engine {
 			var boards = imageData.DefineIteratedBoards();
 			var trainingData = new MutableReferenceSet();
 
-			foreach (var word in RenderedText.WordBounds)
+			foreach (var word in words)
 				boards.Train(word, trainingData);
 
 			trainingData.WriteTo(trainingFolder);
@@ -89,6 +86,7 @@ namespace Prax.OcrEngine.Engine {
 	static class Program {
 		static void Main(string[] args) {
 			var UI = new ExposedFunctionality();
+			UI.TrainAlgorithm();
 			UI.TestAlgorithm();
 		}
 	}
