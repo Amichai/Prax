@@ -27,9 +27,9 @@ using Microsoft.WindowsAzure.ServiceRuntime;
  * 
  * This file is linked to by each project that needs to 
  * be configured. If a project's configuration has types
- * that other projects do not have, it should be wrapped
- * in #if blocks.  This creates a central repository of 
- * all configuration settings.
+ * that other projects do not have, it should be placed 
+ * in a LocalConfig.cs file in the RegisterLocalServies 
+ * partial method.
  */
 #endregion
 
@@ -41,27 +41,26 @@ namespace Prax.OcrEngine {
 
 			StubUserManagement();
 
-			//StubDocuments();
+			StubDocuments();
 
-			DevelopmentStorage();
-			AzureDocuments();
+			StubProcessor();
 
-			if (!RoleEnvironment.IsAvailable)
-				InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
+			//DevelopmentStorage();
+			//AzureDocuments();
+
+			//if (!RoleEnvironment.IsAvailable)
+			//    InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
 
 			StubProcessor();
 			StubConverters();
 
-#if WEB_ROLE
+#if WEB
 			//Add website-only services here
 			MvcSetup();
-
-			ResourcesSetup();
-			StandardResourceLocators();
-			//DebuggingResources();
-			LocalCrunchedResources();
 #endif
+			RegisterLocalServies();
 		}
+		partial void RegisterLocalServies();
 
 
 		public static Config CreateCurrent() {
@@ -86,65 +85,17 @@ namespace Prax.OcrEngine {
 		}
 	}
 }
+
 #region Website
-#if WEB_ROLE
+#if WEB
 namespace Prax.OcrEngine {
-	using System.Reflection;
 	using System.Web;
 	using System.Web.Mvc;
 	using System.Web.Routing;
-	using Autofac.Core;
-	//Add website-only namespaces here (inside the conditional)
-	using Autofac.Features.Indexed;
 	using Autofac.Integration.Web;
 	using Autofac.Integration.Web.Mvc;
-	using Website;
-	using Website.Resources;
 
 	public partial class Config {
-		#region Resources
-		///<summary>Registers basic services used by the resources framework.</summary>
-		private void ResourcesSetup() {
-			Builder.RegisterGeneric(typeof(AutofacResourceService<>)).As(typeof(IResourceService<>)).SingleInstance();
-		}
-		///<summary>Implements the IResourceService interface using Autofac.</summary>
-		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instantiated by Autofac")]
-		class AutofacResourceService<TService> : IResourceService<TService> {
-			readonly IIndex<ResourceType, TService> index;
-			public AutofacResourceService(IIndex<ResourceType, TService> index) { this.index = index; }
-
-			public TService this[ResourceType type] { get { return index[type]; } }
-		}
-
-		///<summary>Registers the standard ResourceLocators.</summary>
-		private void StandardResourceLocators() {
-			Builder.RegisterInstance(new ResourceLocator(ResourceType.Javascript, folder: "~/Content/Javascript"))
-				.Keyed<IResourceLocator>(ResourceType.Javascript);
-
-			Builder.RegisterInstance(new ResourceLocator(ResourceType.Css, folder: "~/Content/CSS"))
-				.Keyed<IResourceLocator>(ResourceType.Css);
-		}
-
-		///<summary>Registers debug-friendly ResourceResolvers that resolve resources uncompressed and un-combined.</summary>
-		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
-		private void DebuggingResources() {
-			Builder.RegisterType<ResourceDebuggingResolver>().As<IResourceResolver>();
-		}
-
-		///<summary>Registers production-ready ResourceResolvers that resolve resources using a server-side cruncher.</summary>
-		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
-		private void LocalCrunchedResources() {
-			Builder.RegisterInstance(new MSAjaxScriptMinifier())
-				.Keyed<IMinifier>(ResourceType.Javascript);
-			Builder.RegisterInstance(new MSAjaxStylesheetMinifier())
-				.Keyed<IMinifier>(ResourceType.Css);
-
-			Builder.RegisterType<ResourceCombiningResolver>().As<IResourceResolver>();
-		}
-
-		//TODO: CdnResources
-		#endregion
-		#region MVC Support
 		///<summary>Sets up the Autofac container for the ASP.Net MVC framework.</summary>
 		private void MvcSetup() {
 			Builder.RegisterControllers(typeof(Website.PraxMvcApplication).Assembly);
@@ -180,7 +131,6 @@ namespace Prax.OcrEngine {
 				requestContext = null;
 			}
 		}
-		#endregion
 	}
 }
 #endif
