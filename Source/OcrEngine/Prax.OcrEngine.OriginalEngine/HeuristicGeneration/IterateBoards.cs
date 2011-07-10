@@ -11,26 +11,25 @@ using Prax.OcrEngine.Engine.ReferenceData;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 	public class IterateBoards {
+		public int BoardWidth { get { return Boards.First().Matrix.Length; } }
+
 		public List<MatrixBoard> Boards = new List<MatrixBoard>();
 		public const int numberOfIterations = 8;
 
-		public void Train(BoundedWord word, MutableReferenceSet library) {
-			int midpoint;
-			int boardWidth = Boards.First().Matrix.Length;
-			foreach (var ch in word.Characters) {
-				var rect = ch.Bounds.ToGdi();
+		public HeuristicSet GetHeuristics(BoundedCharacter ch) {
+			var rect = ch.Bounds.ToGdi();
 
-				midpoint = rect.X + (int)Math.Round(rect.Width / 2d);
-				if (midpoint - 6 >= 0 && midpoint + 6 < boardWidth) {
-					Rectangle smallerRect = new Rectangle(midpoint - 6, 0, 12, rect.Height - 1);
+			int midpoint = rect.X + (int)Math.Round(rect.Width / 2d);
+			if (midpoint - 6 >= 0 && midpoint + 6 < BoardWidth) {
+				Rectangle smallerRect = new Rectangle(midpoint - 6, 0, 12, rect.Height - 1);
 
-					HeuristicSet heursitics = new HeuristicSet();
-					heursitics.GoThroughBoards(Boards, smallerRect);
+				HeuristicSet heursitics = new HeuristicSet { Bounds = rect, Label = ch.ToString() };
+				heursitics.GoThroughBoards(Boards, smallerRect);
 
-					library.GetOrAdd(ch.Character.ToString()).Samples.Add(new LabelSample(heursitics.Heuristics));
-				} else {
-					//TODO: Handle smaller chars
-				}
+				return heursitics;
+			} else {
+				//TODO: Handle smaller chars
+				return null;
 			}
 		}
 
@@ -41,8 +40,6 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.Segmentator.WidthOfCanvas, width));
 			return heuristics;
 		}
-
-
 	}
 
 

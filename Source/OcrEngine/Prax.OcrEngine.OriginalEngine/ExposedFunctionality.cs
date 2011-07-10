@@ -72,8 +72,11 @@ namespace Prax.OcrEngine.Engine {
 			var boards = imageData.DefineIteratedBoards();
 			var trainingData = new MutableReferenceSet();
 
-			foreach (var word in words)
-				boards.Train(word, trainingData);
+			foreach (var ch in words.SelectMany(w => w.Characters)) {
+				var heuristics = boards.GetHeuristics(ch);
+				if (heuristics != null)
+					trainingData.AddHeuristics(heuristics);
+			}
 
 			trainingData.WriteTo(trainingFolder);
 		}
