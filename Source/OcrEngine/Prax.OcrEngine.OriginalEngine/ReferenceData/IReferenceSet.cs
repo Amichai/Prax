@@ -29,13 +29,19 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		public string Label { get; private set; }
 		public Collection<LabelSample> Samples { get; private set; }
 		public RollingVariance Variances { get; private set; }
+
+		public override string ToString() {
+			return "Label '" + Label + "': " + Samples.Count + " Samples";
+		}
 	}
 	public class LabelSample {
 		public LabelSample(IList<int> heuristics) {
 			Heuristics = new ReadOnlyCollection<int>(heuristics);
 		}
-
 		public ReadOnlyCollection<int> Heuristics { get; private set; }
+		public override string ToString() {
+			return Heuristics.Count + " Heuristics";
+		}
 	}
 
 	public class RollingVariance {
