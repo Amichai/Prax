@@ -39,8 +39,8 @@ namespace Prax.OcrEngine.Engine {
 			}
 
 			sortedOutput = sortedOutput.OrderByDescending(k => k.Bounds.Width)
-										.OrderBy(k => k.Bounds.X)
-										.OrderBy(k => k.Bounds.Y).ToList();
+										.ThenBy(k => k.Bounds.X)
+										.ThenBy(k => k.Bounds.Y).ToList();
 			return sortedOutput;
 		}
 
@@ -79,35 +79,35 @@ namespace Prax.OcrEngine.Engine {
 		}
 
 		private class outputObject {
-            string outputString = string.Empty;
-            Paragraph paragraph;
-            iTextSharp.text.Document doc = new iTextSharp.text.Document();
-            PdfWriter writer;
-            public outputObject() {
-                writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
-                string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
-                BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-                Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
-                paragraph = new Paragraph(string.Empty, arabicFont);
-                paragraph.Alignment = Element.ALIGN_RIGHT;
-                doc.Open();
-            }
+			string outputString = string.Empty;
+			Paragraph paragraph;
+			iTextSharp.text.Document doc = new iTextSharp.text.Document();
+			PdfWriter writer;
+			public outputObject() {
+				writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
+				string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
+				BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+				Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
+				paragraph = new Paragraph(string.Empty, arabicFont);
+				paragraph.Alignment = Element.ALIGN_RIGHT;
+				doc.Open();
+			}
 
-            public void AddOutput(string outputToAdd) {
-                paragraph.Add(new string(outputToAdd.Reverse().ToArray()));
-                outputString += new string(outputToAdd.Reverse().ToArray());
-            }
+			public void AddOutput(string outputToAdd) {
+				paragraph.Add(new string(outputToAdd.Reverse().ToArray()));
+				outputString += new string(outputToAdd.Reverse().ToArray());
+			}
 
-            public void PrintStoredOutput() {
-                if (!paragraph.IsEmpty()) {
-                    doc.Add(paragraph);
-                    doc.Close();
-                    outputString = new string(outputString.Reverse().ToArray());
-                    writer.Close();
-                    File.WriteAllText("TxtToRender.txt", outputString);
-                }
-            }
-        }
+			public void PrintStoredOutput() {
+				if (!paragraph.IsEmpty()) {
+					doc.Add(paragraph);
+					doc.Close();
+					outputString = new string(outputString.Reverse().ToArray());
+					writer.Close();
+					File.WriteAllText("TxtToRender.txt", outputString);
+				}
+			}
+		}
 
 		private int columnStart = 0; //int.MaxValue; 
 		//TODO: This won't be necessary when we enforce precise location
