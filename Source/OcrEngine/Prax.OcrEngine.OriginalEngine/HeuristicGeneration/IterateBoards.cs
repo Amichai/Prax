@@ -23,7 +23,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			if (midpoint - 6 >= 0 && midpoint + 6 < BoardWidth) {
 					Rectangle smallerRect = new Rectangle(midpoint - 6, 0, Segmentator.WidthOfCanvas, rect.Height - 1);
 
-				HeuristicSet heursitics = new HeuristicSet { Bounds = rect, Label = ch.ToString() };
+				HeuristicSet heursitics = new HeuristicSet { Bounds = rect, Label = ch.Character.ToString() };
 					heursitics.GoThroughBoards(Boards, smallerRect);
 
 				return heursitics;
