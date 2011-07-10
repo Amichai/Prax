@@ -25,7 +25,9 @@ namespace Prax.OcrEngine.Engine {
 	class ImageData {
 		public ImageData(Stream stream) {
 			UploadedImage = (Bitmap)Bitmap.FromStream(stream);
-			this.ImageMatrix = UploadedImage.BitmapToDoubleArray(".png");
+			int whiteSpaceBuffer = 6;
+			this.ImageMatrix = UploadedImage.BitmapToDoubleArray(".png", whiteSpaceBuffer);
+			UploadedImage = ImageMatrix.ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
 		}
 		Bitmap UploadedImage;
 		//ImageWpf UploadedImage = new ImageWpf();

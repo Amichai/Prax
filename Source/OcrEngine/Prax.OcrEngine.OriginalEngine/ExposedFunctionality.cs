@@ -55,7 +55,7 @@ namespace Prax.OcrEngine.Engine {
 				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > OutputRenderer.ThresholdCertainty);
 				results.Add(returnVal);
 			}
-			results.Render();
+			var outputString = results.Render();
 		}
 
 		public void TrainAlgorithm() {
