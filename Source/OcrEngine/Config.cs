@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Autofac;
@@ -7,7 +6,6 @@ using Microsoft.WindowsAzure;
 using Prax.OcrEngine.Services;
 using Azure = Prax.OcrEngine.Services.Azure;
 using Stubs = Prax.OcrEngine.Services.Stubs;
-using Microsoft.WindowsAzure.ServiceRuntime;
 
 #region Explanation
 /* This file contains all common configuration settings.
@@ -74,9 +72,9 @@ namespace Prax.OcrEngine {
 			Builder = new ContainerBuilder();
 		}
 
-		List<Action<IComponentContext>> creationCallbacks = new List<Action<IComponentContext>>();
+		List<Action<IContainer>> creationCallbacks = new List<Action<IContainer>>();
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called by optional config method")]
-		void AddCallback(Action<IComponentContext> callback) { creationCallbacks.Add(callback); }
+		void AddCallback(Action<IContainer> callback) { creationCallbacks.Add(callback); }
 
 		public IContainer CreateContainer() {
 			var container = Builder.Build();
@@ -92,40 +90,34 @@ namespace Prax.OcrEngine {
 	using System.Web;
 	using System.Web.Mvc;
 	using System.Web.Routing;
-	using Autofac.Integration.Web;
-	using Autofac.Integration.Web.Mvc;
+	using Autofac.Integration.Mvc;
 
 	public partial class Config {
 		///<summary>Sets up the Autofac container for the ASP.Net MVC framework.</summary>
 		private void MvcSetup() {
-			Builder.RegisterControllers(typeof(Website.PraxMvcApplication).Assembly);
+			Builder.RegisterControllers(typeof(Config).Assembly);
 
 			Builder.Register(cc => new HttpServerUtilityWrapper(HttpContext.Current.Server)).As<HttpServerUtilityBase>();
 
+			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory());
 			Builder.Register(cc => requestContext).As<RequestContext>();
+
 			Builder.RegisterType<UrlHelper>().As<UrlHelper>();
 			Builder.RegisterType<HtmlHelper>().As<HtmlHelper>();
+
+			AddCallback(c => DependencyResolver.SetResolver(new AutofacDependencyResolver(c)));
 		}
-		public ContainerProvider CreateProvider() {
-			var provider = new ContainerProvider(CreateContainer());
-
-			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory(provider));
-
-			return provider;
-		}
-
 
 		[ThreadStatic]
 		static RequestContext requestContext;
 
 		///<summary>A ControllerFactory that sets the requestContext field to the current RequestContext, for use with AutoFac.</summary>
-		class InjectingControllerFactory : AutofacControllerFactory {
-			public InjectingControllerFactory(IContainerProvider containerProvider) : base(containerProvider) { }
-
+		class InjectingControllerFactory : DefaultControllerFactory {
 			protected override IController GetControllerInstance(RequestContext context, Type controllerType) {
 				requestContext = context;
 				return base.GetControllerInstance(context, controllerType);
 			}
+
 			public override void ReleaseController(IController controller) {
 				base.ReleaseController(controller);
 				requestContext = null;

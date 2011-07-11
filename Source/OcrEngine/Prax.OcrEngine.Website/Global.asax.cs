@@ -5,8 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Autofac;
-using Autofac.Integration.Web;
-using Autofac.Integration.Web.Mvc;
 using Microsoft.WindowsAzure;
 using Prax.OcrEngine.Services;
 using Azure = Prax.OcrEngine.Services.Azure;
@@ -17,7 +15,7 @@ namespace Prax.OcrEngine.Website {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
 	// visit http://go.microsoft.com/?LinkId=9394801
 
-	public class PraxMvcApplication : HttpApplication, IContainerProviderAccessor {
+	public class PraxMvcApplication : HttpApplication {
 		public static void RegisterRoutes(RouteCollection routes) {
 			routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
@@ -34,9 +32,13 @@ namespace Prax.OcrEngine.Website {
 				new { controller = "Documents", action = "Results" },
 				new { id = GuidConstraint.Instance, format = new EnumConstraint(typeof(ResultFormat)) });
 
-			routes.MapRoute("Default route", // Route name
+			routes.MapRoute("Simple default",
+				"{controller}/{action}",
+				new { action = "Index" }
+			);
+			routes.MapRoute("Default", // Route name
 				"{controller}/{action}/{id}/{name}", // URL with parameters
-				new { controller = "Home", action = "Index", id = UrlParameter.Optional, name = UrlParameter.Optional } // Parameter defaults
+				new { action = "Index", id = UrlParameter.Optional, name = UrlParameter.Optional } // Parameter defaults
 			);
 		}
 
@@ -45,16 +47,10 @@ namespace Prax.OcrEngine.Website {
 			//AreaRegistration.RegisterAllAreas();
 
 			var config = Config.CreateCurrent();
-
-			containerProvider = config.CreateProvider();
+			config.CreateContainer();
 
 			RegisterRoutes(RouteTable.Routes);
 		}
-
-		///<summary>Gets the Autofac container provider.</summary>
-		public IContainerProvider ContainerProvider { get { return containerProvider; } }
-		//This must be static, since HttpApplications are not reused.
-		static IContainerProvider containerProvider;
 	}
 
 	///<summary>An IRouteConstraint implementation that constrains a parameter to a fixed set of values.</summary>

@@ -1,29 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Autofac;
-using Autofac.Integration.Web;
-using System.Web.Mvc;
-using Prax.OcrEngine.Website.Resources;
-using System.Text;
 using System.ComponentModel;
+using System.Linq;
+using System.Web.Mvc;
+using Autofac;
+using Prax.OcrEngine.Website.Resources;
 
 namespace Prax.OcrEngine.Website.Views {
 	///<summary>Contains extensions methods that render resource links in MVC views.</summary>
 	public static class ResourcesExtensions {
-		static Autofac.IComponentContext container;
-
 		///<summary>Gets the Autofac container used to resolve dependencies.</summary>
 		///<remarks>I added this property since Autofac cannot build up a static class.
 		///In general, manual use of the Autofac container should be avoided.</remarks>
-		public static Autofac.IComponentContext Container {
-			get {
-				return container ??	//I might want to explicitly set this in Global.asax.cs
-					   (container = ((IContainerProviderAccessor)HttpContext.Current.ApplicationInstance).ContainerProvider.RequestLifetime);
-			}
-			set { container = value; }	//Useful for unit tests, where there is no HttpContext
-		}
+		public static Autofac.IComponentContext Container { get; set; }
 
 		///<summary>Returns tags that reference a resource set.</summary>
 		public static MvcHtmlString Scripts(this HtmlHelper html, ResourceSet set) { return html.ResourceSet(set); }

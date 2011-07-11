@@ -6,8 +6,6 @@ using Autofac.Core;
 
 using Autofac.Features.Indexed;
 using Autofac;
-using Autofac.Integration.Web;
-using Autofac.Integration.Web.Mvc;
 using System.Diagnostics.CodeAnalysis;
 using Prax.OcrEngine.Website.Resources;
 using Prax.OcrEngine.Website;
@@ -20,12 +18,14 @@ namespace Prax.OcrEngine {
 			StandardResourceLocators();
 			DebuggingResources();
 			//LocalCrunchedResources();
+
 		}
 
 		#region Resources
 		///<summary>Registers basic services used by the resources framework.</summary>
 		private void ResourcesSetup() {
 			Builder.RegisterGeneric(typeof(AutofacResourceService<>)).As(typeof(IResourceService<>)).SingleInstance();
+			AddCallback(c => Website.Views.ResourcesExtensions.Container = c);
 		}
 		///<summary>Implements the IResourceService interface using Autofac.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses", Justification = "Instantiated by Autofac")]
