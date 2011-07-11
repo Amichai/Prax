@@ -92,6 +92,10 @@
       <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
       <Name>Prax.OcrEngine.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Prax.OcrEngine.OriginalEngine\Prax.OcrEngine.OriginalEngine.csproj">
+      <Project>{EDBDAF6E-A58F-438E-954A-558B9C6B3302}</Project>
+      <Name>Prax.OcrEngine.OriginalEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Prax.OcrEngine.Services.Azure\Prax.OcrEngine.Services.Azure.csproj">
       <Project>{1DD058C8-68CD-408A-AF17-CA14CDBDFCCD}</Project>
       <Name>Prax.OcrEngine.Services.Azure</Name>

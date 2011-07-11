@@ -33,6 +33,12 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Prax.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="itextsharp">
       <HintPath>..\..\..\Assemblies\itextsharp.dll</HintPath>
@@ -73,6 +79,9 @@
       <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
       <Name>Prax.OcrEngine.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Prax.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

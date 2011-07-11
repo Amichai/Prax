@@ -69,6 +69,7 @@
     <Compile Include="Services\Stubs\InMemoryStorage.cs" />
     <Compile Include="Services\Stubs\InMemoryUserAccount.cs" />
     <Compile Include="Services\Stubs\SimpleProcessorController.cs" />
+    <Compile Include="Services\Stubs\StaticDataCache.cs" />
     <Compile Include="Services\Stubs\UselessProcessor.cs" />
     <Compile Include="Services\Stubs\UserlessAuthenticator.cs" />
   </ItemGroup>

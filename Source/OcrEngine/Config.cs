@@ -6,6 +6,7 @@ using Microsoft.WindowsAzure;
 using Prax.OcrEngine.Services;
 using Azure = Prax.OcrEngine.Services.Azure;
 using Stubs = Prax.OcrEngine.Services.Stubs;
+using Prax.OcrEngine.Engine.ReferenceData;
 
 #region Explanation
 /* This file contains all common configuration settings.
@@ -49,7 +50,7 @@ namespace Prax.OcrEngine {
 			//if (!RoleEnvironment.IsAvailable)
 			//    InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
 
-			StubProcessor();
+			OriginalProcessor();
 			StubConverters();
 
 #if WEB
@@ -97,7 +98,7 @@ namespace Prax.OcrEngine {
 		private void MvcSetup() {
 			Builder.RegisterControllers(typeof(Config).Assembly);
 
-			Builder.Register(cc => new HttpServerUtilityWrapper(HttpContext.Current.Server)).As<HttpServerUtilityBase>();
+			Builder.RegisterModule<AutofacWebTypesModule>();
 
 			ControllerBuilder.Current.SetControllerFactory(new InjectingControllerFactory());
 			Builder.Register(cc => requestContext).As<RequestContext>();
@@ -166,6 +167,27 @@ namespace Prax.OcrEngine {
 		private void StubConverters() {
 			Builder.RegisterInstance(new Stubs.FixedTextConverter("OCR Results go here")).As<IResultsConverter>();
 			Builder.RegisterInstance(new Stubs.EmptyPdfConverter()).As<IResultsConverter>();
+		}
+		#endregion
+
+		#region Original Engine
+		private void OriginalProcessor() {
+			Builder.RegisterInstance(new Stubs.StaticDataCache(Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining")))
+				   .As<IDataCache>()
+				   .Named("TrainingData", typeof(IDataCache));
+
+			Builder.Register(c => {
+				var cache = c.ResolveNamed<IDataCache>("TrainingData");
+				cache.Update();
+				var set = new MutableReferenceSet();
+				set.ReadFrom(cache.LocalPath);
+				return set;
+			}).As<IReferenceSet>().SingleInstance();
+
+			Builder.RegisterType<ReferenceSearcher>().As<IReferenceSearcher>().SingleInstance();
+
+			Builder.RegisterType<Engine.OriginalDocumentProcessor>().As<IDocumentProcessor>()
+					.InstancePerDependency();
 		}
 		#endregion
 
