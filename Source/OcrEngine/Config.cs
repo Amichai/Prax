@@ -40,12 +40,12 @@ namespace Prax.OcrEngine {
 
 			StubUserManagement();
 
-			StubDocuments();
+			//StubDocuments();
 
-			StubProcessor();
+			//StubRecognizer();
 
-			//DevelopmentStorage();
-			//AzureDocuments();
+			DevelopmentStorage();
+			AzureDocuments();
 
 			//if (!RoleEnvironment.IsAvailable)
 			//    InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
@@ -164,9 +164,9 @@ namespace Prax.OcrEngine {
 				.SingleInstance();
 		}
 
-		///<summary>Registers a useless document processor.</summary>
+		///<summary>Registers a useless document recognizer.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
-		private void StubProcessor() {
+		private void StubRecognizer() {
 			Builder.RegisterType<Stubs.UselessRecognizer>().As<IDocumentRecognizer>()
 						.InstancePerDependency();
 		}
