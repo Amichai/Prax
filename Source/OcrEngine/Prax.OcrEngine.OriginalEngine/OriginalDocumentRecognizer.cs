@@ -22,9 +22,11 @@ namespace Prax.OcrEngine.Engine {
 			var imageData = new ImageData(document);
 			var boards = imageData.DefineIteratedBoards();
 
-			IEnumerable<HeuristicSet> heuristics = boards.Segment();
+			var heuristics = boards.Segment().ToList();
 
-			return heuristics.Select(h => trainingData.PerformLookup(h).FirstOrDefault()).Where(rs => rs != null);
+			progress.Maximum = heuristics.Count * 1000;
+			return heuristics.Select(h => trainingData.PerformLookup(h, progress.ScaledChildOperation(1000)).FirstOrDefault())
+							 .Where(rs => rs != null);
 		}
 	}
 }
