@@ -1,0 +1,292 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SLaks.Progression</name>
+    </assembly>
+    <members>
+        <member name="T:SLaks.Progression.Display.WinForms.ProgressForm">
+            <summary>An IProgressReporter implementation that displays progress in a small popup form.  Supports captions and cancellation.</summary>
+        </member>
+        <member name="T:SLaks.Progression.IProgressReporter">
+            <summary>Displays the progress of an operation.</summary>
+            <remarks>
+            	<para>
+            	A method that performs a lengthy operation can take an IProgressReporter 
+            	to allow callers to display the operation's progress in the UI, without coupling 
+            	the method to any UI framework.
+            	</para>
+            	<para>
+            	 Methods should take an <see cref="T:SLaks.Progression.IProgressReporter"/> as an optional parameter and default to <see cref="T:SLaks.Progression.EmptyProgressReporter"/>.
+            	 <code>
+            		public static void Example(IProgressReporter progress) {	
+            	 	progress = progress ?? new EmptyProgressReporter();
+            	 	progress.Caption = "Demonstrating an example";
+            	 }</code>
+            	</para>
+            </remarks>
+        </member>
+        <member name="P:SLaks.Progression.IProgressReporter.Caption">
+            <summary>Gets or sets a string describing the current operation to display above the progress bar.</summary>
+        </member>
+        <member name="P:SLaks.Progression.IProgressReporter.Maximum">
+            <summary>Gets or sets the progress value at which the operation will be completed.</summary>
+            <remarks>Setting this property will reset Progress to 0.</remarks>
+        </member>
+        <member name="P:SLaks.Progression.IProgressReporter.Progress">
+            <summary>Gets or sets the current progress, between 0 and Maximum, or null to display marquee.</summary>
+        </member>
+        <member name="P:SLaks.Progression.IProgressReporter.AllowCancellation">
+            <summary>Gets or sets whether the operation can be cancelled.  The default is false.  
+            If this progress reporter does not allow users to cancel operations, this property will always return false.</summary>
+            <remarks>Setting this property will reset <see cref="P:SLaks.Progression.IProgressReporter.WasCanceled"/>.</remarks>
+        </member>
+        <member name="P:SLaks.Progression.IProgressReporter.WasCanceled">
+            <summary>Indicates whether the user has cancelled the operation.</summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressForm.Execute(System.Action{SLaks.Progression.IProgressReporter})">
+            <summary>Executes an operation and displays its progress.</summary>
+            <param name="method">The method to execute on the background thread.</param>
+            <returns>False if operation was cancelled.</returns>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressForm.Execute(System.Windows.Forms.IWin32Window,System.Action{SLaks.Progression.IProgressReporter})">
+            <summary>Executes an operation and displays its progress.</summary>
+            <param name="parent">The form that will own the progress display.  This parameter can be null.</param>
+            <param name="method">The method to execute on the background thread.</param>
+            <returns>False if operation was cancelled.</returns>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressForm.#ctor">
+            <summary>Creates a new ProgressForm instance.</summary>
+        </member>
+        <member name="F:SLaks.Progression.Display.WinForms.ProgressForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressForm.Maximum">
+            <summary>Gets or sets the progress value at which the operation will be completed.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressForm.Progress">
+            <summary>Gets or sets the current progress, between 0 and Maximum, or null to display a marquee.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressForm.Caption">
+            <summary>Gets or sets the text of the label above the progress bar.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressForm.AllowCancellation">
+            <summary>Gets or sets whether the operation can be cancelled.  The default is false.</summary>
+            <remarks>Setting this property will reset <see cref="P:SLaks.Progression.Display.WinForms.ProgressForm.WasCanceled"/>.</remarks>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressForm.WasCanceled">
+            <summary>Indicates whether the user has clicked Cancel.</summary>
+        </member>
+        <member name="T:SLaks.Progression.Display.ConsoleProgressReporter">
+            <summary>Prints a progress bar on the console.</summary>
+            <remarks>
+            The progress bar is one line tall, or two if configured to show a caption.
+            </remarks>
+        </member>
+        <member name="T:SLaks.Progression.Display.ScaledProgressReporter">
+            <summary>A base class for a progress reporter that scales progress values to a fixed maximum.</summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.ScaledProgressReporter.UpdateBar(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>Draws an updated progress bar.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ScaledProgressReporter.ScaledMax">
+            <summary>Gets the maximum that the progress bar's value will be scaled to.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ScaledProgressReporter.ScaledValue">
+            <summary>Gets the value of the progress bar, scaled to ScaledMax.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ScaledProgressReporter.Maximum">
+            <summary>Gets or sets the progress value at which the operation will be completed.</summary>
+            <remarks>Setting this property will reset Progress to 0.</remarks>
+        </member>
+        <member name="P:SLaks.Progression.Display.ScaledProgressReporter.Progress">
+            <summary>Gets or sets the current progress, between 0 and Maximum, or null to display a marquee.</summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.ConsoleProgressReporter.#ctor(System.Boolean)">
+            <summary>Creates a ConsoleProgressReporter instance that fills the remainder of the current line in the console.</summary>
+            <param name="showCaption">Whether to show the caption in the above the progress bar in the console.</param>
+        </member>
+        <member name="M:SLaks.Progression.Display.ConsoleProgressReporter.#ctor(System.Boolean,System.Int32)">
+            <summary>Creates a ConsoleProgressReporter instance.</summary>
+            <param name="showCaption">Whether to show the caption in the above the progress bar in the console.</param>
+            <param name="width">The width of the bar in characters.</param>
+        </member>
+        <member name="M:SLaks.Progression.Display.ConsoleProgressReporter.UpdateBar(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>Draws the progress bar to the console.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ConsoleProgressReporter.ShowCaption">
+            <summary>Indicates whether this instance has been configured to show a caption in the console.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ConsoleProgressReporter.BarWidth">
+            <summary>Gets the width of the entire progress bar in characters.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ConsoleProgressReporter.Caption">
+            <summary>Gets or sets a string describing the current operation to display above the progress bar.  The caption is only drawn if <see cref="P:SLaks.Progression.Display.ConsoleProgressReporter.ShowCaption"/> is true.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ConsoleProgressReporter.ScaledMax">
+            <summary>Gets the maximum that the progress bar's value will be scaled to.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.ConsoleProgressReporter.AllowCancellation">
+            <summary>Gets or sets whether the operation can be cancelled.  The default is false.</summary>
+            <remarks>Setting this property will reset <see cref="P:SLaks.Progression.Display.ConsoleProgressReporter.WasCanceled"/>.</remarks>
+        </member>
+        <member name="P:SLaks.Progression.Display.ConsoleProgressReporter.WasCanceled">
+            <summary>Indicates whether the user has cancelled the operation.</summary>
+        </member>
+        <member name="T:SLaks.Progression.ProgressReporterExtensions">
+            <summary>Contains extension methods for progress reporters.</summary>
+        </member>
+        <member name="M:SLaks.Progression.ProgressReporterExtensions.ChildOperation(SLaks.Progression.IProgressReporter)">
+            <summary>Returns an IProgressReporter that adds progress to an existing reporter without affecting the maximum.</summary>
+            <remarks>The new reporter will add its progress directly to the existing reporter without scaling for the maximum; 
+            the maximum of the original reporter is expected to equal the sum of the maximums of the child operations.</remarks>
+        </member>
+        <member name="M:SLaks.Progression.ProgressReporterExtensions.ScaledChildOperation(SLaks.Progression.IProgressReporter,System.Int64)">
+            <summary>Returns an IProgressReporter that adds progress to an existing reporter, scaled to a given range within the parent reporter.</summary>
+            <remarks>The maximum of the original reporter is expected to equal the sum of the ranges of the child operations.</remarks>
+        </member>
+        <member name="F:SLaks.Progression.ProgressReporterExtensions.ChildReporter.parentRange">
+            <summary>The range of the parent reporter's progress that is covered by this child, or null for an unscaled child.</summary>
+        </member>
+        <member name="T:SLaks.Progression.ProgressOperations">
+            <summary>Contains methods that perform useful operations and report progress.</summary>
+        </member>
+        <member name="M:SLaks.Progression.ProgressOperations.CopyTo(System.IO.Stream,System.IO.Stream,SLaks.Progression.IProgressReporter)">
+            <summary>Copies one stream to another.</summary>
+            <param name="from">The stream to copy from.  This stream must be readable.</param>
+            <param name="to">The stream to copy to.  This stream must be writable.</param>
+            <param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
+            <returns>The number of bytes copied.</returns>
+        </member>
+        <member name="M:SLaks.Progression.ProgressOperations.CopyTo(System.IO.Stream,System.IO.Stream,System.Nullable{System.Int64},SLaks.Progression.IProgressReporter)">
+            <summary>Copies one stream to another.</summary>
+            <param name="from">The stream to copy from.  This stream must be readable.</param>
+            <param name="to">The stream to copy to.  This stream must be writable.</param>
+            <param name="length">The length of the source stream.  This parameter is only used to report progress.</param>
+            <param name="progress">An IProgressReporter implementation to report the progress of the upload.</param>
+            <returns>The number of bytes copied.</returns>
+        </member>
+        <member name="T:SLaks.Progression.EmptyProgressReporter">
+            <summary>A placeholder ProgressReporter implementation that doesn't do anything.</summary>
+            <remarks>
+            	<para>
+            	 This class exists to allow progress-reporting methods to be called without progress.
+            	</para>
+            	<para>
+            	 Methods should take an <see cref="T:SLaks.Progression.IProgressReporter"/> as an optional parameter and default to <see cref="T:SLaks.Progression.EmptyProgressReporter"/>.
+            	 <code>
+            		public static void Example(IProgressReporter progress) {	
+            	 	progress = progress ?? new EmptyProgressReporter();
+            	 	progress.Caption = "Demonstrating an example";
+            	 }</code>
+            	</para>
+            </remarks>
+        </member>
+        <member name="P:SLaks.Progression.EmptyProgressReporter.Caption">
+            <summary>Gets or sets a string describing the current operation.  This property has no effect.</summary>
+        </member>
+        <member name="P:SLaks.Progression.EmptyProgressReporter.Maximum">
+            <summary>Gets or sets the progress value at which the operation will be completed.  This property has no effect.</summary>
+        </member>
+        <member name="P:SLaks.Progression.EmptyProgressReporter.Progress">
+            <summary>Gets or sets the current progress, between 0 and Maximum.  This property has no effect.</summary>
+        </member>
+        <member name="P:SLaks.Progression.EmptyProgressReporter.AllowCancellation">
+            <summary>Always returns false.</summary>
+        </member>
+        <member name="P:SLaks.Progression.EmptyProgressReporter.WasCanceled">
+            <summary>Always returns false.</summary>
+        </member>
+        <member name="T:SLaks.Progression.Display.WinForms.ProgressBarReporter">
+            <summary>An IProgressReporter implementation that displays progress on a WinForms progress bar control.  Does not support captions or cancellation.</summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressBarReporter.#ctor(System.Windows.Forms.ProgressBar)">
+            <summary>Creates a new ProgressBarReporter that displays progress on the specified ProgressBar.</summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.WinForms.ProgressBarReporter.UpdateBar(System.Nullable{System.Int32},System.Nullable{System.Int32})">
+            <summary>Updates the progress bar control to reflect the current progress.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressBarReporter.Bar">
+            <summary>Gets the progress bar that this instance controls.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressBarReporter.ScaledMax">
+            <summary>Gets the maximum that the progress bar's value will be scaled to.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressBarReporter.Maximum">
+            <summary>Gets or sets the progress value at which the operation will be completed, or -1 to display a marquee.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressBarReporter.Caption">
+            <summary>Gets or sets a caption for the current operation.  This property is ignored.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressBarReporter.AllowCancellation">
+            <summary>Always returns false.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.WinForms.ProgressBarReporter.WasCanceled">
+            <summary>Always returns false.</summary>
+        </member>
+        <member name="T:SLaks.Progression.Display.MultiProgressReporter">
+            <summary>An <see cref="T:SLaks.Progression.IProgressReporter"/> implementation that displays progress on multiple other <see cref="T:SLaks.Progression.IProgressReporter"/>s.</summary>
+        </member>
+        <member name="M:SLaks.Progression.Display.MultiProgressReporter.#ctor(SLaks.Progression.IProgressReporter[])">
+            <summary>Creates a MultiProgressReporter that forwards to the specified set of child reporters.</summary>
+            <param name="reporters">The <see cref="T:SLaks.Progression.IProgressReporter"/>s that will display progress passed to the new instance.</param>
+        </member>
+        <member name="M:SLaks.Progression.Display.MultiProgressReporter.#ctor(System.Collections.Generic.IEnumerable{SLaks.Progression.IProgressReporter})">
+            <summary>Creates a MultiProgressReporter that forwards to the specified set of child reporters.</summary>
+            <param name="reporters">The <see cref="T:SLaks.Progression.IProgressReporter"/>s that will display progress passed to the new instance.</param>
+        </member>
+        <member name="P:SLaks.Progression.Display.MultiProgressReporter.Reporters">
+            <summary>Gets the reporters that this instance displays progress on.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.MultiProgressReporter.Caption">
+            <summary>Gets or sets a string describing the current operation to display above the progress bar.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.MultiProgressReporter.Maximum">
+            <summary>Gets or sets the progress value at which the operation will be completed.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.MultiProgressReporter.Progress">
+            <summary>Gets or sets the current progress, between 0 and Maximum, or null to display a marquee.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.MultiProgressReporter.AllowCancellation">
+            <summary>Gets or sets whether the operation can be cancelled.  The default is false.  
+            If none of the child reporters allow users to cancel operations, this property will always return false.</summary>
+        </member>
+        <member name="P:SLaks.Progression.Display.MultiProgressReporter.WasCanceled">
+            <summary>Indicates whether the user has cancelled the operation in any of the child reporters..</summary>
+        </member>
+        <member name="T:SLaks.Disposable">
+            <summary>An IDisposable implementation that calls a delegate when disposed.</summary>
+        </member>
+        <member name="M:SLaks.Disposable.#ctor(System.Action)">
+            <summary>Creates a non-repeatable Disposable instance.</summary>
+            <param name="disposer">The delegate to be called by the Dispose method.  The delegate will only be called once.</param>
+        </member>
+        <member name="M:SLaks.Disposable.#ctor(System.Action,System.Boolean)">
+            <summary>Creates a Disposable instance.</summary>
+            <param name="disposer">The delegate to be called by the Dispose method.</param>
+            <param name="repeatable">Indicates whether the underlying delegate should be called multiple times if this instance is disposed multiple times.</param>
+        </member>
+        <member name="M:SLaks.Disposable.Dispose">
+            <summary>Calls the disposer delegate specified in the constructor.</summary>
+        </member>
+        <member name="P:SLaks.Disposable.Repeatable">
+            <summary>Gets whether the underlying delegate will be called multiple times if this instance is disposed multiple times.</summary>
+        </member>
+        <member name="P:SLaks.Disposable.Disposed">
+            <summary>Gets whether the Dispose method has been called.</summary>
+        </member>
+    </members>
+</doc>

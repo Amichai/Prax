@@ -216,10 +216,6 @@
       <Project>{B972ABB6-84DD-4E56-B932-2DE539EC86F9}</Project>
       <Name>Prax.OcrEngine.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Prax.OcrEngine.Engine\Prax.OcrEngine.Engine.csproj">
-      <Project>{0507F74F-3DB1-4FBE-A804-664D2FE52CA5}</Project>
-      <Name>Prax.OcrEngine.Engine</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Prax.OcrEngine.OriginalEngine\Prax.OcrEngine.OriginalEngine.csproj">
       <Project>{EDBDAF6E-A58F-438E-954A-558B9C6B3302}</Project>
       <Name>Prax.OcrEngine.OriginalEngine</Name>

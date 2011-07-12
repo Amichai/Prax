@@ -106,13 +106,6 @@ namespace Prax.OcrEngine {
 			return String.Format(CultureInfo.CurrentCulture, "{0:0.#} {1}", shrunkenSize, sizes[order]);
 		}
 
-
-		///<summary>Gets the progress of an IDocumentProcesor as a number between 0 and 100.</summary>
-		public static int ProgressPercentage(this Services.IDocumentProcessor processor) {
-			if (processor == null) throw new ArgumentNullException("processor");
-			return (int)(100 * (double)processor.CurrentProgress / processor.MaximumProgress);
-		}
-
 		///<summary>Gets the file extension of a result format.</summary>
 		public static string GetExtension(this ResultFormat format) {
 			switch (format) {

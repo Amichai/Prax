@@ -18,12 +18,12 @@ namespace Prax.OcrEngine.RecognitionClient {
 	/// Interaction logic for MainWindow.xaml
 	/// </summary>
 	partial class MainWindow : Window {
-		readonly Func<IDocumentProcessor> processorCreator;
+		readonly IDocumentRecognizer recognizer;
 		readonly ObservableCollection<DocumentModel> documents = new ObservableCollection<DocumentModel>();
 
-		public MainWindow(Func<IDocumentProcessor> processorCreator) {
+		public MainWindow(IDocumentRecognizer recognizer) {
 			InitializeComponent();
-			this.processorCreator = processorCreator;
+			this.recognizer = recognizer;
 			filesList.ItemsSource = documents;
 		}
 
@@ -41,7 +41,7 @@ namespace Prax.OcrEngine.RecognitionClient {
 		private void CancelAll_Click(object sender, RoutedEventArgs e) {
 			for (int i = documents.Count - 1; i >= 0; i--) {
 				if (documents[i].State != DocumentState.Scanned) {
-					documents[i].CancelPending = true;
+					documents[i].WasCanceled = true;
 					documents.RemoveAt(i);	//If the document finishes as we speak, no harm will be done.
 				}
 			}
@@ -53,18 +53,13 @@ namespace Prax.OcrEngine.RecognitionClient {
 			return doc;
 		}
 		void ProcessorWorker(DocumentModel doc) {
-			if (doc.CancelPending) return;	//In case the document was cancelled while queued
-			var processor = processorCreator();
-			processor.ProgressChanged += (sender, e) => doc.Progress = processor.ProgressPercentage();
-			processor.CheckCanceled += (sender, e) => e.Cancel = doc.CancelPending;
+			if (doc.WasCanceled) return;	//In case the document was cancelled while queued
 
 			doc.State = DocumentState.Scanning;
 			using (var stream = File.OpenRead(doc.FilePath))
-				processor.ProcessDocument(stream);
+				doc.Results = new ReadOnlyCollection<RecognizedSegment>(recognizer.Recognize(stream, doc).ToList());
 
-			doc.Results = processor.Results;
-
-			doc.Progress = 100;
+			doc.Progress = doc.Maximum;
 			doc.State = DocumentState.Scanned;
 		}
 
@@ -101,7 +96,7 @@ namespace Prax.OcrEngine.RecognitionClient {
 				case Key.Delete:
 					var models = filesList.SelectedItems.Cast<DocumentModel>().ToList();
 					foreach (var d in models) {
-						d.CancelPending = true;
+						d.WasCanceled = true;
 						documents.Remove(d);
 					}
 					break;

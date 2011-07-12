@@ -53,7 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AzureDataCache.cs" />
-    <Compile Include="AzureProcessorController.cs" />
+    <Compile Include="AzureDocumentExecutor.cs" />
     <Compile Include="AzureScanWorker.cs" />
     <Compile Include="AzureStorageClient.cs" />
     <Compile Include="InMemoryWorkerPool.cs" />

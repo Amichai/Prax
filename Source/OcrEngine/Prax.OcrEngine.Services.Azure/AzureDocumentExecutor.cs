@@ -7,17 +7,17 @@ using Microsoft.WindowsAzure.StorageClient;
 
 namespace Prax.OcrEngine.Services.Azure {
 	///<summary>Controls document processors on Azure worker nodes.</summary>
-	public class AzureProcessorController : IProcessorController {
+	public class AzureDocumentExecutor: IDocumentExecutor {
 		//TODO: Multiple queues
 
 		readonly CloudQueue queue;
-		public AzureProcessorController(CloudStorageAccount account) {
+		public AzureDocumentExecutor(CloudStorageAccount account) {
 			var client = account.CreateCloudQueueClient();
 			queue = client.GetQueueReference("documents");
 			queue.CreateIfNotExist();
 		}
 
-		public void BeginProcessing(DocumentIdentifier id) {
+		public void Execute(DocumentIdentifier id) {
 			queue.AddMessage(new CloudQueueMessage(id.FileName()));
 		}
 

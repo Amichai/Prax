@@ -6,7 +6,7 @@
 	<Window.Resources>
 		<DataTemplate x:Key="ProgressTemplate" DataType="{x:Type local:DocumentModel}">
 			<Grid>
-				<ProgressBar Name="progress" Value="{Binding Progress}" Maximum="100" Visibility="Collapsed" />
+				<ProgressBar Name="progress" Value="{Binding Progress}" Maximum="{Binding Maximum}" Visibility="Collapsed" />
 				<TextBlock Name="queued" Text="Queued"	Visibility="Collapsed" HorizontalAlignment="Center" />
 				<ItemsControl Name="done" Visibility="Collapsed" ItemsSource="{x:Static local:App.BindableConverters}" HorizontalAlignment="Center">
 					<ItemsControl.ItemsPanel>

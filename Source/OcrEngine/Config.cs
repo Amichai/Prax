@@ -54,7 +54,7 @@ namespace Prax.OcrEngine {
 			StubConverters();
 
 #if WEB
-			//Add website-only services here
+			//Add services used by all websites here
 			MvcSetup();
 #endif
 			RegisterLocalServies();
@@ -136,6 +136,17 @@ namespace Prax.OcrEngine {
 			Builder.RegisterType<DocumentManager>().As<IDocumentManager>();
 		}
 
+		///<summary>Registers a DocumentExecutor that performs OCR in-process.</summary>
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called by optional config method")]
+		private void LocalSimpleDocumentExecutor() {
+			Builder.RegisterType<Stubs.SimpleDocumentExecutor>().As<IDocumentExecutor>().SingleInstance();
+		}
+		///<summary>Registers a DocumentExecutor that performs OCR in-process.</summary>
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called by optional config method")]
+		private void LocalThreadedDocumentExecutor() {
+			Builder.RegisterType<ThreadedDocumentExecutor>().As<IDocumentExecutor>().SingleInstance();
+		}
+
 		#region Stubs
 		///<summary>Registers in-memory user management services.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
@@ -151,14 +162,12 @@ namespace Prax.OcrEngine {
 		private void StubDocuments() {
 			Builder.RegisterType<Stubs.InMemoryStorage>().As<IStorageClient>()
 				.SingleInstance();
-			Builder.RegisterType<Stubs.SimpleProcessorController>().As<IProcessorController>()
-				.SingleInstance();
 		}
 
 		///<summary>Registers a useless document processor.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
 		private void StubProcessor() {
-			Builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>()
+			Builder.RegisterType<Stubs.UselessRecognizer>().As<IDocumentRecognizer>()
 						.InstancePerDependency();
 		}
 
@@ -177,7 +186,7 @@ namespace Prax.OcrEngine {
 				   .Named("TrainingData", typeof(IDataCache));
 
 			Builder.Register(c => {
-				var cache = c.ResolveNamed<IDataCache>("TrainingData");
+				var cache = c.Resolve<IDataCache>();// Named<IDataCache>("TrainingData", null);
 				cache.Update();
 				var set = new MutableReferenceSet();
 				set.ReadFrom(cache.LocalPath);
@@ -186,12 +195,19 @@ namespace Prax.OcrEngine {
 
 			Builder.RegisterType<ReferenceSearcher>().As<IReferenceSearcher>().SingleInstance();
 
-			Builder.RegisterType<Engine.OriginalDocumentProcessor>().As<IDocumentProcessor>()
+			Builder.RegisterType<Engine.OriginalDocumentRecognizer>().As<IDocumentRecognizer>()
 					.InstancePerDependency();
 		}
 		#endregion
 
 		#region Azure
+		///<summary>Registers a DocumentExecuter that executes OCR remotely using an Azure queue.  Must not be called on the worker role.</summary>
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
+		private void AzureRemoteDocumentExecutor() {
+			Builder.RegisterType<Services.Azure.AzureDocumentExecutor>().As<IDocumentExecutor>()
+					.SingleInstance();
+		}
+
 		///<summary>Registers a CloudStorageAccount for local development storage that requires Fiddler.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
 		private void FiddlerDevelopmentStorage() {
@@ -214,7 +230,6 @@ namespace Prax.OcrEngine {
 		///<remarks>This must be called both by the worker roles and the web roles.</remarks>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Optional config method")]
 		private void AzureDocuments() {
-			Builder.RegisterType<Azure.AzureProcessorController>().As<IProcessorController>();
 			Builder.RegisterType<Azure.AzureStorageClient>().As<IStorageClient>();
 
 			Builder.RegisterType<Azure.AzureScanWorker>();

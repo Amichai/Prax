@@ -33,7 +33,7 @@ namespace Prax.OcrEngine.RecognitionClient {
 			foreach (var converter in resultConverters)
 				builder.RegisterInstance(converter).As<IResultsConverter>();
 
-			builder.RegisterType<Stubs.UselessProcessor>().As<IDocumentProcessor>().InstancePerDependency();
+			builder.RegisterType<Stubs.UselessRecognizer>().As<IDocumentRecognizer>().InstancePerDependency();
 
 			builder.RegisterType<MainWindow>();
 

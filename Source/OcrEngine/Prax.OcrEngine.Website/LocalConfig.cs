@@ -19,6 +19,7 @@ namespace Prax.OcrEngine {
 			DebuggingResources();
 			//LocalCrunchedResources();
 
+			AzureRemoteDocumentExecutor();
 		}
 
 		#region Resources

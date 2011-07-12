@@ -6,27 +6,29 @@ using System.IO;
 using System.Threading;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using SLaks.Progression;
 
 namespace Prax.OcrEngine.Services.Stubs {
-	///<summary>An IDocumentProcessor implementation that doesn't do anything.</summary>
-	public class UselessProcessor : DocumentProcessorBase {
+	///<summary>An IDocumentRecognizer implementation that doesn't do anything.</summary>
+	public class UselessRecognizer : IDocumentRecognizer {
 		[ThreadStatic]
 		static Random rand;
 
 		///<summary>Does nothing for a while.</summary>
-		public override void ProcessDocument(Stream document) {
+
+		public IEnumerable<RecognizedSegment> Recognize(Stream document, IProgressReporter progress) {
 			if (rand == null)
 				rand = new Random(Thread.CurrentThread.ManagedThreadId ^ Environment.TickCount);
 
-			MaximumProgress = rand.Next(5, 9);
-			for (int i = 0; i < MaximumProgress; i++) {
-				if (CheckCancel()) break;
+			progress.Maximum = rand.Next(5, 9);
+			for (int i = 0; i < progress.Maximum; i++) {
+				if (progress.WasCanceled) break;
 
 				Thread.Sleep(TimeSpan.FromSeconds(rand.Next(1, 3)));
-				CurrentProgress = i + 1;
-				OnProgressChanged();
+				progress.Progress = i + 1;
 			}
-			Results = new ReadOnlyCollection<RecognizedSegment>(new RecognizedSegment[0]);
+
+			yield break;
 		}
 	}
 }

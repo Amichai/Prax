@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Threading;
 
 namespace Prax.OcrEngine.Services {
 	///<summary>The primary IDocumentManager implementation, which forwards to IStorageClient and IProcessorController.</summary>
 	public class DocumentManager : IDocumentManager {
 		public IStorageClient StorageClient { get; private set; }
-		public IProcessorController ProcessorController { get; private set; }
+		public IDocumentExecutor DocumentExecutor { get; private set; }
 
-		public DocumentManager(Guid userId, IStorageClient storageClient, IProcessorController processorController) {
+		public DocumentManager(Guid userId, IStorageClient storageClient, IDocumentExecutor documentExecutor) {
 			if (storageClient == null) throw new ArgumentNullException("storageClient");
-			if (processorController == null) throw new ArgumentNullException("processorController");
+			if (documentExecutor == null) throw new ArgumentNullException("documentExecutor");
 
 			UserId = userId;
 			StorageClient = storageClient;
-			ProcessorController = processorController;
+			DocumentExecutor = documentExecutor;
 		}
 
 		///<summary>Gets the user ID that this instance manages.</summary>
@@ -27,7 +28,7 @@ namespace Prax.OcrEngine.Services {
 
 		public Guid UploadDocument(string name, string mimeType, Stream document, long length) {
 			var id = StorageClient.UploadDocument(UserId, name, mimeType, document, length);
-			ProcessorController.BeginProcessing(MakeId(id));
+			ThreadPool.QueueUserWorkItem(delegate { DocumentExecutor.Execute(MakeId(id)); });
 			return id;
 		}
 
@@ -35,7 +36,7 @@ namespace Prax.OcrEngine.Services {
 		public Document GetDocument(Guid id) { return StorageClient.GetDocument(MakeId(id)); }
 
 		public void DeleteDocument(Guid id) {
-			ProcessorController.CancelProcessing(MakeId(id));	//TODO: Check state?
+			DocumentExecutor.CancelProcessing(MakeId(id));	//TODO: Check state?
 			StorageClient.DeleteDocument(MakeId(id));
 		}
 

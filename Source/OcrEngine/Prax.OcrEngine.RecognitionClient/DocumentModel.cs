@@ -4,12 +4,13 @@ using System.IO;
 using System.Threading;
 using Prax.OcrEngine.Services;
 using System.Collections.ObjectModel;
+using SLaks.Progression;
+using SLaks.Progression.Display;
 
 namespace Prax.OcrEngine.RecognitionClient {
 	///<summary>The document model class bound to the ListView in the UI.</summary>
-	class DocumentModel : INotifyPropertyChanged {
+	class DocumentModel : IProgressReporter, INotifyPropertyChanged {
 		readonly SynchronizationContext syncContext;
-		int progress;
 		DocumentState state;
 		volatile bool cancelPending;
 
@@ -24,7 +25,7 @@ namespace Prax.OcrEngine.RecognitionClient {
 		public ReadOnlyCollection<RecognizedSegment> Results { get; set; }
 
 		///<summary>Gets or sets whether the scan operation should be cancelled.</summary>
-		public bool CancelPending {	//Volatile backing field
+		public bool WasCanceled {	//Volatile backing field
 			get { return cancelPending; }
 			set { cancelPending = value; }
 		}
@@ -32,18 +33,39 @@ namespace Prax.OcrEngine.RecognitionClient {
 		public long Size { get; private set; }
 		public string FilePath { get; private set; }
 
-		///<summary>Gets or sets the scan progress.</summary>
-		public int Progress {
-			get { return progress; }
-			set { progress = value; OnPropertyChanged("Progress"); }
-		}
-
 		///<summary>Gets or sets the state of the document.</summary>
 		public DocumentState State {
 			get { return state; }
 			set { state = value; OnPropertyChanged("State"); }
 		}
 
+		long? progress = 0;
+		long maximum = 100;
+
+		///<summary>Gets or sets the progress value at which the operation will be completed.</summary>
+		///<remarks>Setting this property will reset Progress to 0.</remarks>
+		public virtual long Maximum {
+			get { return maximum; }
+			set {
+				if (value <= 0)
+					throw new ArgumentOutOfRangeException("value");
+
+				maximum = value;
+				progress = 0;
+				OnPropertyChanged("Maximum");
+			}
+		}
+
+		///<summary>Gets or sets the current progress, between 0 and Maximum, or null to display a marquee.</summary>
+		public virtual long? Progress {
+			get { return progress; }
+			set {
+				if (value < 0 || value > Maximum)
+					throw new ArgumentOutOfRangeException("value", "Progress must be between 0 and " + Maximum);
+				progress = value;
+				OnPropertyChanged("Progress");
+			}
+		}
 
 		//Databinding properties
 		public string FileName { get { return Path.GetFileName(FilePath); } }
@@ -67,5 +89,9 @@ namespace Prax.OcrEngine.RecognitionClient {
 			else
 				handler(this, e);
 		}
+
+
+		public bool AllowCancellation { get { return true; } set { } }
+		string IProgressReporter.Caption { get; set; }
 	}
 }

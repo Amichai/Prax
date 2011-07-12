@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 
 namespace Prax.OcrEngine.Services {
-	///<summary>Controls document processors, possibly on remote computers.</summary>
-	public interface IProcessorController {
-		///<summary>Causes the document with the given ID to start processing.</summary>
-		void BeginProcessing(DocumentIdentifier id);
+	///<summary>Performs OCR processing and result conversion on a document in storage.</summary>
+	public interface IDocumentExecutor {
+		///<summary>OCR's a document and stores the result.</summary>
+		void Execute(DocumentIdentifier id);
 
 		///<summary>Cancels the document with the given ID.</summary>
 		///<remarks>This method supports active cancellation.

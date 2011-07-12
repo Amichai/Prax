@@ -50,6 +50,9 @@
     <Reference Include="Autofac">
       <HintPath>..\..\..\Assemblies\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="SLaks.Progression">
+      <HintPath>..\..\..\Assemblies\SLaks.Progression.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />

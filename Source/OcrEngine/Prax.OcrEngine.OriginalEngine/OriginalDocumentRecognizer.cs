@@ -9,13 +9,14 @@ using System.IO;
 using Prax.OcrEngine.Engine.Segmentation;
 using Prax.OcrEngine.Engine.HeuristicGeneration;
 using Prax.OcrEngine.Engine.ReferenceData;
+using SLaks.Progression;
 
 namespace Prax.OcrEngine.Engine {
-	public class OriginalDocumentProcessor : DocumentProcessorBase {
+	public class OriginalDocumentRecognizer : IDocumentRecognizer {
 		readonly IReferenceSearcher trainingData;
-		public OriginalDocumentProcessor(IReferenceSearcher trainingData) { this.trainingData = trainingData; }
+		public OriginalDocumentRecognizer(IReferenceSearcher trainingData) { this.trainingData = trainingData; }
 
-		public override void ProcessDocument(Stream document) {
+		public IEnumerable<RecognizedSegment> Recognize(Stream document, IProgressReporter progress) {
 			//TODO: Report progress
 
 			var imageData = new ImageData(document);
@@ -23,11 +24,7 @@ namespace Prax.OcrEngine.Engine {
 
 			IEnumerable<HeuristicSet> heuristics = boards.Segment();
 
-			Results = new ReadOnlyCollection<RecognizedSegment>(
-				heuristics.Select(h => trainingData.PerformLookup(h).FirstOrDefault())
-						  .Where(rs => !String.IsNullOrWhiteSpace(rs.Text))	//Where it isn't default(RecognizedSegment)
-						  .ToList()
-			);
+			return heuristics.Select(h => trainingData.PerformLookup(h).FirstOrDefault()).Where(rs => rs != null);
 		}
 	}
 }

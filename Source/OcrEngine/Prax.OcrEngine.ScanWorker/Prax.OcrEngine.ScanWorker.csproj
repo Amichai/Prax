@@ -75,6 +75,7 @@
     <Compile Include="..\Config.cs">
       <Link>Config.cs</Link>
     </Compile>
+    <Compile Include="LocalConfig.cs" />
     <Compile Include="WorkerRole.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
