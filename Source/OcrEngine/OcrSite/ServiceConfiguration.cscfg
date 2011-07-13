@@ -7,9 +7,10 @@
     </ConfigurationSettings>
   </Role>
   <Role name="Prax.OcrEngine.ScanWorker">
-    <Instances count="4" />
+    <Instances count="1" />
     <ConfigurationSettings>
       <Setting name="DiagnosticsConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>

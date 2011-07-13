@@ -19,6 +19,10 @@
     <ConfigurationSettings>
       <Setting name="DiagnosticsConnectionString" />
     </ConfigurationSettings>
-    <LocalResources></LocalResources>
+    <LocalResources>
+    </LocalResources>
+    <Imports>
+      <Import moduleName="Diagnostics" />
+    </Imports>
   </WorkerRole>
 </ServiceDefinition>
