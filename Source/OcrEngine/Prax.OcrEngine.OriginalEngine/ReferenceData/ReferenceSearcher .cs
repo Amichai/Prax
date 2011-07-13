@@ -69,24 +69,21 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 				for (int lblIdx = 0; lblIdx < Library.Count; lblIdx++) {
 					while (dontCheck.Contains(lblIdx)) {
 						lblIdx++;
-						if (lblIdx == Library.Count){
-							goto BreakOut;
+					}
+					if (lblIdx != Library.Count) {
+						var current = Library[lblIdx];
+						foreach (var item in current.Samples) {
+							progress.Progress++;
+							if (unlabledHeuristic.GetAtIndex(heurIdx) == item.Heuristics[heurIdx])
+								lblComparisonResults[lblIdx][heurIdx]++;
 						}
 					}
-					var current = Library[lblIdx];
-
-					foreach (var item in current.Samples) {
-						progress.Progress++;
-						if (unlabledHeuristic.GetAtIndex(heurIdx) == item.Heuristics[heurIdx])
-							lblComparisonResults[lblIdx][heurIdx]++;
-					}
 				}
-				BreakOut:
 				for (int labelIndex = 0; labelIndex < Library.Count; labelIndex++) {
 					while (dontCheck.Contains(labelIndex)) {
 						labelIndex++;
 					}
-					if (labelIndex < Library.Count) {
+					if (labelIndex != Library.Count) {
 						lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)Library[labelIndex].Samples.Count;
 					}
 				}
@@ -96,16 +93,15 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 			double heuristicProbabilisticIndication;
 			double multiplicativeOffset;
 			labelProbability = new double[Library.Count];
-			double aprioriProb = 1.0 / (double)Library.Count;
+			double aprioriProb = 1.0 / ((double)Library.Count - dontCheck.Count());
 			double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
-
+			//factorIncrease+=10;
 			for (int inspectionLbl = 0; inspectionLbl < Library.Count; inspectionLbl++) {
 				while (dontCheck.Contains(inspectionLbl)) {
 					inspectionLbl++;
 				}
 				if (inspectionLbl != Library.Count) {
-
-					labelProbability[inspectionLbl] = 1.0 / (double)Library.Count;
+					labelProbability[inspectionLbl] = 1.0 / ((double)Library.Count - dontCheck.Count());
 					for (int heurIdx = 0; heurIdx < heuristicCount; heurIdx++) {
 						progress.Progress++;
 
@@ -119,12 +115,15 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 							multiplicativeOffset += aprioriProb / (double)Library[inspectionLbl].Variances.Count;
 
 							if (multiplicativeOffset < double.MaxValue)
-								labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+								labelProbability[inspectionLbl] *= (factorIncrease * (heuristicProbabilisticIndication + multiplicativeOffset)) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 
 							if (double.IsInfinity(labelProbability[inspectionLbl]) || labelProbability[inspectionLbl] == 0)
 								heurIdx = heuristicCount;
 						}
 					}
+				}
+				if (labelProbability[inspectionLbl] != 0) {
+
 				}
 				if (Library[inspectionLbl].Samples.Count > 0) {
 					yield return new RecognizedSegment(unlabledHeuristic.Bounds, Library[inspectionLbl].Label, labelProbability[inspectionLbl]);
@@ -206,7 +205,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 						multiplicativeOffset += aprioriProb / (double)Library[idx].Variances.Count;
 
 						if (multiplicativeOffset < double.MaxValue)
-							labelProbability[lbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+							labelProbability[lbl] *= (factorIncrease * (heuristicProbabilisticIndication + multiplicativeOffset)) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 
 						if (double.IsInfinity(labelProbability[lbl]) || labelProbability[lbl] == 0)
 							heurIdx = heuristicCount;

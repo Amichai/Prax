@@ -59,29 +59,29 @@ namespace Prax.OcrEngine.Engine {
 			var results = new List<RecognizedSegment>();
 			foreach (var segment in boards.Segment()) {
 				var whitespaceResults = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
-				if (whitespaceResults.FirstOrDefault().Text == "AllLabels") {
-					whitespaceResults.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
+				if (whitespaceResults.LastOrDefault().Text == "AllLabels") {
+					whitespaceResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
 					//results.Add(whitespaceResults[0]);
 					//Debug.Print(whitespaceResults.First().Text + " " + whitespaceResults.First().Certainty.ToString());
 				
 					System.Drawing.Bitmap b = boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
-					var characterResults = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
+					var characterResults = searcher.PerformLookup(segment).Where(r => r.Certainty > 0).ToList();
+					//var characterResults = searcher.PerformLookup(segment).ToList();
 					if (characterResults.Count > 0) {
-						characterResults.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
-						results.Add(characterResults[0]);
-						Debug.Print(characterResults.First().Text + " " + characterResults.First().Certainty.ToString());
+						characterResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
+						results.Add(characterResults.Last());
+						Debug.Print(characterResults.Last().Text + " " + characterResults.Last().Certainty.ToString());
 					}
 				}
 			}
 			var outputString = new StreamReader(OutputRenderer.PlainText.Convert(stream, results.AsReadOnly())).ReadToEnd();
 			Debug.Print(outputString);
 			stream.Close();
-			//TODO: Solve the backward word problem
 		}
 		//TODO: Test for white space first
 		public void TrainAlgorithm() {
-			string renderText = "أدخل نص هنا لترجمة";
-			//string renderText = "ﺬﻤﺈﺗﻹﻕﻐﻘﻝﺺﻔﺒﺭﻧﻂﺓﻫﻲﺸﺪﺊﻭﻜﺶﻆﻸﻒﺆﺄﻤﻴﺣﻄﻗﻖﺹﺶﺅﺆﺔﻣﻕﻨﺝﻓﻂﺭﺡﺀﻷﺣﺜﻷﻞﺶﺼﺈﻎﻍﺁﺂﻊﻓﻶﻃﺰﻊﻒﺑﺈﻙﻦﻬﺣﻃﺲﺄﺿﻠﺄﻊﺰﺆﺊﻁﻗﺨﻣﺡﺚﺱﻤﺴﺄﺑﺙﺂﻮﻖﺢﻴﻘﺐﻴﺞﺹﺬﻔﺛﺄﺷﻅﻫﻈﺳﻎﻃﻉﺵﻨﺇﻤﺱﻴﻔﻱﺲﻨﺑﺩﺯﺒﻥﺽﺍﻯﺠﺏﻨﺇﺫﻑﻈﺜﻟﻨﻶﻨﻎﻀﻒﺵﺹﻫﺚﺏﺧﺙﺟﺪﺇﻁﻂﻮﻑﺤﻝﺭﺻﻁﺮﺴﻝﺭﺽﺳﺛﺔﺔﻩﻸﻆﺙﻎﻓﻶﻖﻷﺣﻺﻇﺇﻬﺾﺀﻦﺎﻖﻈﺻﺋﻈﺭﺌﺑﺞﻕﺋﺮﻤﻱﺒﺅﺳﺮﺽﺨﻱﺛﻗﻊﻣﺊﺽﻶﺧﻄﺞﺭﻔﺤﻁﻉﻕﻝﺯﺘﺌﺼﺴﺡﻊﻈﺼﺉﺵﺁﺹﺏﺿﺾﺚﺻﻭﻭﺥﺽﻬﺓﻧﻗﺷﻚﻗﺿﺯﻅﺬﻒﻼﺥﺛﺴﻣﺶﻼﺚﻋﺳﻁﺥﺊﺎﻫﺕﺊﺆﻙﻥﺸﻯﺨﻶﻒﻚﻧﻭﻮﻹﻗ";
+			//string renderText = "أدخل نص هنا لترجمة";
+			string renderText = "ﻂﺎﺉﻳﺕﺍﻈﺕﻊﺹﻫﻑﻈﻂﻟﺐﺻﺔﺛﺅﺡﺽﻛﻟﺊﺒﻖﺼﻞﺫﻳﺀﺎﻠﻜﻯﺛﺠﻔﺡﺜﺠﻹﺡﺕﺨﺜﻛﻃﺜﺗﺯﺘﺈﻞﺄﺰﺦﻨﺂﺳﺋﺳﺟﻃﻪﻃﻤﻣﻭﻱﺚﺽﻷﻦﺁﻁﺹﻊﻞﻲﻷﻶﻁﺓﻃﻥﺅﺂﻗﺿﻲﺵﻑﻪﺐﻩﻚﻛﺧﻢﺵﻵﻓﺨﻹﻯﺝﺟﻝﺿﻳﻘﺉﺌﺸﺒﻮﺋﻼﺅﺽﻢﺋﺭﻻﻢﻨﺍﻕﺔﻤﻛﺢﻹﺽﺂﺣﺙﺖﻑﻇﻣﺢﺘﻈﺙﺫﻄﺱﻺﻷﻎﻛﺢﺥﻏﻩﺥﺩﺗﺇﺐﻆﻈﻘﺘﺶﺍﻌﺶﻬﻕﻱﺫﺺﻖﻀﻰﻢﻡﺶﺣﻘﻗﺙﺖﻼﻼﻔﻫﺕﻺﻬﻼﻉﺶﺜﻖﺼﺰﻠﺞﻵﻸﺎﺢﻙﺯﻤﻋﺏﻵﺿﻄﻝﻡﺵﻬﺯﻂﺘﺶﺵﻞﺠﻮﻥﻱﻟﺄﺺﻦﺳﺲﺁﺘﺪﻜﻉﻴﺹﻍﺘﺉﻛﺜﺻﺧﺟﻥﺁﺭﺧﻷﺗﺪﻥﺗﻗﺜﺹﻥﻍﻠﺐﺥﻂﺍﻃﻅﺶﻕﺣﺸﺈﻇﺞﺬﺂﺃﺳﺽﻒﻶﺃﺌﺿﺸﺚﻓﺯﺒﺄﺬﺺﻐﺀﺴﻵﺶﻗﺭﻡﻗﺮﺨﺊﻫﻯﻌﺌﺹﺕﻔﻦﻸﺒﻓﻝﺄﻢﺉﻯﻬﺕﺤﻐﻳﻺﺵﻇﻦﺴﻉﺨﺅﻙﻷﻇﻗﺂﻐﻆﻊﻇﻲﻺﺭﻃﺾﺽﺩﻓﻰﻐﻎﺺﻱﻁﺊﻕﺓﻭﺺﺅﺢﺄﻈﺫﻠﺟﺘﺌﺆﺂﺑﺿﺤﺤﺟﺦﺣﺰﺼﻴﺞﺒﻀﻶﻗﻇﻤﺶﺼﺂﻫﻟﺌﻅﺥﻮﺱﺁﻟﺟﺥﺝﻍﻮﺾﺎﺖﻌﺡﻠﺱﻠﺱﻂﻣﺏﻁﻏﻐﺘﺷﻞﻌﺃﺓﺮﺳﻜﻼﺮﻲﺡﻍﺝﻎﺀﻂﻎﺷﻉﺱﺘﺔﻙﻍﺊﺮﻆﻞﺕﺭﻞﺭﻇﻤﻃﻍﻉﻛﺏﻗﺶﻍﻯﻫﺐﺒﺔﻱﻢﻊﻯﺗﺇﻣﺞﻉﻰﺳﺉﺀﻩﻺﻦﺁﺓﻰﺆﺵﺊﺰﻵﻰﺨﻮﻷﻈﺢﻪﺽﻴﺚﻒﻸﻈﺺﻆﺦﻠﻅﻶﻚﺖﻑﺏﻫﺹﻣﻮﻗﺜﺌﻛﻧﺲﻒﻻﻬﺕﻨﻓﺧﺅﻳﺑﻣﺗﺁﺞﻄﻉﻉﺢﻬﺐﻒﻞﺞﺘﺃﺾﻡﺱﺒﺠﻨﺻﻨﻅﻲﺻﻗﺑﻵﻯﻏﻔﺟﻀﺩﻓﺷﻄﺩﺎﻐﻦﻬﻖﻝﻰﻜﻓﺒﺪﻮﻳﻰﻓﺦﺧﺬﺸﺨﺈﻯﺸﺪﻺﺾﻺﺾﻛﻬﺬﺆﺝﺇﺄﻍﺁﻋﺑﻥﺂﻜﺃﻻﻊﺀﻘﻡﻉﺚﺁﺧﻻﺛﺡﺛﺗﺼﻯﺘﻠﺱﺁﻤﻣﺣﻑﻬﻫﺆﺤﻘﺚﻐﺦﺩﻬﺺﻜﻺﻢﺘﻲﻀﻫﺄﺇﺁﻢﻦﺵﻁﻙﻶﺄﻍﻚﺛﺘﺧﺫﻨﻳﻃﻲﺥﺌﺫﻱﻵﺫﻚﻜﻲﺲﻇﺼﺽﻵﻞﺛﻐﺊﺅﻍﻠﻻﺡﻌﻖﻋﻐﺡﺵﻎﻷﺢﺮﻋﻅﻴﻙﺌﻩﺺﻘﻢﻤﻃﺹﺐﺜﺣﺷﺋﻘﻞﻭﻳﺒﺦﻨﻜﺛﺪﻘﺸﺧﺣﺸﺥﺎﻯﺰﻦﺿﻃﺝﻈﻱﻺﺗﻚﺒﻅﺯﺭﻧﺩﻳﺘﺲﺷﺸﺞﺌﻺﻭﺿﻞﺠﺺﻁﺋﺔﺂﺩﻯﻍﻉﺕﻀﺤﺂﺔﺏﺍﻊﻓﻷﺪﻍﻻﺭﺟﻰﻓﺷﺒﻚﻂﻒﻛﻦﻑﻀﻓﻏﻺﻂﺅﺺﺚﻝﻞﻕﺍﺵﺣﺎﻼﺰﺚﻄﺴﻏﺼﺓﻨﺡﺫﻯﻝﻰﺇﺿﻢﺻﺮﻑﺹﺻﻌﺐﻲﻬﺳﺝﻌﻇﻢﺞﺓﺃﻛﺒﺸﺗﺲﺁﺃﺿﻣﻘﺖﺒﻚﺦﻖﺞﻯﻏﺇﻏﻒﻁﻠﺉﻎﻄﺛﺞﻄﺡﺼﺍﻜﻚﺕﻲﺇﻊﺈﺬﻍﻷﻔﻱﻷﻠﺒﺌﻄﺭﻔﺓﺖﻀﺮﺙﺮﺯﻅﻫﻢﻢﻷﻂﺜﺉﺳﺀﺑﻡﺗﺥﻆﻘﺁﻗﻩﻫﺏﻫﺲﺎﻗﺗﻉﺨﻳﺛﺫﻸﻃﻕﺅﺚﻆﻨﻼﺑﻔﻭﺬﺑﻸﻠﺖﺯﻉﺻﺾﻓﺭﻀﺟﻖﺸﻔﺊﻠﻶﻰﺒﺗﻑﺖﺝﺿﺟﺬﺑﺖﻗﻘﺖﺞﺾ";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
 			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
