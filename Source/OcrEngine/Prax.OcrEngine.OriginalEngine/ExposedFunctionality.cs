@@ -58,16 +58,22 @@ namespace Prax.OcrEngine.Engine {
 
 			var results = new List<RecognizedSegment>();
 			foreach (var segment in boards.Segment()) {
-				var test = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
-				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
-				if (returnVal.Count > 0) {
-					returnVal.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
-					results.Add(returnVal[0]);
-					Debug.Print(returnVal.First().Text + " " + returnVal.First().Certainty.ToString());
+				var whitespaceResults = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
+				if (whitespaceResults.FirstOrDefault().Text == "AllLabels") {
+					whitespaceResults.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
+					//results.Add(whitespaceResults[0]);
+					//Debug.Print(whitespaceResults.First().Text + " " + whitespaceResults.First().Certainty.ToString());
+				
+					System.Drawing.Bitmap b = boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
+					var characterResults = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
+					if (characterResults.Count > 0) {
+						characterResults.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
+						results.Add(characterResults[0]);
+						Debug.Print(characterResults.First().Text + " " + characterResults.First().Certainty.ToString());
+					}
 				}
 			}
 			var outputString = new StreamReader(OutputRenderer.PlainText.Convert(stream, results.AsReadOnly())).ReadToEnd();
-			var test2 = outputString.Reverse();
 			Debug.Print(outputString);
 			stream.Close();
 			//TODO: Solve the backward word problem
