@@ -8,6 +8,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows;
 using Color = System.Drawing.Color;
+using Prax.OcrEngine.Services;
 
 namespace Prax.OcrEngine.Engine.ImageUtilities {
 	public static class Utilities {
@@ -32,6 +33,16 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			var rtb = new RenderTargetBitmap((int)dg.Bounds.Width, (int)dg.Bounds.Height, 96, 96, PixelFormats.Pbgra32);
 			rtb.Render(dv);
 			return rtb;
+		}
+
+		public static List<Tuple<RecognizedSegment, Bitmap>> OutputLog = new List<Tuple<RecognizedSegment, Bitmap>>();
+		public static void Log(this RecognizedSegment seg, Bitmap b) {
+			OutputLog.Add(new Tuple<RecognizedSegment, Bitmap>(seg, b));
+		}
+
+		public static List<Tuple<Bitmap, char, Rectangle>> TrainingLog = new List<Tuple<Bitmap, char, Rectangle>>();
+		public static void Log(this Bitmap image, char segment, Rectangle rect) {
+			TrainingLog.Add(new Tuple<Bitmap, char, Rectangle>(image, segment, rect));
 		}
 
 		/// <summary>Extension method converts a bitmap to a double array</summary>

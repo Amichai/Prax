@@ -45,7 +45,7 @@ namespace Prax.OcrEngine.Engine {
 			return boards;
 		}
 
-		public static int OffsetBuffer = 6;
+		public static int OffsetBuffer = Segmentation.Segmentator.PointerOffset;
 	}
 
 }

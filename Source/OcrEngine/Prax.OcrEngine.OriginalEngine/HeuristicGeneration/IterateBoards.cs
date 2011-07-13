@@ -8,6 +8,7 @@ using Prax.OcrEngine.Engine.AutomatedTraining;
 using Prax.OcrEngine.Engine.ImageUtilities;
 using Prax.OcrEngine.Engine.Segmentation;
 using Prax.OcrEngine.Engine.ReferenceData;
+using Prax.OcrEngine.Engine.ImageUtilities;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 	public class IterateBoards {
@@ -19,9 +20,11 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 		public HeuristicSet GetHeuristics(BoundedCharacter ch) {
 			var rect = ch.Bounds.ToGdi();
 			int midpoint = rect.X + (int)Math.Round(rect.Width / 2d);
-			Rectangle smallerRect = new Rectangle(midpoint - 6, 0, Segmentator.WidthOfCanvas, Segmentator.HeightOfCanvas);
+			Rectangle smallerRect = new Rectangle(midpoint - Segmentator.PointerOffset, 0, Segmentator.WidthOfCanvas, Segmentator.HeightOfCanvas);
 			HeuristicSet heursitics = new HeuristicSet { Bounds = rect, Label = ch.Character.ToString() };
 			heursitics.GoThroughBoards(Boards, smallerRect);
+			Bitmap b = Boards.First().Matrix.ExtractRectangularContentArea(smallerRect).ConvertDoubleArrayToBitmap(Color.White);
+			b.Log(ch.Character, smallerRect);
 			return heursitics;
 		}
 

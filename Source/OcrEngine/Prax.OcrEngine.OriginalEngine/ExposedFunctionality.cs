@@ -38,7 +38,9 @@ namespace Prax.OcrEngine.Engine {
 
 		static readonly string trainingFolder = Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining");
 		public void TestAlgorithm() {
-			string renderText = "أدخل نص هنا لترجمة";
+			//string renderText = "أدخل نص هنا لترجمة";
+			//string renderText = "ﺀﺁﺂﺃﺄﺅﺆﺇﺈﺉﺊﺋﺌﺍﺎﺏﺐﺑﺒﺓﺔﺕﺖﺗﺘﺙﺚﺛﺜﺝﺞﺟﺠﺡﺢﺣﺤﺥﺦﺧﺨﺩﺪﺫﺬﺭﺮﺯﺰﺱﺲﺳﺴﺵﺶﺷﺸﺹﺺﺻﺼﺽﺾﺿﻀﻁﻂﻃﻄﻅﻆﻇﻈﻉﻊﻋﻌﻍﻎﻏﻐﻑﻒﻓﻔﻕﻖﻗﻘﻙﻚﻛﻜﻝﻞﻟﻠﻡﻢﻣﻤﻥﻦﻧﻨﻩﻪﻫﻬﻭﻮﻯﻰﻱﻲﻳﻴﻵﻶﻷﻸﻹﻺﻻﻼ";
+			string renderText = "ﺬﻤﺈﺗﻹﻕﻐﻘﻝﺺﻔﺒﺭﻧﻂﺓﻫﻲﺸﺪﺊﻭﻜﺶﻆﻸﻒﺆﺄﻤﻴﺣﻄﻗﻖﺹﺶﺅﺆﺔﻣﻕﻨﺝﻓﻂﺭﺡﺀﻷﺣﺜﻷﻞﺶﺼﺈﻎﻍﺁﺂﻊﻓﻶﻃﺰﻊﻒﺑﺈﻙﻦﻬﺣﻃﺲﺄﺿﻠﺄﻊﺰﺆﺊﻁﻗﺨﻣﺡﺚﺱﻤﺴﺄﺑﺙﺂﻮﻖﺢﻴﻘﺐﻴﺞﺹﺬﻔﺛﺄﺷﻅﻫﻈﺳﻎﻃﻉﺵﻨﺇﻤﺱﻴﻔﻱﺲﻨﺑﺩﺯﺒﻥﺽﺍﻯﺠﺏﻨﺇﺫﻑﻈﺜﻟﻨﻶﻨﻎﻀﻒﺵﺹﻫﺚﺏﺧﺙﺟﺪﺇﻁﻂﻮﻑﺤﻝﺭﺻﻁﺮﺴﻝﺭﺽﺳﺛﺔﺔﻩﻸﻆﺙﻎﻓﻶﻖﻷﺣﻺﻇﺇﻬﺾﺀﻦﺎﻖﻈﺻﺋﻈﺭﺌﺑﺞﻕﺋﺮﻤﻱﺒﺅﺳﺮﺽﺨﻱﺛﻗﻊﻣﺊﺽﻶﺧﻄﺞﺭﻔﺤﻁﻉﻕﻝﺯﺘﺌﺼﺴﺡﻊﻈﺼﺉﺵﺁﺹﺏﺿﺾﺚﺻﻭﻭﺥﺽﻬﺓﻧﻗﺷﻚﻗﺿﺯﻅﺬﻒﻼﺥﺛﺴﻣﺶﻼﺚﻋﺳﻁﺥﺊﺎﻫﺕﺊﺆﻙﻥﺸﻯﺨﻶﻒﻚﻧﻭﻮﻹﻗ";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
 			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
@@ -52,18 +54,20 @@ namespace Prax.OcrEngine.Engine {
 			var searcher = new ReferenceSearcher(trainingData);
 			var results = new OutputRenderer();
 			foreach (var segment in boards.Segment()) {
-				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > OutputRenderer.ThresholdCertainty).ToList();
+				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
 				if (returnVal.Count() > 0) {
+					returnVal.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
 					results.Add(returnVal);
 					Debug.Print(returnVal.First().Text + " " + returnVal.First().Certainty.ToString());
 				}
 			}
 			var outputString = results.Render();
+			Debug.Print(outputString);
 		}
 
 		public void TrainAlgorithm() {
-
-			string renderText = "أدخل نص هنا لترجمة";
+			//string renderText = "أدخل نص هنا لترجمة";
+			string renderText = "ﺬﻤﺈﺗﻹﻕﻐﻘﻝﺺﻔﺒﺭﻧﻂﺓﻫﻲﺸﺪﺊﻭﻜﺶﻆﻸﻒﺆﺄﻤﻴﺣﻄﻗﻖﺹﺶﺅﺆﺔﻣﻕﻨﺝﻓﻂﺭﺡﺀﻷﺣﺜﻷﻞﺶﺼﺈﻎﻍﺁﺂﻊﻓﻶﻃﺰﻊﻒﺑﺈﻙﻦﻬﺣﻃﺲﺄﺿﻠﺄﻊﺰﺆﺊﻁﻗﺨﻣﺡﺚﺱﻤﺴﺄﺑﺙﺂﻮﻖﺢﻴﻘﺐﻴﺞﺹﺬﻔﺛﺄﺷﻅﻫﻈﺳﻎﻃﻉﺵﻨﺇﻤﺱﻴﻔﻱﺲﻨﺑﺩﺯﺒﻥﺽﺍﻯﺠﺏﻨﺇﺫﻑﻈﺜﻟﻨﻶﻨﻎﻀﻒﺵﺹﻫﺚﺏﺧﺙﺟﺪﺇﻁﻂﻮﻑﺤﻝﺭﺻﻁﺮﺴﻝﺭﺽﺳﺛﺔﺔﻩﻸﻆﺙﻎﻓﻶﻖﻷﺣﻺﻇﺇﻬﺾﺀﻦﺎﻖﻈﺻﺋﻈﺭﺌﺑﺞﻕﺋﺮﻤﻱﺒﺅﺳﺮﺽﺨﻱﺛﻗﻊﻣﺊﺽﻶﺧﻄﺞﺭﻔﺤﻁﻉﻕﻝﺯﺘﺌﺼﺴﺡﻊﻈﺼﺉﺵﺁﺹﺏﺿﺾﺚﺻﻭﻭﺥﺽﻬﺓﻧﻗﺷﻚﻗﺿﺯﻅﺬﻒﻼﺥﺛﺴﻣﺶﻼﺚﻋﺳﻁﺥﺊﺎﻫﺕﺊﺆﻙﻥﺸﻯﺨﻶﻒﻚﻧﻭﻮﻹﻗ";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
 			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
@@ -85,6 +89,7 @@ namespace Prax.OcrEngine.Engine {
 				if (heuristics != null)
 					trainingData.AddHeuristics(heuristics);
 			}
+			ImageUtilities.Utilities.TrainingLog.ToString();
 
 			trainingData.WriteTo(trainingFolder);
 		}
