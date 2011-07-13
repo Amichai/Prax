@@ -41,6 +41,7 @@ namespace Prax.OcrEngine.Engine {
 		static readonly string trainingFolder = Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining");
 		public void TestAlgorithm() {
 			string renderText = "أدخل نص هنا لترجمة";
+			//string renderText = "أد";
 			//string renderText = "ﺀﺁﺂﺃﺄﺅﺆﺇﺈﺉﺊﺋﺌﺍﺎﺏﺐﺑﺒﺓﺔﺕﺖﺗﺘﺙﺚﺛﺜﺝﺞﺟﺠﺡﺢﺣﺤﺥﺦﺧﺨﺩﺪﺫﺬﺭﺮﺯﺰﺱﺲﺳﺴﺵﺶﺷﺸﺹﺺﺻﺼﺽﺾﺿﻀﻁﻂﻃﻄﻅﻆﻇﻈﻉﻊﻋﻌﻍﻎﻏﻐﻑﻒﻓﻔﻕﻖﻗﻘﻙﻚﻛﻜﻝﻞﻟﻠﻡﻢﻣﻤﻥﻦﻧﻨﻩﻪﻫﻬﻭﻮﻯﻰﻱﻲﻳﻴﻵﻶﻷﻸﻹﻺﻻﻼ";
 			//string renderText = "ﺬﻤﺈﺗﻹﻕﻐﻘﻝﺺﻔﺒﺭﻧﻂﺓﻫﻲﺸﺪﺊﻭﻜﺶﻆﻸﻒﺆﺄﻤﻴﺣﻄﻗﻖﺹﺶﺅﺆﺔﻣﻕﻨﺝﻓﻂﺭﺡﺀﻷﺣﺜﻷﻞﺶﺼﺈﻎﻍﺁﺂﻊﻓﻶﻃﺰﻊﻒﺑﺈﻙﻦﻬﺣﻃﺲﺄﺿﻠﺄﻊﺰﺆﺊﻁﻗﺨﻣﺡﺚﺱﻤﺴﺄﺑﺙﺂﻮﻖﺢﻴﻘﺐﻴﺞﺹﺬﻔﺛﺄﺷﻅﻫﻈﺳﻎﻃﻉﺵﻨﺇﻤﺱﻴﻔﻱﺲﻨﺑﺩﺯﺒﻥﺽﺍﻯﺠﺏﻨﺇﺫﻑﻈﺜﻟﻨﻶﻨﻎﻀﻒﺵﺹﻫﺚﺏﺧﺙﺟﺪﺇﻁﻂﻮﻑﺤﻝﺭﺻﻁﺮﺴﻝﺭﺽﺳﺛﺔﺔﻩﻸﻆﺙﻎﻓﻶﻖﻷﺣﻺﻇﺇﻬﺾﺀﻦﺎﻖﻈﺻﺋﻈﺭﺌﺑﺞﻕﺋﺮﻤﻱﺒﺅﺳﺮﺽﺨﻱﺛﻗﻊﻣﺊﺽﻶﺧﻄﺞﺭﻔﺤﻁﻉﻕﻝﺯﺘﺌﺼﺴﺡﻊﻈﺼﺉﺵﺁﺹﺏﺿﺾﺚﺻﻭﻭﺥﺽﻬﺓﻧﻗﺷﻚﻗﺿﺯﻅﺬﻒﻼﺥﺛﺴﻣﺶﻼﺚﻋﺳﻁﺥﺊﺎﻫﺕﺊﺆﻙﻥﺸﻯﺨﻶﻒﻚﻧﻭﻮﻹﻗ";
 			var output = new DrawingGroup();
@@ -60,12 +61,10 @@ namespace Prax.OcrEngine.Engine {
 			foreach (var segment in boards.Segment()) {
 				var whitespaceResults = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
 				if (whitespaceResults.LastOrDefault().Text == "AllLabels") {
-					whitespaceResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
-					//results.Add(whitespaceResults[0]);
-					//Debug.Print(whitespaceResults.First().Text + " " + whitespaceResults.First().Certainty.ToString());
+					//whitespaceResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
 				
 					System.Drawing.Bitmap b = boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
-					var characterResults = searcher.PerformLookup(segment).Where(r => r.Certainty > 0).ToList();
+					var characterResults = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
 					//var characterResults = searcher.PerformLookup(segment).ToList();
 					if (characterResults.Count > 0) {
 						characterResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
@@ -80,8 +79,8 @@ namespace Prax.OcrEngine.Engine {
 		}
 		//TODO: Test for white space first
 		public void TrainAlgorithm() {
-			//string renderText = "أدخل نص هنا لترجمة";
-			string renderText = "ﻂﺎﺉﻳﺕﺍﻈﺕﻊﺹﻫﻑﻈﻂﻟﺐﺻﺔﺛﺅﺡﺽﻛﻟﺊﺒﻖﺼﻞﺫﻳﺀﺎﻠﻜﻯﺛﺠﻔﺡﺜﺠﻹﺡﺕﺨﺜﻛﻃﺜﺗﺯﺘﺈﻞﺄﺰﺦﻨﺂﺳﺋﺳﺟﻃﻪﻃﻤﻣﻭﻱﺚﺽﻷﻦﺁﻁﺹﻊﻞﻲﻷﻶﻁﺓﻃﻥﺅﺂﻗﺿﻲﺵﻑﻪﺐﻩﻚﻛﺧﻢﺵﻵﻓﺨﻹﻯﺝﺟﻝﺿﻳﻘﺉﺌﺸﺒﻮﺋﻼﺅﺽﻢﺋﺭﻻﻢﻨﺍﻕﺔﻤﻛﺢﻹﺽﺂﺣﺙﺖﻑﻇﻣﺢﺘﻈﺙﺫﻄﺱﻺﻷﻎﻛﺢﺥﻏﻩﺥﺩﺗﺇﺐﻆﻈﻘﺘﺶﺍﻌﺶﻬﻕﻱﺫﺺﻖﻀﻰﻢﻡﺶﺣﻘﻗﺙﺖﻼﻼﻔﻫﺕﻺﻬﻼﻉﺶﺜﻖﺼﺰﻠﺞﻵﻸﺎﺢﻙﺯﻤﻋﺏﻵﺿﻄﻝﻡﺵﻬﺯﻂﺘﺶﺵﻞﺠﻮﻥﻱﻟﺄﺺﻦﺳﺲﺁﺘﺪﻜﻉﻴﺹﻍﺘﺉﻛﺜﺻﺧﺟﻥﺁﺭﺧﻷﺗﺪﻥﺗﻗﺜﺹﻥﻍﻠﺐﺥﻂﺍﻃﻅﺶﻕﺣﺸﺈﻇﺞﺬﺂﺃﺳﺽﻒﻶﺃﺌﺿﺸﺚﻓﺯﺒﺄﺬﺺﻐﺀﺴﻵﺶﻗﺭﻡﻗﺮﺨﺊﻫﻯﻌﺌﺹﺕﻔﻦﻸﺒﻓﻝﺄﻢﺉﻯﻬﺕﺤﻐﻳﻺﺵﻇﻦﺴﻉﺨﺅﻙﻷﻇﻗﺂﻐﻆﻊﻇﻲﻺﺭﻃﺾﺽﺩﻓﻰﻐﻎﺺﻱﻁﺊﻕﺓﻭﺺﺅﺢﺄﻈﺫﻠﺟﺘﺌﺆﺂﺑﺿﺤﺤﺟﺦﺣﺰﺼﻴﺞﺒﻀﻶﻗﻇﻤﺶﺼﺂﻫﻟﺌﻅﺥﻮﺱﺁﻟﺟﺥﺝﻍﻮﺾﺎﺖﻌﺡﻠﺱﻠﺱﻂﻣﺏﻁﻏﻐﺘﺷﻞﻌﺃﺓﺮﺳﻜﻼﺮﻲﺡﻍﺝﻎﺀﻂﻎﺷﻉﺱﺘﺔﻙﻍﺊﺮﻆﻞﺕﺭﻞﺭﻇﻤﻃﻍﻉﻛﺏﻗﺶﻍﻯﻫﺐﺒﺔﻱﻢﻊﻯﺗﺇﻣﺞﻉﻰﺳﺉﺀﻩﻺﻦﺁﺓﻰﺆﺵﺊﺰﻵﻰﺨﻮﻷﻈﺢﻪﺽﻴﺚﻒﻸﻈﺺﻆﺦﻠﻅﻶﻚﺖﻑﺏﻫﺹﻣﻮﻗﺜﺌﻛﻧﺲﻒﻻﻬﺕﻨﻓﺧﺅﻳﺑﻣﺗﺁﺞﻄﻉﻉﺢﻬﺐﻒﻞﺞﺘﺃﺾﻡﺱﺒﺠﻨﺻﻨﻅﻲﺻﻗﺑﻵﻯﻏﻔﺟﻀﺩﻓﺷﻄﺩﺎﻐﻦﻬﻖﻝﻰﻜﻓﺒﺪﻮﻳﻰﻓﺦﺧﺬﺸﺨﺈﻯﺸﺪﻺﺾﻺﺾﻛﻬﺬﺆﺝﺇﺄﻍﺁﻋﺑﻥﺂﻜﺃﻻﻊﺀﻘﻡﻉﺚﺁﺧﻻﺛﺡﺛﺗﺼﻯﺘﻠﺱﺁﻤﻣﺣﻑﻬﻫﺆﺤﻘﺚﻐﺦﺩﻬﺺﻜﻺﻢﺘﻲﻀﻫﺄﺇﺁﻢﻦﺵﻁﻙﻶﺄﻍﻚﺛﺘﺧﺫﻨﻳﻃﻲﺥﺌﺫﻱﻵﺫﻚﻜﻲﺲﻇﺼﺽﻵﻞﺛﻐﺊﺅﻍﻠﻻﺡﻌﻖﻋﻐﺡﺵﻎﻷﺢﺮﻋﻅﻴﻙﺌﻩﺺﻘﻢﻤﻃﺹﺐﺜﺣﺷﺋﻘﻞﻭﻳﺒﺦﻨﻜﺛﺪﻘﺸﺧﺣﺸﺥﺎﻯﺰﻦﺿﻃﺝﻈﻱﻺﺗﻚﺒﻅﺯﺭﻧﺩﻳﺘﺲﺷﺸﺞﺌﻺﻭﺿﻞﺠﺺﻁﺋﺔﺂﺩﻯﻍﻉﺕﻀﺤﺂﺔﺏﺍﻊﻓﻷﺪﻍﻻﺭﺟﻰﻓﺷﺒﻚﻂﻒﻛﻦﻑﻀﻓﻏﻺﻂﺅﺺﺚﻝﻞﻕﺍﺵﺣﺎﻼﺰﺚﻄﺴﻏﺼﺓﻨﺡﺫﻯﻝﻰﺇﺿﻢﺻﺮﻑﺹﺻﻌﺐﻲﻬﺳﺝﻌﻇﻢﺞﺓﺃﻛﺒﺸﺗﺲﺁﺃﺿﻣﻘﺖﺒﻚﺦﻖﺞﻯﻏﺇﻏﻒﻁﻠﺉﻎﻄﺛﺞﻄﺡﺼﺍﻜﻚﺕﻲﺇﻊﺈﺬﻍﻷﻔﻱﻷﻠﺒﺌﻄﺭﻔﺓﺖﻀﺮﺙﺮﺯﻅﻫﻢﻢﻷﻂﺜﺉﺳﺀﺑﻡﺗﺥﻆﻘﺁﻗﻩﻫﺏﻫﺲﺎﻗﺗﻉﺨﻳﺛﺫﻸﻃﻕﺅﺚﻆﻨﻼﺑﻔﻭﺬﺑﻸﻠﺖﺯﻉﺻﺾﻓﺭﻀﺟﻖﺸﻔﺊﻠﻶﻰﺒﺗﻑﺖﺝﺿﺟﺬﺑﺖﻗﻘﺖﺞﺾ";
+			string renderText = "أدخل نص هنا لترجمة";
+			//string renderText = "ﻂﺎﺉﻳﺕﺍﻈﺕﻊﺹﻫﻑﻈﻂﻟﺐﺻﺔﺛﺅﺡﺽﻛﻟﺊﺒﻖﺼﻞﺫﻳﺀﺎﻠﻜﻯﺛﺠﻔﺡﺜﺠﻹﺡﺕﺨﺜﻛﻃﺜﺗﺯﺘﺈﻞﺄﺰﺦﻨﺂﺳﺋﺳﺟﻃﻪﻃﻤﻣﻭﻱﺚﺽﻷﻦﺁﻁﺹﻊﻞﻲﻷﻶﻁﺓﻃﻥﺅﺂﻗﺿﻲﺵﻑﻪﺐﻩﻚﻛﺧﻢﺵﻵﻓﺨﻹﻯﺝﺟﻝﺿﻳﻘﺉﺌﺸﺒﻮﺋﻼﺅﺽﻢﺋﺭﻻﻢﻨﺍﻕﺔﻤﻛﺢﻹﺽﺂﺣﺙﺖﻑﻇﻣﺢﺘﻈﺙﺫﻄﺱﻺﻷﻎﻛﺢﺥﻏﻩﺥﺩﺗﺇﺐﻆﻈﻘﺘﺶﺍﻌﺶﻬﻕﻱﺫﺺﻖﻀﻰﻢﻡﺶﺣﻘﻗﺙﺖﻼﻼﻔﻫﺕﻺﻬﻼﻉﺶﺜﻖﺼﺰﻠﺞﻵﻸﺎﺢﻙﺯﻤﻋﺏﻵﺿﻄﻝﻡﺵﻬﺯﻂﺘﺶﺵﻞﺠﻮﻥﻱﻟﺄﺺﻦﺳﺲﺁﺘﺪﻜﻉﻴﺹﻍﺘﺉﻛﺜﺻﺧﺟﻥﺁﺭﺧﻷﺗﺪﻥﺗﻗﺜﺹﻥﻍﻠﺐﺥﻂﺍﻃﻅﺶﻕﺣﺸﺈﻇﺞﺬﺂﺃﺳﺽﻒﻶﺃﺌﺿﺸﺚﻓﺯﺒﺄﺬﺺﻐﺀﺴﻵﺶﻗﺭﻡﻗﺮﺨﺊﻫﻯﻌﺌﺹﺕﻔﻦﻸﺒﻓﻝﺄﻢﺉﻯﻬﺕﺤﻐﻳﻺﺵﻇﻦﺴﻉﺨﺅﻙﻷﻇﻗﺂﻐﻆﻊﻇﻲﻺﺭﻃﺾﺽﺩﻓﻰﻐﻎﺺﻱﻁﺊﻕﺓﻭﺺﺅﺢﺄﻈﺫﻠﺟﺘﺌﺆﺂﺑﺿﺤﺤﺟﺦﺣﺰﺼﻴﺞﺒﻀﻶﻗﻇﻤﺶﺼﺂﻫﻟﺌﻅﺥﻮﺱﺁﻟﺟﺥﺝﻍﻮﺾﺎﺖﻌﺡﻠﺱﻠﺱﻂﻣﺏﻁﻏﻐﺘﺷﻞﻌﺃﺓﺮﺳﻜﻼﺮﻲﺡﻍﺝﻎﺀﻂﻎﺷﻉﺱﺘﺔﻙﻍﺊﺮﻆﻞﺕﺭﻞﺭﻇﻤﻃﻍﻉﻛﺏﻗﺶﻍﻯﻫﺐﺒﺔﻱﻢﻊﻯﺗﺇﻣﺞﻉﻰﺳﺉﺀﻩﻺﻦﺁﺓﻰﺆﺵﺊﺰﻵﻰﺨﻮﻷﻈﺢﻪﺽﻴﺚﻒﻸﻈﺺﻆﺦﻠﻅﻶﻚﺖﻑﺏﻫﺹﻣﻮﻗﺜﺌﻛﻧﺲﻒﻻﻬﺕﻨﻓﺧﺅﻳﺑﻣﺗﺁﺞﻄﻉﻉﺢﻬﺐﻒﻞﺞﺘﺃﺾﻡﺱﺒﺠﻨﺻﻨﻅﻲﺻﻗﺑﻵﻯﻏﻔﺟﻀﺩﻓﺷﻄﺩﺎﻐﻦﻬﻖﻝﻰﻜﻓﺒﺪﻮﻳﻰﻓﺦﺧﺬﺸﺨﺈﻯﺸﺪﻺﺾﻺﺾﻛﻬﺬﺆﺝﺇﺄﻍﺁﻋﺑﻥﺂﻜﺃﻻﻊﺀﻘﻡﻉﺚﺁﺧﻻﺛﺡﺛﺗﺼﻯﺘﻠﺱﺁﻤﻣﺣﻑﻬﻫﺆﺤﻘﺚﻐﺦﺩﻬﺺﻜﻺﻢﺘﻲﻀﻫﺄﺇﺁﻢﻦﺵﻁﻙﻶﺄﻍﻚﺛﺘﺧﺫﻨﻳﻃﻲﺥﺌﺫﻱﻵﺫﻚﻜﻲﺲﻇﺼﺽﻵﻞﺛﻐﺊﺅﻍﻠﻻﺡﻌﻖﻋﻐﺡﺵﻎﻷﺢﺮﻋﻅﻴﻙﺌﻩﺺﻘﻢﻤﻃﺹﺐﺜﺣﺷﺋﻘﻞﻭﻳﺒﺦﻨﻜﺛﺪﻘﺸﺧﺣﺸﺥﺎﻯﺰﻦﺿﻃﺝﻈﻱﻺﺗﻚﺒﻅﺯﺭﻧﺩﻳﺘﺲﺷﺸﺞﺌﻺﻭﺿﻞﺠﺺﻁﺋﺔﺂﺩﻯﻍﻉﺕﻀﺤﺂﺔﺏﺍﻊﻓﻷﺪﻍﻻﺭﺟﻰﻓﺷﺒﻚﻂﻒﻛﻦﻑﻀﻓﻏﻺﻂﺅﺺﺚﻝﻞﻕﺍﺵﺣﺎﻼﺰﺚﻄﺴﻏﺼﺓﻨﺡﺫﻯﻝﻰﺇﺿﻢﺻﺮﻑﺹﺻﻌﺐﻲﻬﺳﺝﻌﻇﻢﺞﺓﺃﻛﺒﺸﺗﺲﺁﺃﺿﻣﻘﺖﺒﻚﺦﻖﺞﻯﻏﺇﻏﻒﻁﻠﺉﻎﻄﺛﺞﻄﺡﺼﺍﻜﻚﺕﻲﺇﻊﺈﺬﻍﻷﻔﻱﻷﻠﺒﺌﻄﺭﻔﺓﺖﻀﺮﺙﺮﺯﻅﻫﻢﻢﻷﻂﺜﺉﺳﺀﺑﻡﺗﺥﻆﻘﺁﻗﻩﻫﺏﻫﺲﺎﻗﺗﻉﺨﻳﺛﺫﻸﻃﻕﺅﺚﻆﻨﻼﺑﻔﻭﺬﺑﻸﻠﺖﺯﻉﺻﺾﻓﺭﻀﺟﻖﺸﻔﺊﻠﻶﻰﺒﺗﻑﺖﺝﺿﺟﺬﺑﺖﻗﻘﺖﺞﺾ";
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
 			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();

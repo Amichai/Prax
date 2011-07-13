@@ -14,6 +14,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 	public interface IReferenceSearcher {
 		///<summary>Finds the best matching labels for a given piece of heuristics.</summary>
 		IEnumerable<RecognizedSegment> PerformLookup(HeuristicSet heuristics, IProgressReporter progress = null);
+		IEnumerable<RecognizedSegment> PerformWhitespaceLookup(HeuristicSet heuristics, IProgressReporter progress = null);
 	}
 
 	/// <summary>Training data is a set of heuristics return values associated with their corresponding input label.
@@ -115,7 +116,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 							multiplicativeOffset += aprioriProb / (double)Library[inspectionLbl].Variances.Count;
 
 							if (multiplicativeOffset < double.MaxValue)
-								labelProbability[inspectionLbl] *= (factorIncrease * (heuristicProbabilisticIndication + multiplicativeOffset)) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+								labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 
 							if (double.IsInfinity(labelProbability[inspectionLbl]) || labelProbability[inspectionLbl] == 0)
 								heurIdx = heuristicCount;
@@ -133,7 +134,7 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 
 		private static HeuristicsControlPanel heuristicsControl = new HeuristicsControlPanel();
 
-		internal IEnumerable<RecognizedSegment> PerformWhitespaceLookup(HeuristicSet unlabledHeuristic, IProgressReporter progress = null) {
+		public IEnumerable<RecognizedSegment> PerformWhitespaceLookup(HeuristicSet unlabledHeuristic, IProgressReporter progress = null) {
 			progress = progress ?? new EmptyProgressReporter();
 
 			int heuristicCount = unlabledHeuristic.Heuristics.Count;

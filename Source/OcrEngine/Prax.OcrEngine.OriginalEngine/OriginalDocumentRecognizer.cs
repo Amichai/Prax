@@ -22,11 +22,24 @@ namespace Prax.OcrEngine.Engine {
 			var imageData = new ImageData(document);
 			var boards = imageData.DefineIteratedBoards();
 
-			var heuristics = boards.Segment().ToList();
+			//var heuristics = boards.Segment().ToList();
 
-			progress.Maximum = heuristics.Count * 1000;
-			return heuristics.Select(h => trainingData.PerformLookup(h, progress.ScaledChildOperation(1000)).FirstOrDefault())
-							 .Where(rs => rs != null);
+			//progress.Maximum = heuristics.Count * 1000;
+
+			foreach (var segment in boards.Segment()) {
+				
+				var whitespaceResults = trainingData.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
+				if (whitespaceResults.LastOrDefault().Text == "AllLabels") {
+					var characterResults = trainingData.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
+					if (characterResults.Count > 0) {
+						yield return characterResults.Last();
+					}
+				}
+			}
+
+			//var temp = heuristics.Select(h => trainingData.PerformLookup(h, progress.ScaledChildOperation(1000)).FirstOrDefault())
+			//                 .Where(rs => rs != null);
+			//return temp;
 		}
 	}
 }
