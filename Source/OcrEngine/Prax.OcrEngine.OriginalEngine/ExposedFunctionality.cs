@@ -59,6 +59,8 @@ namespace Prax.OcrEngine.Engine {
 
 			var results = new List<RecognizedSegment>();
 			foreach (var segment in boards.Segment()) {
+			}
+			foreach (var segment in boards.Segment()) {
 				var whitespaceResults = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
 				if (whitespaceResults.LastOrDefault().Text == "AllLabels") {
 					//whitespaceResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
