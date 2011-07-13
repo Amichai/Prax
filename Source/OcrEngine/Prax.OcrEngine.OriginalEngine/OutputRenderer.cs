@@ -168,16 +168,14 @@ namespace Prax.OcrEngine.Engine {
 			Stream GetStream();
 		}
 		class PlainTextRenderer : IRenderer {
-			StreamWriter writer = new StreamWriter(new MemoryStream());
+			StringBuilder builder = new StringBuilder();
 
 			public void AddText(string text) {
-				writer.Write(text);
+				builder.Insert(0, new string(text.Reverse().ToArray()));
 			}
 
 			public Stream GetStream() {
-				writer.Flush();
-				writer.BaseStream.Position = 0;
-				return writer.BaseStream;
+				return new MemoryStream(Encoding.UTF8.GetBytes(builder.ToString()));
 			}
 		}
 		class PdfRenderer : IRenderer {
