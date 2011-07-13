@@ -40,15 +40,15 @@ namespace Prax.OcrEngine {
 
 			StubUserManagement();
 
-			//StubDocuments();
+			StubDocuments();
 
 			//StubRecognizer();
 
-			DevelopmentStorage();
-			AzureDocuments();
+			//DevelopmentStorage();
+			//AzureDocuments();
 
 			//if (!RoleEnvironment.IsAvailable)
-			//    InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
+			    //InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
 
 			OriginalProcessor();
 			StubConverters();
@@ -182,6 +182,7 @@ namespace Prax.OcrEngine {
 		#region Original Engine
 		private void OriginalProcessor() {
 			Builder.RegisterInstance(new Stubs.StaticDataCache(Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining")))
+			//Builder.RegisterInstance(new Stubs.StaticDataCache(Environment.ExpandEnvironmentVariables(@"C:\Users\Amichai\Documents\Prax\PadOcrTraining")))
 				   .As<IDataCache>()
 				   .Named("TrainingData", typeof(IDataCache));
 
