@@ -28,27 +28,38 @@ namespace Prax.OcrEngine.Services.Stubs {
 		public void Execute(DocumentIdentifier id) {
 			var doc = StorageClient.GetDocument(id);
 			if (doc == null) return;
-			doc.State = DocumentState.Scanning;
-			doc.ScanProgress = 0;
-			StorageClient.UpdateDocument(doc);
 
-			var stream = new MemoryStream();
-			using (var source = doc.OpenRead())
-				source.CopyTo(stream);
-			var results = new ReadOnlyCollection<RecognizedSegment>(
-				Recognizer.Recognize(stream, new StorageProgressReporter(this, id)).ToList()
-			);
+			try {
+				doc.State = DocumentState.Scanning;
+				doc.ScanProgress = 0;
+				StorageClient.UpdateDocument(doc);
 
-			doc = StorageClient.GetDocument(doc.Id);
-			if (doc == null) return;
-			foreach (var converter in ResultConverters) {
-				var convertedStream = converter.Convert(doc.OpenRead(), results);
-				doc.UploadStream(converter.OutputFormat.ToString(), convertedStream, convertedStream.Length);
+				var stream = new MemoryStream();
+				using (var source = doc.OpenRead())
+					source.CopyTo(stream);
+				var results = new ReadOnlyCollection<RecognizedSegment>(
+					Recognizer.Recognize(stream, new StorageProgressReporter(this, id)).ToList()
+				);
+
+				doc = StorageClient.GetDocument(doc.Id);
+				if (doc == null) return;
+				foreach (var converter in ResultConverters) {
+					var convertedStream = converter.Convert(doc.OpenRead(), results);
+					doc.UploadStream(converter.OutputFormat.ToString(), convertedStream, convertedStream.Length);
+				}
+
+				doc.ScanProgress = 100;
+				doc.State = DocumentState.Scanned;
+				StorageClient.UpdateDocument(doc);
+			} catch (Exception ex) {
+				doc = StorageClient.GetDocument(id);
+				if (doc == null) return;
+
+				doc.State = DocumentState.Error;
+				doc.UploadString("Error", ex.ToString());
+				StorageClient.UpdateDocument(doc);
 			}
 
-			doc.ScanProgress = 100;
-			doc.State = DocumentState.Scanned;
-			StorageClient.UpdateDocument(doc);
 		}
 		public void CancelProcessing(DocumentIdentifier id) {
 			canceledDocuments.TryAdd(id, true);

@@ -26,33 +26,42 @@ namespace Prax.OcrEngine.Services {
 
 
 		public void Execute(DocumentIdentifier id) {
-			using (var reporter = new AsyncProgressReporter(StorageClient, id)) {
-				reporter.StartReporter();
+			try {
+				using (var reporter = new AsyncProgressReporter(StorageClient, id)) {
+					reporter.StartReporter();
 
+					var document = StorageClient.GetDocument(id);
+					if (document == null) return;
+					document.State = DocumentState.Scanning;
+					document.ScanProgress = 0;
+					StorageClient.UpdateDocument(document);
+
+					var stream = new MemoryStream();
+					using (var source = document.OpenRead())
+						source.CopyTo(stream);
+					var results = new ReadOnlyCollection<RecognizedSegment>(
+						Recognizer.Recognize(stream, reporter).ToList()
+					);
+					reporter.StopReporter();
+
+					document = StorageClient.GetDocument(document.Id);	//Refresh properties before saving them (eg, if it was renamed)
+					if (document == null) return;
+
+					foreach (var converter in ResultConverters) {
+						var convertedStream = converter.Convert(document.OpenRead(), results);
+						document.UploadStream(converter.OutputFormat.ToString(), convertedStream, convertedStream.Length);
+					}
+
+					document.ScanProgress = 100;
+					document.State = DocumentState.Scanned;
+					StorageClient.UpdateDocument(document);
+				}
+			} catch (Exception ex) {
 				var document = StorageClient.GetDocument(id);
 				if (document == null) return;
-				document.State = DocumentState.Scanning;
-				document.ScanProgress = 0;
-				StorageClient.UpdateDocument(document);
 
-				var stream = new MemoryStream();
-				using (var source = document.OpenRead())
-					source.CopyTo(stream);
-				var results = new ReadOnlyCollection<RecognizedSegment>(
-					Recognizer.Recognize(stream, reporter).ToList()
-				);
-				reporter.StopReporter();
-
-				document = StorageClient.GetDocument(document.Id);	//Refresh properties before saving them (eg, if it was renamed)
-				if (document == null) return;
-
-				foreach (var converter in ResultConverters) {
-					var convertedStream = converter.Convert(document.OpenRead(), results);
-					document.UploadStream(converter.OutputFormat.ToString(), convertedStream, convertedStream.Length);
-				}
-
-				document.ScanProgress = 100;
-				document.State = DocumentState.Scanned;
+				document.State = DocumentState.Error;
+				document.UploadString("Error", ex.ToString());
 				StorageClient.UpdateDocument(document);
 			}
 		}

@@ -74,7 +74,7 @@ namespace Prax.OcrEngine.Services.Stubs {
 			public override void UploadStream(string name, Stream stream, long length) {
 				var bytes = new byte[length];
 				stream.ReadFill(bytes);
-				dataStreams.AddOrUpdate(name, bytes, (k, v) => bytes);
+				dataStreams[name] = bytes;
 			}
 
 			public override IEnumerable<string> AlternateStreamNames {

@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using Prax.OcrEngine.Services;
 using System.ComponentModel;
+using System.Text;
 
 namespace Prax.OcrEngine {
 	///<summary>Contains useful extension methods.</summary>
@@ -119,5 +120,10 @@ namespace Prax.OcrEngine {
 		}
 		///<summary>Gets the MIME type of a result format.</summary>
 		public static string GetMimeType(this ResultFormat format) { return MimeTypes.ForExtension(format.GetExtension()); }
+
+		public static void UploadString(this Document doc, string name, string content) {
+			using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(content)))
+				doc.UploadStream(name, stream, stream.Length);
+		}
 	}
 }

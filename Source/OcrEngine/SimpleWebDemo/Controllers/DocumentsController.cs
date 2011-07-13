@@ -47,16 +47,20 @@ namespace SimpleWebDemo.Controllers {
 			switch (doc.State) {
 				case DocumentState.ScanQueued:
 					return Json(new { state = "Queued", progress = 0 }, JsonRequestBehavior.AllowGet);
-					
+
 				case DocumentState.Scanning:
 					return Json(new { state = "Scanning", progress = doc.ScanProgress }, JsonRequestBehavior.AllowGet);
-					
+
 				case DocumentState.Scanned:
 					using (var reader = new StreamReader(doc.OpenStream("PlainText")))
 						return Json(new { state = "Complete", text = reader.ReadToEnd() }, JsonRequestBehavior.AllowGet);
 
 				default:	//Including DocumentState.Error
-					return Json(new { state = "Error" }, JsonRequestBehavior.AllowGet);
+					if (doc.AlternateStreamNames.Contains("Error")) {
+						using (var reader = new StreamReader(doc.OpenStream("Error")))
+							return Json(new { state = "Error", message = reader.ReadToEnd() }, JsonRequestBehavior.AllowGet);
+					} else
+						return Json(new { state = "Error" }, JsonRequestBehavior.AllowGet);
 			}
 		}
 	}
