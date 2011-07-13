@@ -35,6 +35,19 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		}
 
 		private IEnumerable<RecognizedSegment> GetMatchesIterator(HeuristicSet unlabledHeuristic, IProgressReporter progress) {
+			int whitespaceIdx = int.MinValue,
+				allLabelsIdx = int.MinValue;
+			for (int i = 0; i < Library.Count; i++) {
+				if (Library[i].Label == "whitespace") {
+					whitespaceIdx = i;
+				} if (Library[i].Label == "AllLabels") {
+					allLabelsIdx = i;
+				} if (whitespaceIdx != int.MinValue && allLabelsIdx != int.MinValue) {
+					i = Library.Count;
+				}
+			}
+			HashSet<int> dontCheck = new HashSet<int>() {whitespaceIdx, allLabelsIdx};
+
 			progress = progress ?? new EmptyProgressReporter();
 
 			int heuristicCount = unlabledHeuristic.Heuristics.Count;
@@ -54,6 +67,12 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 
 			for (int heurIdx = 0; heurIdx < heuristicCount; heurIdx++) {
 				for (int lblIdx = 0; lblIdx < Library.Count; lblIdx++) {
+					while (dontCheck.Contains(lblIdx)) {
+						lblIdx++;
+						if (lblIdx == Library.Count){
+							goto BreakOut;
+						}
+					}
 					var current = Library[lblIdx];
 
 					foreach (var item in current.Samples) {
@@ -61,10 +80,15 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 						if (unlabledHeuristic.GetAtIndex(heurIdx) == item.Heuristics[heurIdx])
 							lblComparisonResults[lblIdx][heurIdx]++;
 					}
-					//totalComparison_test[lblIdx] += lblComparisonResults[lblIdx][heurIdx];
 				}
+				BreakOut:
 				for (int labelIndex = 0; labelIndex < Library.Count; labelIndex++) {
-					lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)Library[labelIndex].Samples.Count;
+					while (dontCheck.Contains(labelIndex)) {
+						labelIndex++;
+					}
+					if (labelIndex < Library.Count) {
+						lblComparisonResults[labelIndex][heurIdx] = lblComparisonResults[labelIndex][heurIdx] / (double)Library[labelIndex].Samples.Count;
+					}
 				}
 			}
 
@@ -72,31 +96,34 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 			double heuristicProbabilisticIndication;
 			double multiplicativeOffset;
 			labelProbability = new double[Library.Count];
-			//double maxProb = 0;
-			//int maxProbIndex = 0;
 			double aprioriProb = 1.0 / (double)Library.Count;
 			double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
 
-
 			for (int inspectionLbl = 0; inspectionLbl < Library.Count; inspectionLbl++) {
-				labelProbability[inspectionLbl] = 1.0 / (double)Library.Count;
-				for (int heurIdx = 0; heurIdx < heuristicCount; heurIdx++) {
-					progress.Progress++;
+				while (dontCheck.Contains(inspectionLbl)) {
+					inspectionLbl++;
+				}
+				if (inspectionLbl != Library.Count) {
 
-					double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
-					double comparisonToOtherLabels = lblComparisonResults.Sum(h => h[heurIdx]) - comparisonToThisLabel;
+					labelProbability[inspectionLbl] = 1.0 / (double)Library.Count;
+					for (int heurIdx = 0; heurIdx < heuristicCount; heurIdx++) {
+						progress.Progress++;
 
-					if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
-						heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
-						heuristicsControl.buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, inspectionLbl, heurIdx);
-						multiplicativeOffset = Library[inspectionLbl].Variances.Append(heuristicProbabilisticIndication);
-						multiplicativeOffset += aprioriProb / (double)Library[inspectionLbl].Variances.Count;
+						double comparisonToThisLabel = lblComparisonResults[inspectionLbl][heurIdx];
+						double comparisonToOtherLabels = lblComparisonResults.Sum(h => h[heurIdx]) - comparisonToThisLabel;
 
-						if (multiplicativeOffset < double.MaxValue)
-							labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+						if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
+							heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
+							heuristicsControl.buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, inspectionLbl, heurIdx);
+							multiplicativeOffset = Library[inspectionLbl].Variances.Append(heuristicProbabilisticIndication);
+							multiplicativeOffset += aprioriProb / (double)Library[inspectionLbl].Variances.Count;
 
-						if (double.IsInfinity(labelProbability[inspectionLbl]) || labelProbability[inspectionLbl] == 0)
-							heurIdx = heuristicCount;
+							if (multiplicativeOffset < double.MaxValue)
+								labelProbability[inspectionLbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+
+							if (double.IsInfinity(labelProbability[inspectionLbl]) || labelProbability[inspectionLbl] == 0)
+								heurIdx = heuristicCount;
+						}
 					}
 				}
 				if (Library[inspectionLbl].Samples.Count > 0) {
@@ -107,12 +134,91 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 
 		private static HeuristicsControlPanel heuristicsControl = new HeuristicsControlPanel();
 
-		internal object PerformWhitespaceLookup(HeuristicSet segment) {
-			//TODO: Wrapper method. Perform regular lookup with restriction that we only care about whitespace
-			//use the results to improve eliminate image content that isn't part of the letter under inspection
-			throw new NotImplementedException();
+		internal IEnumerable<RecognizedSegment> PerformWhitespaceLookup(HeuristicSet unlabledHeuristic, IProgressReporter progress = null) {
+			progress = progress ?? new EmptyProgressReporter();
+
+			int heuristicCount = unlabledHeuristic.Heuristics.Count;
+			Dictionary<string, double[]> probabilityFromEachHeuristic = new Dictionary<string,double[]>();
+			Dictionary<string, double[]> lblComparisonResults = new Dictionary<string,double[]>();
+			Dictionary<string, double> labelProbability = new Dictionary<string, double>();
+
+			int whitespaceIdx = int.MinValue,
+				allLabelsIdx = int.MinValue;
+			for(int i=0; i < Library.Count; i++){
+				if (Library[i].Label == "whitespace") {
+					whitespaceIdx = i;
+				} if(Library[i].Label == "AllLabels"){
+					allLabelsIdx = i;
+				} if (whitespaceIdx != int.MinValue && allLabelsIdx != int.MinValue) {
+					i = Library.Count;
+				}
+			}
+
+
+			var totalSampleCount = Library.Sum(rl => rl.Samples.Count);
+
+			progress.Maximum = heuristicCount * totalSampleCount + heuristicCount * Library.Count;
+
+			probabilityFromEachHeuristic["whitespace"] = new double[heuristicCount];
+			probabilityFromEachHeuristic["allLabels"] = new double[heuristicCount];
+			lblComparisonResults["whitespace"] = new double[heuristicCount];
+			lblComparisonResults["allLabels"] = new double[heuristicCount];
+
+			for (int heurIdx = 0; heurIdx < heuristicCount; heurIdx++) {
+				var current = Library[whitespaceIdx];
+				foreach (var item in current.Samples) {
+					progress.Progress++;
+					if (unlabledHeuristic.GetAtIndex(heurIdx) == item.Heuristics[heurIdx]) {
+						lblComparisonResults["whitespace"][heurIdx]++;
+					}
+				}
+				current = Library[allLabelsIdx];
+				foreach (var item in current.Samples) {
+					progress.Progress++;
+					if (unlabledHeuristic.GetAtIndex(heurIdx) == item.Heuristics[heurIdx]) {
+						lblComparisonResults["allLabels"][heurIdx]++;
+					}
+				}
+				lblComparisonResults["whitespace"][heurIdx] = lblComparisonResults["whitespace"][heurIdx] / (double)Library[whitespaceIdx].Samples.Count;
+				lblComparisonResults["allLabels"][heurIdx] = lblComparisonResults["allLabels"][heurIdx] / (double)Library[allLabelsIdx].Samples.Count;
+			}
+
+			double heuristicProbabilisticIndication;
+			double multiplicativeOffset;
+			double aprioriProb = 1.0 / (double)2;
+			double factorIncrease = (1.0 - aprioriProb) / aprioriProb;
+
+			string lbl = string.Empty; int idx = int.MinValue;
+			for (int i = 0; i < 2; i++) {
+				if (i == 0) { lbl = "whitespace"; idx = whitespaceIdx; }
+				if (i == 1) { lbl = "allLabels"; idx = allLabelsIdx; }
+				labelProbability[lbl] = 1.0 / (double)2;
+				for (int heurIdx = 0; heurIdx < heuristicCount; heurIdx++) {
+					progress.Progress++;
+
+					double comparisonToThisLabel = lblComparisonResults[lbl][heurIdx];
+					double comparisonToOtherLabels = lblComparisonResults.Sum(h => h.Value[heurIdx]) - comparisonToThisLabel;
+
+					if (comparisonToThisLabel + comparisonToOtherLabels != 0) {
+						heuristicProbabilisticIndication = comparisonToThisLabel / (comparisonToThisLabel + comparisonToOtherLabels);
+						heuristicsControl.buildHeuristicProbabilityHistorgram(heuristicProbabilisticIndication, idx, heurIdx);
+						multiplicativeOffset = Library[idx].Variances.Append(heuristicProbabilisticIndication);
+						multiplicativeOffset += aprioriProb / (double)Library[idx].Variances.Count;
+
+						if (multiplicativeOffset < double.MaxValue)
+							labelProbability[lbl] *= (factorIncrease * heuristicProbabilisticIndication + multiplicativeOffset) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
+
+						if (double.IsInfinity(labelProbability[lbl]) || labelProbability[lbl] == 0)
+							heurIdx = heuristicCount;
+					}
+				}
+				if (Library[idx].Samples.Count > 0) {
+					yield return new RecognizedSegment(unlabledHeuristic.Bounds, Library[idx].Label, labelProbability[lbl]);
+				}
+			}
 		}
 	}
+
 	class HeuristicsControlPanel {
 		private int[] probabilityHistorgram = new int[21];
 		public void buildHeuristicProbabilityHistorgram(double probability, int labelUnderInspection, int heuristicUnderInspection) {

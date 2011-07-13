@@ -58,7 +58,7 @@ namespace Prax.OcrEngine.Engine {
 
 			var results = new List<RecognizedSegment>();
 			foreach (var segment in boards.Segment()) {
-				bool whitespace = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
+				var test = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
 				var returnVal = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
 				if (returnVal.Count > 0) {
 					returnVal.First().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
@@ -67,6 +67,7 @@ namespace Prax.OcrEngine.Engine {
 				}
 			}
 			var outputString = new StreamReader(OutputRenderer.PlainText.Convert(stream, results.AsReadOnly())).ReadToEnd();
+			var test2 = outputString.Reverse();
 			Debug.Print(outputString);
 			stream.Close();
 			//TODO: Solve the backward word problem
@@ -97,8 +98,8 @@ namespace Prax.OcrEngine.Engine {
 				var letterHeuristics = boards.GetLetterHeuristics(ch1);
 				if (i < characters.Count() - 1) {
 					var ch2 = characters[i + 1];
-					var spaceHeuristics = boards.GetSpaceHeuristics(ch1, ch2);
-					//trainingData.AddHeuristics(spaceHeuristics);
+					var whitespaceHeuristics = boards.GetSpaceHeuristics(ch1, ch2);
+					trainingData.AddHeuristics(whitespaceHeuristics);
 				}
 				if (letterHeuristics != null)
 					trainingData.AddHeuristics(letterHeuristics);

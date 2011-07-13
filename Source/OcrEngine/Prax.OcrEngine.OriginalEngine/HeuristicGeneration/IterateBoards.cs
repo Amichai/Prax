@@ -8,7 +8,6 @@ using Prax.OcrEngine.Engine.AutomatedTraining;
 using Prax.OcrEngine.Engine.ImageUtilities;
 using Prax.OcrEngine.Engine.Segmentation;
 using Prax.OcrEngine.Engine.ReferenceData;
-using Prax.OcrEngine.Engine.ImageUtilities;
 
 namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 	public class IterateBoards {
