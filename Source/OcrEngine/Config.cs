@@ -42,7 +42,6 @@ namespace Prax.OcrEngine {
 
 			StubDocuments();
 
-			//StubRecognizer();
 
 			//DevelopmentStorage();
 			//AzureDocuments();
@@ -50,8 +49,12 @@ namespace Prax.OcrEngine {
 			//if (!RoleEnvironment.IsAvailable)
 			    //InMemoryAzureProcessing();	//If we're not running in Azure, start some fake workers.
 
-			OriginalProcessor();
-			StubConverters();
+			TempTrainingDataSource();
+			OriginalRecognizer();
+			OriginalConverters();
+
+			//StubRecognizer();
+			//StubConverters();
 
 #if WEB
 			//Add services used by all websites here
@@ -141,7 +144,7 @@ namespace Prax.OcrEngine {
 		private void LocalSimpleDocumentExecutor() {
 			Builder.RegisterType<Stubs.SimpleDocumentExecutor>().As<IDocumentExecutor>().SingleInstance();
 		}
-		///<summary>Registers a DocumentExecutor that performs OCR in-process.</summary>
+		///<summary>Registers a DocumentExecutor that performs OCR in-process and reports progress in the background.  Use this if progress reporting is slow.</summary>
 		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called by optional config method")]
 		private void LocalThreadedDocumentExecutor() {
 			Builder.RegisterType<ThreadedDocumentExecutor>().As<IDocumentExecutor>().SingleInstance();
@@ -180,12 +183,17 @@ namespace Prax.OcrEngine {
 		#endregion
 
 		#region Original Engine
-		private void OriginalProcessor() {
-			Builder.RegisterInstance(new Stubs.StaticDataCache(Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining")))
+		///<summary>Registers an IDataCache that reads training data from %TEMP%.</summary>
+		private void TempTrainingDataSource() {
 			//Builder.RegisterInstance(new Stubs.StaticDataCache(Environment.ExpandEnvironmentVariables(@"C:\Users\Amichai\Documents\Prax\PadOcrTraining")))
+			Builder.RegisterInstance(new Stubs.StaticDataCache(Environment.ExpandEnvironmentVariables(@"%TEMP%\PadOcrTraining")))
 				   .As<IDataCache>()
 				   .Named("TrainingData", typeof(IDataCache));
+		}
 
+		///<summary>Registers the original OCR recognizer</summary>
+		[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode", Justification = "Called by optional config method")]
+		private void OriginalRecognizer() {
 			Builder.Register(c => {
 				var cache = c.Resolve<IDataCache>();// Named<IDataCache>("TrainingData", null);
 				cache.Update();
@@ -198,6 +206,12 @@ namespace Prax.OcrEngine {
 
 			Builder.RegisterType<Engine.OriginalDocumentRecognizer>().As<IDocumentRecognizer>()
 					.InstancePerDependency();
+		}
+
+		///<summary>Registers the ResultConverters from the original recognition engine.</summary>
+		private void OriginalConverters() {
+			Builder.RegisterInstance(Engine.OutputRenderer.PlainText).As<IResultsConverter>();
+			Builder.RegisterInstance(Engine.OutputRenderer.Pdf).As<IResultsConverter>();
 		}
 		#endregion
 

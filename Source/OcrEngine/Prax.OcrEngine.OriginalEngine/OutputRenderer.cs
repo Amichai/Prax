@@ -9,18 +9,21 @@ using iTextSharp.text.pdf;
 using System.IO;
 
 namespace Prax.OcrEngine.Engine {
-	public class OutputRenderer {
-		public const int ThresholdCertainty = 500;
-		public List<RecognizedSegment> resolvedSegmentsList = new List<RecognizedSegment>();
+	public class OutputRenderer : IResultsConverter {
+		public static readonly OutputRenderer PlainText = new OutputRenderer(ResultFormat.PlainText, () => new PlainTextRenderer());
+		public static readonly OutputRenderer Pdf = new OutputRenderer(ResultFormat.Pdf, () => new PdfRenderer());
 
-		internal void Add(List<RecognizedSegment> returnVal) {
-			resolvedSegmentsList.AddRange(returnVal);
+		readonly Func<IRenderer> rendererCreator;
+		private OutputRenderer(ResultFormat format, Func<IRenderer> rendererCreator) {
+			OutputFormat = format;
+			this.rendererCreator = rendererCreator;
 		}
 
+		public const int ThresholdCertainty = 500;
 		const int newLineYDiscrepancy = 3;
 
-		private List<RecognizedSegment> orderAllResults(ReadOnlyCollection<RecognizedSegment> results) {
-			var sortedOutput = results.OrderBy(k => k.Bounds.Y).ToList();
+		static List<RecognizedSegment> CombineSegments(IEnumerable<RecognizedSegment> segments) {
+			var sortedOutput = segments.OrderBy(k => k.Bounds.Y).ToList();
 			int indiciesToAdjust = 0;
 
 			for (int i = sortedOutput.Count - 1; i >= 0; i--) {
@@ -29,19 +32,19 @@ namespace Prax.OcrEngine.Engine {
 				} else {
 					for (int j = 1; j <= indiciesToAdjust; j++) {
 						System.Drawing.Rectangle newBounds = new System.Drawing.Rectangle(sortedOutput[i + j].Bounds.X,
-																							sortedOutput[i].Bounds.Y,
-																							sortedOutput[i + j].Bounds.Width,
-																							sortedOutput[i + j].Bounds.Height);
+																						  sortedOutput[i].Bounds.Y,
+																						  sortedOutput[i + j].Bounds.Width,
+																						  sortedOutput[i + j].Bounds.Height);
 						sortedOutput[i + j] = new RecognizedSegment(newBounds, sortedOutput[i + j].Text, sortedOutput[i + j].Certainty);
 					}
 					indiciesToAdjust = 0;
 				}
 			}
 
-			sortedOutput = sortedOutput.OrderByDescending(k => k.Bounds.Width)
-										.ThenBy(k => k.Bounds.X)
-										.ThenBy(k => k.Bounds.Y).ToList();
-			return sortedOutput;
+			return sortedOutput.OrderByDescending(k => k.Bounds.Width)
+							   .ThenBy(k => k.Bounds.X)
+							   .ThenBy(k => k.Bounds.Y)
+							   .ToList();
 		}
 
 		private class lastSegmentRendered {
@@ -77,52 +80,22 @@ namespace Prax.OcrEngine.Engine {
 				YValue = seg.Bounds.Y;
 			}
 		}
-
-		private class outputObject {
-			string outputString = string.Empty;
-			Paragraph paragraph;
-			iTextSharp.text.Document doc = new iTextSharp.text.Document();
-			PdfWriter writer;
-			public outputObject() {
-				writer = PdfWriter.GetInstance(doc, new FileStream("pdfOutput.pdf", FileMode.Create));
-				string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
-				BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-				Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
-				paragraph = new Paragraph(string.Empty, arabicFont);
-				paragraph.Alignment = Element.ALIGN_RIGHT;
-				doc.Open();
-			}
-
-			public void AddOutput(string outputToAdd) {
-				paragraph.Add(new string(outputToAdd.Reverse().ToArray()));
-				outputString += new string(outputToAdd.Reverse().ToArray());
-			}
-
-			public string PrintStoredOutput() {
-				if (!paragraph.IsEmpty()) {
-					doc.Add(paragraph);
-					doc.Close();
-					outputString = new string(outputString.Reverse().ToArray());
-					writer.Close();
-					File.WriteAllText("TxtToRender.txt", outputString);
-					return outputString;
-				} else return null;
-			}
-		}
-
-		private int columnStart = 0; //int.MaxValue; 
+		
 		//TODO: This won't be necessary when we enforce precise location
-
 		private enum writerPosition { firstSeg, newLine, sameLine };
 
-		public string Render() {
-			outputObject resultsRenderer = new outputObject();
-			List<RecognizedSegment> sortedOutput = orderAllResults(resolvedSegmentsList.AsReadOnly());
+		public ResultFormat OutputFormat { get; private set; }
+
+		public Stream Convert(Stream input, ReadOnlyCollection<RecognizedSegment> results) {
+			List<RecognizedSegment> sortedOutput = CombineSegments(results);
+
+			var renderer = rendererCreator();
 
 			const int overlapThreshold = 1;
 			const int spaceWidth = 7; //The amount of pixels in a space
 
 			lastSegmentRendered lastSeg = new lastSegmentRendered();
+			const int columnStart = 0; //int.MaxValue; 
 			lastSeg.endingXValue = columnStart;
 			lastSeg.startingXValue = columnStart;
 
@@ -132,7 +105,7 @@ namespace Prax.OcrEngine.Engine {
 				//Test for new line
 				if (lastSeg.TestForNewLine(sortedOutput[i], position)) {
 					//New line determined
-					resultsRenderer.AddOutput(Environment.NewLine);
+					renderer.AddText(Environment.NewLine);
 					lastSeg.AdjustLastSegValues(sortedOutput[i]);
 					position = writerPosition.newLine;
 				} else {
@@ -145,7 +118,7 @@ namespace Prax.OcrEngine.Engine {
 						//Add spaces
 						int numberOfSpaces = (sortedOutput[i].Bounds.X - lastSeg.endingXValue) / spaceWidth;
 						for (int j = 0; j < numberOfSpaces; j++) {
-							resultsRenderer.AddOutput(" ");
+							renderer.AddText(" ");
 						}
 						string segToResolve = sortedOutput[i].Text;
 						string segToRender = string.Empty;
@@ -167,13 +140,13 @@ namespace Prax.OcrEngine.Engine {
 								}
 							}
 							lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(segToRender, sortedOutput[i].Bounds.Right));
-							resultsRenderer.AddOutput(segToRender);
+							renderer.AddText(segToRender);
 							lastSeg.AdjustLastSegValues(sortedOutput[i]);
 						} else {
 							//No overlap. Clear list of previous rendrings
 							lastSeg.ResetListOfPreviousRenderings();
 							lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(sortedOutput[i].Text, sortedOutput[i].Bounds.Right));
-							resultsRenderer.AddOutput(sortedOutput[i].Text);
+							renderer.AddText(sortedOutput[i].Text);
 							lastSeg.AdjustLastSegValues(sortedOutput[i]);
 						}
 					}
@@ -181,13 +154,63 @@ namespace Prax.OcrEngine.Engine {
 						//New line. Render without checking for spaces
 						lastSeg.ResetListOfPreviousRenderings();
 						lastSeg.renderingsAndEndIdx.Add(new Tuple<string, int>(sortedOutput[i].Text, sortedOutput[i].Bounds.Right));
-						resultsRenderer.AddOutput(sortedOutput[i].Text);
+						renderer.AddText(sortedOutput[i].Text);
 						lastSeg.AdjustLastSegValues(sortedOutput[i]);
 						position = writerPosition.sameLine;
 					}
 				}
 			}
-			return resultsRenderer.PrintStoredOutput();
+			return renderer.GetStream();
+		}
+
+		interface IRenderer {
+			void AddText(string text);
+			Stream GetStream();
+		}
+		class PlainTextRenderer : IRenderer {
+			StreamWriter writer = new StreamWriter(new MemoryStream());
+
+			public void AddText(string text) {
+				writer.Write(text);
+			}
+
+			public Stream GetStream() {
+				writer.Flush();
+				writer.BaseStream.Position = 0;
+				return writer.BaseStream;
+			}
+		}
+		class PdfRenderer : IRenderer {
+			static readonly string fontpath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "times.ttf");
+			readonly MemoryStream stream = new MemoryStream();
+
+			Paragraph paragraph;
+			iTextSharp.text.Document doc = new iTextSharp.text.Document();
+			PdfWriter writer;
+
+			public PdfRenderer() {
+				writer = PdfWriter.GetInstance(doc, stream);
+				writer.CloseStream = false;
+				BaseFont basefont = BaseFont.CreateFont(fontpath, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+				Font arabicFont = new Font(basefont, 10f, Font.NORMAL);
+				paragraph = new Paragraph(string.Empty, arabicFont);
+				paragraph.Alignment = Element.ALIGN_RIGHT;
+				doc.Open();
+			}
+
+			public void AddText(string text) {
+				paragraph.Add(new string(text.Reverse().ToArray()));
+			}
+
+			public Stream GetStream() {
+				if (!paragraph.IsEmpty())
+					doc.Add(paragraph);
+
+				doc.Close();
+				writer.Close();
+				stream.Position = 0;
+				return stream;
+			}
 		}
 	}
 }
