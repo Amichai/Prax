@@ -40,9 +40,9 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			OutputLog.Add(new Tuple<RecognizedSegment, Bitmap>(seg, b));
 		}
 
-		public static List<Tuple<Bitmap, char, Rectangle>> TrainingLog = new List<Tuple<Bitmap, char, Rectangle>>();
-		public static void Log(this Bitmap image, char segment, Rectangle rect) {
-			TrainingLog.Add(new Tuple<Bitmap, char, Rectangle>(image, segment, rect));
+		public static List<Tuple<Bitmap, string, Rectangle>> TrainingLog = new List<Tuple<Bitmap, string, Rectangle>>();
+		public static void Log(this Bitmap image, string segment, Rectangle rect) {
+			TrainingLog.Add(new Tuple<Bitmap, string, Rectangle>(image, segment, rect));
 		}
 
 		/// <summary>Extension method converts a bitmap to a double array</summary>
@@ -50,6 +50,7 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 		/// <param name="extension">Image File extension</param>
 		/// <param name="whitespaceBuffer">Number of pixels of whitespace to add on the right and left of the image</param>
 		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension, int whitespaceBuffer) {
+			whitespaceBuffer++;
 			int[][] uploadedDocument;
 			int width = fileBitmap.Width + whitespaceBuffer*2;
 			int height = fileBitmap.Height;

@@ -43,7 +43,7 @@ namespace Prax.OcrEngine.Engine.DevUI {
 
 			var boards = imageData.DefineIteratedBoards();
 			var chars = words.SelectMany(w => w.Characters);
-			Segments = chars.Select(boards.GetHeuristics).ToList();
+			Segments = chars.Select(boards.GetLetterHeuristics).ToList();
 		}
 
 		///<summary>Occurs when a property value is changed.</summary>

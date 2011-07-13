@@ -92,7 +92,7 @@ namespace Prax.OcrEngine.Engine {
 			var renderer = rendererCreator();
 
 			const int overlapThreshold = 1;
-			const int spaceWidth = 7; //The amount of pixels in a space
+			const int spaceWidth = 4; //The amount of pixels in a space
 
 			lastSegmentRendered lastSeg = new lastSegmentRendered();
 			const int columnStart = 0; //int.MaxValue; 

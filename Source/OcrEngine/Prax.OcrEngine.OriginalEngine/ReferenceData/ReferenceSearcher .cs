@@ -106,6 +106,12 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		}
 
 		private static HeuristicsControlPanel heuristicsControl = new HeuristicsControlPanel();
+
+		internal object PerformWhitespaceLookup(HeuristicSet segment) {
+			//TODO: Wrapper method. Perform regular lookup with restriction that we only care about whitespace
+			//use the results to improve eliminate image content that isn't part of the letter under inspection
+			throw new NotImplementedException();
+		}
 	}
 	class HeuristicsControlPanel {
 		private int[] probabilityHistorgram = new int[21];

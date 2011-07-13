@@ -17,17 +17,28 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 		public List<MatrixBoard> Boards = new List<MatrixBoard>();
 		public const int numberOfIterations = 8;
 
-		public HeuristicSet GetHeuristics(BoundedCharacter ch) {
+		public HeuristicSet GetLetterHeuristics(BoundedCharacter ch) {
 			var rect = ch.Bounds.ToGdi();
 			int midpoint = rect.X + (int)Math.Round(rect.Width / 2d);
 			Rectangle smallerRect = new Rectangle(midpoint - Segmentator.PointerOffset, 0, Segmentator.WidthOfCanvas, Segmentator.HeightOfCanvas);
 			HeuristicSet heursitics = new HeuristicSet { Bounds = rect, Label = ch.Character.ToString() };
 			heursitics.GoThroughBoards(Boards, smallerRect);
 			Bitmap b = Boards.First().Matrix.ExtractRectangularContentArea(smallerRect).ConvertDoubleArrayToBitmap(Color.White);
-			b.Log(ch.Character, smallerRect);
+			b.Log(ch.Character.ToString(), smallerRect);
 			return heursitics;
 		}
 
+		public HeuristicSet GetSpaceHeuristics(BoundedCharacter ch1, BoundedCharacter ch2) {
+			var rect1 = ch1.Bounds.ToGdi();
+			var rect2 = ch2.Bounds.ToGdi();
+			int midpoint = rect1.Right + (rect2.X - rect1.Right) / 2;
+			Rectangle smallerRect = new Rectangle(midpoint - Segmentator.PointerOffset, 0, Segmentator.WidthOfCanvas, Segmentator.HeightOfCanvas);
+			HeuristicSet heursitics = new HeuristicSet { Bounds = smallerRect, Label = "whitespace" };
+			heursitics.GoThroughBoards(Boards, smallerRect);
+			Bitmap b = Boards.First().Matrix.ExtractRectangularContentArea(smallerRect).ConvertDoubleArrayToBitmap(Color.White);
+			b.Log("whitespace", smallerRect);
+			return heursitics;
+		}
 		private HeuristicSet ExtractHeursitics(int midpoint) {
 			HeuristicSet heuristics = new HeuristicSet();
 			int idx = midpoint - 6;
@@ -35,6 +46,7 @@ namespace Prax.OcrEngine.Engine.HeuristicGeneration {
 			heuristics.GoThroughBoards(Boards, new Rectangle(idx, 0, Segmentation.Segmentator.WidthOfCanvas, width));
 			return heuristics;
 		}
+
 	}
 
 
