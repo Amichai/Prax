@@ -136,11 +136,11 @@ var scanPane = {
 				case "Scanning":
 					self.progress.progressbar("option", "value", doc.progress);
 
-					setTimeout(function () { self.update(); }, 5000);
+					setTimeout(function () { self.update(); }, 3000);
 					break;
 
 				case "Error":
-					alert("An error occurred.\r\nPlease try again later.");
+					alert($.trim("An error occurred.\r\nPlease try again later.\r\n\r\n" + doc.message));
 					break;
 
 				case "Complete":
