@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Collections.Generic;
 using Prax.OcrEngine.Services;
+using SLaks.Progression.Display;
 
 namespace Prax.OcrEngine.Engine {
 	class ExposedFunctionality {
@@ -44,40 +45,39 @@ namespace Prax.OcrEngine.Engine {
 			//string renderText = "أد";
 			//string renderText = "ﺀﺁﺂﺃﺄﺅﺆﺇﺈﺉﺊﺋﺌﺍﺎﺏﺐﺑﺒﺓﺔﺕﺖﺗﺘﺙﺚﺛﺜﺝﺞﺟﺠﺡﺢﺣﺤﺥﺦﺧﺨﺩﺪﺫﺬﺭﺮﺯﺰﺱﺲﺳﺴﺵﺶﺷﺸﺹﺺﺻﺼﺽﺾﺿﻀﻁﻂﻃﻄﻅﻆﻇﻈﻉﻊﻋﻌﻍﻎﻏﻐﻑﻒﻓﻔﻕﻖﻗﻘﻙﻚﻛﻜﻝﻞﻟﻠﻡﻢﻣﻤﻥﻦﻧﻨﻩﻪﻫﻬﻭﻮﻯﻰﻱﻲﻳﻴﻵﻶﻷﻸﻹﻺﻻﻼ";
 			//string renderText = "ﺬﻤﺈﺗﻹﻕﻐﻘﻝﺺﻔﺒﺭﻧﻂﺓﻫﻲﺸﺪﺊﻭﻜﺶﻆﻸﻒﺆﺄﻤﻴﺣﻄﻗﻖﺹﺶﺅﺆﺔﻣﻕﻨﺝﻓﻂﺭﺡﺀﻷﺣﺜﻷﻞﺶﺼﺈﻎﻍﺁﺂﻊﻓﻶﻃﺰﻊﻒﺑﺈﻙﻦﻬﺣﻃﺲﺄﺿﻠﺄﻊﺰﺆﺊﻁﻗﺨﻣﺡﺚﺱﻤﺴﺄﺑﺙﺂﻮﻖﺢﻴﻘﺐﻴﺞﺹﺬﻔﺛﺄﺷﻅﻫﻈﺳﻎﻃﻉﺵﻨﺇﻤﺱﻴﻔﻱﺲﻨﺑﺩﺯﺒﻥﺽﺍﻯﺠﺏﻨﺇﺫﻑﻈﺜﻟﻨﻶﻨﻎﻀﻒﺵﺹﻫﺚﺏﺧﺙﺟﺪﺇﻁﻂﻮﻑﺤﻝﺭﺻﻁﺮﺴﻝﺭﺽﺳﺛﺔﺔﻩﻸﻆﺙﻎﻓﻶﻖﻷﺣﻺﻇﺇﻬﺾﺀﻦﺎﻖﻈﺻﺋﻈﺭﺌﺑﺞﻕﺋﺮﻤﻱﺒﺅﺳﺮﺽﺨﻱﺛﻗﻊﻣﺊﺽﻶﺧﻄﺞﺭﻔﺤﻁﻉﻕﻝﺯﺘﺌﺼﺴﺡﻊﻈﺼﺉﺵﺁﺹﺏﺿﺾﺚﺻﻭﻭﺥﺽﻬﺓﻧﻗﺷﻚﻗﺿﺯﻅﺬﻒﻼﺥﺛﺴﻣﺶﻼﺚﻋﺳﻁﺥﺊﺎﻫﺕﺊﺆﻙﻥﺸﻯﺨﻶﻒﻚﻧﻭﻮﻹﻗ";
+
 			var output = new DrawingGroup();
 			var format = new BasicTextParagraphProperties("Times New Roman", 14, FlowDirection.LeftToRight);
 			var words = BoundedWord.GetWords(renderText, Measurer.MeasureLines(renderText, 200, format, output)).ToList();
-			var stream = output.ToBitmap().CreateStream();
 
-			var imageData = new ImageData(stream);
-			stream.Position = 0;
+			//using (var stream = output.ToBitmap().CreateStream()) {
+			using (var stream = File.OpenRead(@"C:\Users\SSL\Temp\Arabic.png")) {
+				//using (var targetStream = File.Create(@"C:\Users\SSL\Temp\Arabic-Console.png"))
+				//    stream.CopyTo(targetStream);
 
-			var boards = imageData.DefineIteratedBoards();
-			var trainingData = new MutableReferenceSet();
-			trainingData.ReadFrom(trainingFolder);
-			var searcher = new ReferenceSearcher(trainingData);
+				stream.Position = 0;
 
-			var results = new List<RecognizedSegment>();
-			foreach (var segment in boards.Segment()) {
+				var imageData = new ImageData(stream);
+				stream.Position = 0;
+
+				//System.Drawing.Bitmap b = boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
+				//whitespaceResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
+
+				//characterResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
+				//Debug.Print(characterResults.Last().Text + " " + characterResults.Last().Certainty.ToString());
+
+				var trainingData = new MutableReferenceSet();
+				trainingData.ReadFrom(trainingFolder);
+				var searcher = new ReferenceSearcher(trainingData);
+				var recognizer = new OriginalDocumentRecognizer(searcher);
+
+
+				var reporter = new ConsoleProgressReporter(false);
+				var results = recognizer.Recognize(stream, reporter).ToList().AsReadOnly();
+
+				var outputString = new StreamReader(OutputRenderer.PlainText.Convert(stream, results)).ReadToEnd();
+				Debug.Print(outputString);
 			}
-			foreach (var segment in boards.Segment()) {
-				var whitespaceResults = searcher.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
-				if (whitespaceResults.LastOrDefault().Text == "AllLabels") {
-					//whitespaceResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
-				
-					System.Drawing.Bitmap b = boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White);
-					var characterResults = searcher.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
-					//var characterResults = searcher.PerformLookup(segment).ToList();
-					if (characterResults.Count > 0) {
-						characterResults.Last().Log(boards.Boards.First().Matrix.ExtractRectangularContentArea(segment.Bounds).ConvertDoubleArrayToBitmap(System.Drawing.Color.White));
-						results.Add(characterResults.Last());
-						Debug.Print(characterResults.Last().Text + " " + characterResults.Last().Certainty.ToString());
-					}
-				}
-			}
-			var outputString = new StreamReader(OutputRenderer.PlainText.Convert(stream, results.AsReadOnly())).ReadToEnd();
-			Debug.Print(outputString);
-			stream.Close();
 		}
 		//TODO: Test for white space first
 		public void TrainAlgorithm() {

@@ -17,29 +17,23 @@ namespace Prax.OcrEngine.Engine {
 		public OriginalDocumentRecognizer(IReferenceSearcher trainingData) { this.trainingData = trainingData; }
 
 		public IEnumerable<RecognizedSegment> Recognize(Stream document, IProgressReporter progress) {
-			//TODO: Report progress
-
 			var imageData = new ImageData(document);
 			var boards = imageData.DefineIteratedBoards();
 
-			//var heuristics = boards.Segment().ToList();
+			var heuristics = boards.Segment().ToList();
 
-			//progress.Maximum = heuristics.Count * 1000;
+			progress.Maximum = heuristics.Count * 1000;
 
-			foreach (var segment in boards.Segment()) {
-				
-				var whitespaceResults = trainingData.PerformWhitespaceLookup(segment).Where(r => r.Certainty > 10).ToList();
-				if (whitespaceResults.LastOrDefault().Text == "AllLabels") {
-					var characterResults = trainingData.PerformLookup(segment).Where(r => r.Certainty > 10).ToList();
-					if (characterResults.Count > 0) {
-						yield return characterResults.Last();
-					}
-				}
+			foreach (var segment in heuristics) {
+				var whitespaceResults = trainingData.PerformWhitespaceLookup(segment, progress.ScaledChildOperation(500)).LastOrDefault(r => r.Certainty > 10);
+
+				if (whitespaceResults != null && whitespaceResults.Text == "AllLabels") {
+					var match = trainingData.PerformLookup(segment, progress.ScaledChildOperation(500)).LastOrDefault(r => r.Certainty > 10);
+					if (match != null)
+						yield return match;
+				} else
+					progress.Progress += 500;	//Add the progress that would have been used by the character recognition
 			}
-
-			//var temp = heuristics.Select(h => trainingData.PerformLookup(h, progress.ScaledChildOperation(1000)).FirstOrDefault())
-			//                 .Where(rs => rs != null);
-			//return temp;
 		}
 	}
 }
