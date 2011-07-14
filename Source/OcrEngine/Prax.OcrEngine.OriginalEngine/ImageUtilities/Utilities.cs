@@ -74,8 +74,8 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 					uploadedDocument[x][y] = 255;
 				}
 			}
-			for (int x = whitespaceBuffer; x < fileBitmap.Width; x++) {
-				for (int y = whitespaceBuffer; y < fileBitmap.Height; y++) {
+			for (int x = whitespaceBuffer; x < fileBitmap.Width + whitespaceBuffer; x++) {
+				for (int y = whitespaceBuffer; y < fileBitmap.Height + whitespaceBuffer; y++) {
 					var pixelColor = fileBitmap.GetPixel(x - whitespaceBuffer, y - whitespaceBuffer);
 					switch (extension) {
 						case ".bmp":
