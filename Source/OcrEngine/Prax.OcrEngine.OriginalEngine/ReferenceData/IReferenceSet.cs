@@ -13,6 +13,9 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 		///<summary>Gets an existing label by index.</summary>
 		ReferenceLabel this[int index] { get; }
 
+		///<summary>Gets the index of an existing label.</summary>
+		int IndexOf(ReferenceLabel label);
+
 		//It looks like we don't need string indexing, so this
 		//is essentially a ReadOnlyCollection.  However, we do
 		//need string indexing to add samples, so the concrete
