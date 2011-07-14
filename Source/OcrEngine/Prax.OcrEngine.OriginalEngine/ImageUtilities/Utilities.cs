@@ -52,30 +52,37 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension, int whitespaceBuffer) {
 			whitespaceBuffer++;
 			int[][] uploadedDocument;
-			int width = fileBitmap.Width + whitespaceBuffer*2;
-			int height = fileBitmap.Height;
-			uploadedDocument = new int[width ][];
+			int width = fileBitmap.Width + whitespaceBuffer * 2;
+			int height = fileBitmap.Height + whitespaceBuffer * 2;
+			uploadedDocument = new int[width][];
 			for (int i = 0; i < width; i++)
 				uploadedDocument[i] = new int[height];
 
-			Color pixelColor;
-			for (int j = 0; j < height; j++) {
-				for (int i = 0; i < whitespaceBuffer; i++) {
-					uploadedDocument[i][j] = 255;
+			for (int y = 0; y < height; y++) {
+				for (int x = 0; x < whitespaceBuffer; x++) {
+					uploadedDocument[x][y] = 255;
 				}
-				for (int i = width - whitespaceBuffer; i < width; i++) {
-					uploadedDocument[i][j] = 255;
+				for (int x = fileBitmap.Width; x < width; x++) {
+					uploadedDocument[x][y] = 255;
 				}
 			}
-			for (int i = whitespaceBuffer; i < width - whitespaceBuffer; i++) {
-				for (int j = 0; j < height; j++) {
+			for (int x = 0; x < width; x++) {
+				for (int y = 0; y < whitespaceBuffer; y++) {
+					uploadedDocument[x][y] = 255;
+				}
+				for (int y = fileBitmap.Height; y < height; y++) {
+					uploadedDocument[x][y] = 255;
+				}
+			}
+			for (int x = whitespaceBuffer; x < fileBitmap.Width; x++) {
+				for (int y = whitespaceBuffer; y < fileBitmap.Height; y++) {
+					var pixelColor = fileBitmap.GetPixel(x - whitespaceBuffer, y - whitespaceBuffer);
 					switch (extension) {
 						case ".bmp":
-							pixelColor = fileBitmap.GetPixel(i - whitespaceBuffer, j);
-							uploadedDocument[i][j] = (int)(pixelColor.R * 0.3 + pixelColor.G * 0.59 + pixelColor.B * 0.11);
+							uploadedDocument[x][y] = (int)(pixelColor.R * 0.3 + pixelColor.G * 0.59 + pixelColor.B * 0.11);
 							break;
 						case ".png":
-							uploadedDocument[i][j] = (255 - (int)fileBitmap.GetPixel(i - whitespaceBuffer, j).A);
+							uploadedDocument[x][y] = (255 - (int)pixelColor.A);
 							break;
 					}
 				}
@@ -83,9 +90,6 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 			return uploadedDocument;
 		}
 
-		public static int[][] BitmapToDoubleArray(this Bitmap fileBitmap, string extension) {
-			return fileBitmap.BitmapToDoubleArray(extension, 0);
-		}
 		public static void DrawBounds(this System.Drawing.Bitmap bitmap, Rectangle r) {
 			Graphics g = Graphics.FromImage(bitmap);
 			g.DrawRectangle(new System.Drawing.Pen(System.Drawing.Color.Black), r);
