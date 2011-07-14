@@ -62,7 +62,7 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 				for (int x = 0; x < whitespaceBuffer; x++) {
 					uploadedDocument[x][y] = 255;
 				}
-				for (int x = fileBitmap.Width; x < width; x++) {
+				for (int x = fileBitmap.Width + whitespaceBuffer; x < width; x++) {
 					uploadedDocument[x][y] = 255;
 				}
 			}
@@ -70,7 +70,7 @@ namespace Prax.OcrEngine.Engine.ImageUtilities {
 				for (int y = 0; y < whitespaceBuffer; y++) {
 					uploadedDocument[x][y] = 255;
 				}
-				for (int y = fileBitmap.Height; y < height; y++) {
+				for (int y = fileBitmap.Height + whitespaceBuffer; y < height; y++) {
 					uploadedDocument[x][y] = 255;
 				}
 			}

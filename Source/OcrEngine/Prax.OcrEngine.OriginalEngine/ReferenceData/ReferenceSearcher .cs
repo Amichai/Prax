@@ -204,8 +204,10 @@ namespace Prax.OcrEngine.Engine.ReferenceData {
 						if (multiplicativeOffset < double.MaxValue)
 							labelProbability[label] *= (factorIncrease * (heuristicProbabilisticIndication + multiplicativeOffset)) / (1 - heuristicProbabilisticIndication + multiplicativeOffset);
 
-						if (double.IsInfinity(labelProbability[label]) || labelProbability[label] == 0)
-							heurIdx = heuristicCount;
+						if (double.IsInfinity(labelProbability[label]) || labelProbability[label] == 0) {
+							progress.Progress += heuristicCount - heurIdx - 1;
+							break;
+						}
 					}
 				}
 				if (label.Samples.Count > 0)
