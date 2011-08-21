@@ -195,6 +195,9 @@ TextWizard.prototype = {
 					self.lastSourceText = text;
 					self.targetBox.text(result)
 
+					self.owner.html = self.targetBox.html();
+					self.owner.text = result;
+
 					if (text === $.trim(self.sourceBox.val()))
 						self.markTranslated();
 					else //If the text changed since we sent the call, we're still dirty
@@ -207,50 +210,54 @@ TextWizard.prototype = {
 			this.owner.next.button("option", "disabled", false);
 		}
 	},
-	formatStep: {
-		owner: null,
-		textBox: $(),
-		fontSizes: [10, 12, 14, 16, 20, 24, 28],
-		fontUnit: "px",
+	//TODO: Uncomment for formatting
+	//formatStep: {
+	//	owner: null,
+	//	textBox: $(),
+	//	fontSizes: [10, 12, 14, 16, 20, 24, 28],
+	//	fontUnit: "px",
 
-		setUp: function (parent) {
-			this.owner = parent;
-			var self = this;
+	//	setUp: function (parent) {
+	//		this.owner = parent;
+	//		var self = this;
 
-			var sizesString = this.fontSizes.join(this.fontUnit + ",") + this.fontUnit;
+	//		var sizesString = this.fontSizes.join(this.fontUnit + ",") + this.fontUnit;
 
-			this.textBox = $('#formatBox');
-			this.textBox.tinymce({
-				script_url: basePath + 'Scripts/tiny_mce/tiny_mce_src.js',
-				theme: "advanced",
-				directionality: parent.translationStep.targetBox.css('direction'),
+	//		this.textBox = $('#formatBox');
+	//		this.textBox.tinymce({
+	//			script_url: basePath + 'Scripts/tiny_mce/tiny_mce_src.js',
+	//			theme: "advanced",
+	//			directionality: parent.translationStep.targetBox.css('direction'),
 
-				width: '100%',
-				height: '100%',
+	//			width: '100%',
+	//			height: '100%',
 
-				//Removed sup,sub - WPF can't render them in Arabic
-				theme_advanced_buttons1: "bold,italic,underline,separator,fontsizeselect,separator,forecolor,backcolor",
-				theme_advanced_buttons2: "",
-				theme_advanced_buttons3: "",
-				theme_advanced_font_sizes: sizesString,
-				font_size_style_values: sizesString
-			});
-			this.textBox.addClass("OcrFont");
-		},
-		setText: function (text) {
-			this.textBox.html(
-				$('<span></span>', { text: text, css: { fontSize: this.fontSizes[2] + this.fontUnit} }).wrap('<p></p>').parent().html()
-			);
-		},
-		onEnter: function (isBack) {
-			//Work around Firefox layout bug
-			var iframe = $('#formatBox_ifr');
-			iframe.height(iframe.parent().height());
+	//			//Removed sup,sub - WPF can't render them in Arabic
+	//			theme_advanced_buttons1: "bold,italic,underline,separator,fontsizeselect,separator,forecolor,backcolor",
+	//			theme_advanced_buttons2: "",
+	//			theme_advanced_buttons3: "",
+	//			theme_advanced_font_sizes: sizesString,
+	//			font_size_style_values: sizesString
+	//		});
+	//		this.textBox.addClass("OcrFont");
+	//		this.element.hide();
+	//	},
+	//	setText: function (text) {
+	//		this.textBox.html(
+	//			$('<span></span>', { text: text, css: { fontSize: this.fontSizes[2] + this.fontUnit} }).wrap('<p></p>').parent().html()
+	//		);
+	//	},
+	//	onEnter: function (isBack) {
+	//		//Work around Firefox layout bug
+	//		var iframe = $('#formatBox_ifr');
+	//		iframe.height(iframe.parent().height());
 
-			if (!isBack)
-				this.setText(this.owner.translationStep.targetBox.text());
-		}
-	},
+	//		if (!isBack)
+	//			this.setText(this.owner.translationStep.targetBox.text());
+
+	//		this.owner.setStep(this.index + (isBack ? -1 : +1));
+	//	}
+	//},
 	finalStep: {
 		owner: null,
 		loadingPanel: $(),
@@ -281,9 +288,10 @@ TextWizard.prototype = {
 			this.imagePanel.hide();
 			this.loadingPanel.show();
 
-			this.owner.html = this.owner.formatStep.textBox.html();
-			this.owner.text = this.owner.formatStep.textBox.text();
-
+			if (this.owner.formatStep) {
+				this.owner.html = this.owner.formatStep.textBox.html();
+				this.owner.text = this.owner.formatStep.textBox.text();
+			}
 			var self = this;
 			$.post(basePath + "Documents/CreateFromHtml", { html: this.owner.html }, function (imageId) {
 				self.owner.imageId = imageId;

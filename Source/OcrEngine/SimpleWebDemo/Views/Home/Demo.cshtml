@@ -231,6 +231,7 @@
         <div id="translatedText" class="ui-wizard-content ui-helper-reset ui-state-default ui-corner-all OcrFont">
             Translation will appear here</div>
     </section>
+    @* TODO: Uncomment for formatting
     <section class="step" id="formatStep">
         <div class="Instructions ui-corner-all">
             <h2>
@@ -238,7 +239,7 @@
             Add formatting to the translated text. </div>
         <div id="formatContainer">
             <textarea id="formatBox"></textarea></div>
-    </section>
+    </section>*@
     <section class="step" id="finalStep">
         <div id="loadingPanel">
             <div class="Instructions ui-corner-all">
@@ -268,7 +269,8 @@
 
     <script src="@Href("~/Scripts/jquery.filedrop.js")" type="text/javascript"></script>
 
-    <script src="@Href("~/Scripts/tiny_mce/jquery.tinymce.js")" type="text/javascript"></script>
+    @* TODO: Uncomment for formatting
+    <script src="@Href("~/Scripts/tiny_mce/jquery.tinymce.js")" type="text/javascript"></script>*@
 
     <script src="@Href("~/Content/Javascript/TextWizard.js")" type="text/javascript"></script>
 
