@@ -90,6 +90,7 @@
     <Compile Include="HtmlToXaml\HtmlToXamlConverter.cs" />
     <Compile Include="ImageRenderer.cs" />
     <Compile Include="LocalConfig.cs" />
+    <Compile Include="MeasuredTextRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
